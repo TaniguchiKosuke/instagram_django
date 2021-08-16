@@ -29,7 +29,12 @@
           </nav>
           {% block search %}
           {% endblock search %}
-          <a class="btn btn-outline-primary " style="margin-left: 12px;" href="{% url 'users:login' %}">ログイン</a>
+
+          {% if user.is_authenticated %}
+          <a class="btn btn-outline-primary " style="margin-left: 12px;" href="{% url 'users:logout' %}">ログアウト</a>
+          {% else %}
+            <a class="btn btn-outline-primary " style="margin-left: 12px;" href="{% url 'users:login' %}">ログイン</a>
+          {% endif %}
         </div>
       </div>
     </header>

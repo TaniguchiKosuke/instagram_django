@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
-# from django.contrib.auth.models import User
 from .models import User
 from django.contrib.auth import login, authenticate
 from django.views.generic import CreateView, View
 from .forms import LoginForm, CreateUserForm
-from django.urls import reverse_lazy, reverse
+from django.contrib.auth import logout
+from django.urls import reverse
 
 
 class CreateUser(CreateView):
@@ -39,3 +39,8 @@ class UserLogin(View):
     def get(self, request, *args, **kwargs):
         form = LoginForm(request.POST)
         return render(request, 'login.html', {'form':form})
+
+
+def user_logout(request):
+    logout(request)
+    return redirect('instagram:home')

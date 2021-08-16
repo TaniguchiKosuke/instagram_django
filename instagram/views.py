@@ -9,7 +9,7 @@ from .models import Posts
 from .forms import PostForm
 
 
-class HomeView(LoginRequiredMixin, ListView):
+class HomeView(ListView):
     template_name = 'home.html'
     queryset = Posts
 
