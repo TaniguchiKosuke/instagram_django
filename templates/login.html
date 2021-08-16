@@ -9,16 +9,16 @@
     <p>投稿、コメント、いいねするにはログインが必要です</p>
     <dl>
       {% csrf_token %}
-      <h3>メールアドレス</h3>
+      <h4>メールアドレス</h4>
       {{ form.username }}
       {{ form.username.errors }}
-      <h3>パスワード</h3>
+      <h4>パスワード</h4>
       {{ form.password }}
       {{ form.password.errors }}
     </dl>
-    <button type="submit">ログイン</button>
+    <button class="btn btn-primary" type="submit">ログイン</button>
   <p class="login-to-signup">
-    <a href="">新規登録はこちら</a>
+    <a href="{% url 'users:signup' %}">新規登録はこちら</a>
   </p>
 </form>
 {% endblock content %}
