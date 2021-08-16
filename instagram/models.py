@@ -13,6 +13,7 @@ class Posts(models.Model):
     tag = models.CharField(max_length=100, null=True, blank=True)
     post_date = models.DateTimeField(default=timezone.now(), null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    like_count = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = 'Post'
