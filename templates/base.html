@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Jekyll v3.8.5">
+    <title>Instagram Clone</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.2/examples/album/">
+
+    <!-- Bootstrap core CSS -->
+    <link href="/docs/4.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+    <style>
+
+      html {
+        font-size: 14px;
+      }
+      @media (min-width: 768px) {
+        html {
+          font-size: 16px;
+        }
+      }
+      
+      .container {
+        max-width: 960px;
+      }
+
+      .jumbotron {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+        margin-bottom: 0;
+        background-color: #fff;
+      }
+      
+      .jumbotron p:last-child {
+        margin-bottom: 0;
+      }
+      
+      .jumbotron-heading {
+        font-weight: 300;
+      }
+      
+      .jumbotron .container {
+        max-width: 40rem;
+      }
+      
+      footer {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+      }
+      
+      footer p {
+        margin-bottom: .25rem;
+      }
+
+      .header {
+        z-index: 1;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+
+      .form-signin {
+        margin-top: 132px;
+      }
+
+      .title-of-app {
+        text-decoration: none;
+        color: black;
+      }
+      
+      .title-of-app:hover {
+        color: black;
+      }
+
+      .top-image-of-user {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+      }
+
+      @media (max-width: 768px) {
+        .row {
+          margin-top: 120px;
+        }
+
+      }
+
+      .post-username {
+        font-weight: lighter;
+        text-align: center;
+      }
+
+      .post-username-a {
+        text-decoration: none;
+        color: black;
+      }
+
+      .post-username-a:hover {
+        text-decoration: none;
+        color: black;
+      }
+
+      .see-more {
+        text-decoration: none;
+        color: #666;
+        line-height: 32px;
+        margin-left: 8px;
+      }
+
+      .see-more:hover{
+        color: #666;
+        text-decoration: underline;
+      }
+
+      .see-post-image {
+        width: 400px;
+        height: 400px;
+      }
+
+      .see-post-content {
+        font-size: 20px;
+        font-weight: lighter;
+        margin-top: 24px;
+      }
+      
+      .border-under-post {
+        border-bottom: solid 1px #888;
+        padding-bottom: 24px;
+      }
+
+      .post-comment {
+        border-bottom: solid 1px #888;
+        padding-bottom: 24px;
+        padding-top: 24px;
+      }
+
+      .comment-author {
+        color: #666;
+        text-decoration: none;
+      }
+
+      .comment-author:hover {
+        color: #666;
+        text-decoration: none;
+      }
+
+      .see-post-author {
+        text-decoration: none;
+        color: #555;
+      }
+
+      .see-post-author:hover {
+        text-decoration: none;
+        color: #555;
+      }
+
+      .page-header {
+        color: #555;
+        font-weight: lighter;
+      }
+
+      .page-btn {
+        width: 100px;
+      }
+
+      .following {
+        margin: 12px;
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        color: black;
+      }
+
+      .following:hover {
+        text-decoration: none;
+        color: black;
+      }
+
+      .user-image-small {
+        width: 100px;
+        border-radius: 50%;
+      }
+
+      .table {
+        width: 76%;
+        margin: auto;
+      }
+
+      .post-card {
+        width: 94%;
+        margin: 6px auto;
+      }
+
+      .post-image {
+        width: 100%;
+      }
+
+      @media (min-width: 768px) {
+
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+
+        .jumbotron {
+          padding-top: 6rem;
+          padding-bottom: 3rem;
+        }
+
+        .posts-area {
+          width: 56%;
+          margin-top: 80px;
+          margin-left: 10%;
+        }
+
+        .home-profile {
+          width: 32%;
+          position: fixed;
+          top: 100px;
+          right: 6%;
+          background-color: #f8f9fa!important;
+        }
+
+        .table {
+          width: 560px;
+          margin: auto; 
+        }
+
+        .post-card {
+          width: 100%;
+        }
+  
+        .post-image {
+          width: 100%;
+        }
+      }
+
+    .searched-username {
+      text-decoration: none;
+      color: #666;
+      line-height: 32px;
+      margin-left: 8px;
+      font-size: 24px;
+    }
+
+    .searched-username:hover {
+      color: #666;
+      text-decoration: underline;
+    }
+    </style>
+    <!-- Custom styles for this template -->
+  </head>
+  <body>
+    <header>
+      <div class="header">
+        <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+          <h4 class="my-0 mr-md-auto font-weight-normal"><a href="{% url 'instagram:home' %}" class="title-of-app">Instagram</a></h4>
+          <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" style="text-decoration: none;" href="">プロフィール</a>
+            <a class="p-2 text-dark" style="text-decoration: none;" href="{% url 'users:signup' %}">新規アカウント</a>
+          </nav>
+          {% block search %}
+          {% endblock search %}
+          <a class="btn btn-outline-primary " style="margin-left: 12px;" href="{% url 'users:login' %}">ログイン</a>
+        </div>
+      </div>
+    </header>
+
+<main role="main">
+
+  <div class="album py-5 bg-light">
+    <div class="container">
+
+      <div class="row">
+        {% block content %}
+        {% endblock content %}
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="text-muted">
+  <div class="container">
+    <p class="float-right">
+      <a href="#">Back to top</a>
+    </p>
+    <p>&copy; InstagramCloneApp.com</p>
+  </div>
+</footer>
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+      <script>window.jQuery || document.write('<script src="/docs/4.2/assets/js/vendor/jquery-slim.min.js"><\/script>')</script><script src="/docs/4.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-zDnhMsjVZfS3hiP7oCBRmfjkQC4fzxVxFhBx8Hkz2aZX8gEvA/jsP3eXRCvzTofP" crossorigin="anonymous"></script></body>
+</html>

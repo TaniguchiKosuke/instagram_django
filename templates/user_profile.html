@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+<section class="jumbotron text-center">
+  <div class="container">
+    {% if user.picture_path%}
+    <img  class="top-image-of-user" src="{{ url_for('static', filename=user.picture_path) }}" alt="">
+    {% endif %}
+    <h1 class="jumbotron-heading">{{ user.username }}</h1>
+    <p class="ff-layout">
+      <a href="" class="following">フォロー</a>
+      <a href="" class="following">フォロワー</a>
+    </p>
+  </div>
+  {% if current_user.id == user.id %}
+    <p>
+      <a href="{{ url_for('app.edit_profile') }}" class="btn btn-primary my-2">編集</a>
+    </p>
+  {% endif %}
+  {% if user.profile_comment %}
+    <p>
+      {{ user.profile_comment }}
+    </p>
+  {% else %}
+  {% endif %}
+  <p>
+    <a href="{{ url_for('app.user_profile', user_id=user.id) }}" class="see-more">過去の投稿</a>
+    <a href="{{ url_for('app.liked_posts', user_id=user.id) }}" class="see-more">いいねした投稿</a>
+  </p>
+</section>
+
+{% if posts %}
+  {% for post in posts.items %}
+  <div class="col-md-4">
+    <div class="card mb-4 shadow-sm">
+      <h5 class="post-username"><a href="{{ url_for('app.user_profile', user_id=post.user_id) }}" class="post-username-a">{{ post.author }}</a></h5>
+      <div class="col-lg-2 offset-lg-2">
+        {% if post.picture_path %}
+        <img  src="{{ url_for('static', filename=post.picture_path) }}" class="bd-placeholder-img card-img-top" style="width:240px; height:240px;" >
+        {% endif %}
+      </div>
+      <div class="card-body">
+        <p class="card-text">{{ post.content }}</p>
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="btn-group">
+            {% if current_user.has_liked_post(post) %}
+              <a href="{{ url_for('app.likes', post_id=post.id, action='unlike') }}" class="btn btn-sm btn-outline-danger">いいね: {{ post.like_count }}</a>
+            {% else%}
+              <a href="{{ url_for('app.likes', post_id=post.id, action='like') }}" class="btn btn-sm btn-outline-danger">いいね: {{ post.like_count }}</a>
+            {% endif %}
+            <a href="{{ url_for('app.see_post', post_id=post.id) }}" class="see-more">もっと見る</a>
+          </div>
+          <small class="text-muted">{{ post.date_posted }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="page-btn">
+    {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+      {% if page_num %}
+        {% if posts.page == page_num %}
+          <a class="btn btn-primary mb-4" href="{{ url_for('app.user_profile', user_id=user_id, page=page_num) }}">{{ page_num }}</a>
+        {% else %}
+          <a class="btn btn-outline-primary mb-4" href="{{ url_for('app.user_profile', user_id=user_id, page=page_num) }}">{{ page_num }}</a>
+        {% endif %}
+      {% else %}
+        ...
+      {% endif %}
+    {% endfor %}
+  </div>
+{% else %}
+  <p>投稿がありません</p>
+{% endif %}
+{% endblock content %}

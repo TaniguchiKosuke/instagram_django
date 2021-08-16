@@ -1,0 +1,15 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends 'base.html' %}
+
+{% block content %}
+<form method='POST' enctype="multipart/form-data" class="form-signin">
+    <h1 class="page-header">投稿</h1>
+    <dl>
+      {{ form.csrf_token }}
+      {{ render_field(form.picture_path, class='form-control') }}
+      {{ render_field(form.content, class="form-control") }}
+      {{ render_field(form.author, value=current_user.username) }}
+      {{ form.submit(class="btn btn-lg btn-primary btn-block" ) }}
+    </dl>
+</form>
+{% endblock content %}

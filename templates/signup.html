@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form method='POST' enctype="multipart/form-data" class="form-signin">
+    <h1 class="page-header">登録</h1>
+    {% csrf_token %}
+    <h3>メールアドレス</h3>
+    {{ form.username }}
+    {{ form.username.errors }}
+    <h3>パスワード</h3>
+    {{ form.password1 }}
+    {{ form.password1.errors }}
+    <h3>パスワード確認</h3>
+    {{ form.password2 }}
+    {{ form.password2.errors }}
+    <button type="submit">ユーザー登録</button>
+  <p class="login-to-signup">
+    <a href="">アカウントをお持ちの方ははこちら</a>
+  </p>
+</form>
+{% endblock content %}

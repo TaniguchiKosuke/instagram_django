@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if form.errors %}
+<p>ユーザーID、パスワードが一致しません</p>
+{% endif %}
+<form method='POST' class="form-signin">
+    <h1 class="page-header">ログイン</h1>
+    <p>投稿、コメント、いいねするにはログインが必要です</p>
+    <dl>
+      {% csrf_token %}
+      <h3>メールアドレス</h3>
+      {{ form.username }}
+      {{ form.username.errors }}
+      <h3>パスワード</h3>
+      {{ form.password }}
+      {{ form.password.errors }}
+    </dl>
+    <button type="submit">ログイン</button>
+  <p class="login-to-signup">
+    <a href="">新規登録はこちら</a>
+  </p>
+</form>
+{% endblock content %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block search %}
+  <form class="d-flex" method="POST">
+
+  </form>
+{% endblock search %}
+
+
+{% block content %}
+  <section class="jumbotron text-center home-profile">
+    <div class="container">
+  
+      <a href=""><img  class="top-image-of-user" src="" alt=""></a>
+  
+      <h1 class="jumbotron-heading">kosuke</h1>
+      <p class="ff-layout">
+        <a href="" class="following">フォロー</a>
+        <a href="" class="following">フォロワー</a>
+      </p>
+      <p>
+        <a href="" class="btn btn-primary my-2">投稿</a>
+        <a href="" class="btn btn-secondary my-2">友達を探す</a>
+        <a href="" class="btn btn-secondary my-2">プロフィール</a>
+      </p>
+    </div>
+    </section>
+  
+  {% if object_list %}
+  {% for post in object_list %}
+  <div class="posts-area">
+    <div class="card post-card mb-4 shadow-sm">
+      <h5 class="post-username"><a href="" class="post-username-a">{{ post.author }}</a></h5>
+      <div>
+        <img  src="{{ MEDIA_URL }}{{ post.image }}" class="post-image bd-placeholder-img card-img-top" >
+        <p>{{ post.text }}</p>
+      </div>
+      <div class="card-body">
+        <p class="card-text"></p>
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="btn-group">
+              <a href="" class="btn btn-sm btn-outline-danger">いいね: </a>
+              <a href="" class="btn btn-sm btn-outline-danger">いいね: </a>
+            <a href="" class="see-more">もっと見る</a>
+          </div>
+          <small class="text-muted"></small>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p>投稿はありません</p>
+  {% endif %}
+  
+  {% endblock content %}
