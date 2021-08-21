@@ -4,7 +4,7 @@
 <form method='POST' enctype="multipart/form-data" class="form-signin">
     <h1 class="page-header">登録</h1>
     {% csrf_token %}
-    <h4>メールアドレス</h4>
+    <h4>ユーザーネーム</h4>
     {{ form.username }}
     {{ form.username.errors }}
     <h4>パスワード</h4>

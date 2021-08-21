@@ -1,6 +1,8 @@
+from os import name
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.db.models.base import ModelState
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import send_mail
@@ -77,6 +79,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+    name = models.CharField(max_length=100, blank=True)
+    text = models.CharField(max_length=300, blank=True)
+    user_image = models.ImageField(upload_to='images/', null=True, blank=True)
 
     objects = UserManager()
 

@@ -1,13 +1,17 @@
+from django.db.models import query
 from django.http import request
+from django.views.generic import detail
+from django.views.generic.base import TemplateView
 from users.models import User
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.urls.base import reverse
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Posts, UserProfile
+from .models import Posts
 from .forms import PostForm
 
 
@@ -37,18 +41,12 @@ class PostView(LoginRequiredMixin, CreateView):
         return super(PostView, self).form_valid(form)
 
 
-class UserProfileView(ListView):
+class UserProfileView(TemplateView):
     template_name = 'user_profile.html'
-    queryset = Posts
-    
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        author = User.objects.get(pk=self.kwargs['pk'])
-        queryset = Posts.objects.filter(author=author)
-        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['user'] = UserProfile.objects.filter(user=self.kwargs['pk'])
-        context['request_user'] = self.request.user
+        user = User.objects.get(pk=self.kwargs['pk'])
+        context['posts'] = Posts.objects.filter(author=user)
+        context['user_profile'] = User.objects.get(pk=user.pk)
         return context

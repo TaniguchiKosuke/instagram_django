@@ -19,6 +19,9 @@
       {% endif %}
   
       <h1 class="jumbotron-heading">{{ user.username }}</h1>
+      {% if user.name %}
+      <h3 class="jumbotron-heading">{{ user.name }}</h3>
+      {% endif %}
       <p class="ff-layout">
         <a href="" class="following">フォロー</a>
         <a href="" class="following">フォロワー</a>
@@ -26,7 +29,7 @@
       <p>
         <a href="{% url 'instagram:post' %}" class="btn btn-primary my-2">投稿</a>
         <a href="" class="btn btn-secondary my-2">友達を探す</a>
-        <a href="" class="btn btn-secondary my-2">プロフィール</a>
+        <a href="{% url 'instagram:user_profile' pk=user.pk %}" class="btn btn-secondary my-2">プロフィール</a>
       </p>
     </div>
     </section>
