@@ -1,18 +1,17 @@
 from django.db.models import query
 from django.http import request
-from django.views.generic import detail
 from django.views.generic.base import TemplateView
 from users.models import User
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.urls.base import reverse
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Posts
-from .forms import PostForm
+from .forms import PostForm, UserProfileUpdateForm
 
 
 class HomeView(ListView):
@@ -49,4 +48,14 @@ class UserProfileView(TemplateView):
         user = User.objects.get(pk=self.kwargs['pk'])
         context['posts'] = Posts.objects.filter(author=user)
         context['user_profile'] = User.objects.get(pk=user.pk)
+        context['request_user'] = self.request.user
         return context
+
+
+class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = 'edit_user_profile.html'
+    model = User
+    form_class = UserProfileUpdateForm
+    
+    def get_success_url(self):
+        return reverse('instagram:user_profile', kwargs={'pk': self.kwargs['pk']})
