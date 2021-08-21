@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.mail import send_mail
 import uuid as uuid_lib
 from django.contrib.auth.base_user import BaseUserManager
+from django.db.models.signals import post_save
 
 
 class UserManager(BaseUserManager):

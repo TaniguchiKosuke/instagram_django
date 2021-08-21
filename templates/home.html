@@ -36,7 +36,7 @@
     {% for post in object_list %}
     <div class="posts-area">
       <div class="card post-card mb-4 shadow-sm">
-        <h5 class="post-username"><a href="" class="post-username-a">{{ post.author }}</a></h5>
+        <h5 class="post-username"><a href="{% url 'instagram:user_profile' pk=post.author.pk %}" class="post-username-a">{{ post.author }}</a></h5>
         <div>
           <img  src="{{ MEDIA_URL }}{{ post.image }}" class="post-image bd-placeholder-img card-img-top" >
           {% if post.text %}
