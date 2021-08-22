@@ -27,9 +27,6 @@ class HomeView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user'] = self.request.user
-        #下のコメントアウトは投稿一覧で、ある投稿に対して既にいいねをリクエストユーザーが押したかを判定するためのフラグを投げるために書いたつもり。しかしうまく動かず。
-        # post = Posts.objects.get(pk=kwargs['pk'])
-        # context['post_flag'] = PostLikes.objects.filter(user=self.request.user).filter(post=post).count()
         return context
 
 
@@ -82,3 +79,7 @@ def like_post(request, *args, **kwargs):
     post_like.post = post
     post_like.save()
     return redirect(reverse_lazy('instagram:home'))
+
+
+class CommentToPostView(LoginRequiredMixin, CreateView):
+    pass
