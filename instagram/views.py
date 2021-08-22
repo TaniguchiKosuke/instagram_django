@@ -10,8 +10,9 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Posts
+from .models import PostLikes, Posts
 from .forms import PostForm, UserProfileUpdateForm
+from django.contrib.auth.decorators import login_required
 
 
 class HomeView(ListView):
@@ -26,6 +27,9 @@ class HomeView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user'] = self.request.user
+        #下のコメントアウトは投稿一覧で、ある投稿に対して既にいいねをリクエストユーザーが押したかを判定するためのフラグを投げるために書いたつもり。しかしうまく動かず。
+        # post = Posts.objects.get(pk=kwargs['pk'])
+        # context['post_flag'] = PostLikes.objects.filter(user=self.request.user).filter(post=post).count()
         return context
 
 
@@ -59,3 +63,22 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     
     def get_success_url(self):
         return reverse('instagram:user_profile', kwargs={'pk': self.kwargs['pk']})
+
+
+@login_required
+def like_post(request, *args, **kwargs):
+    post = Posts.objects.get(pk=kwargs['pk'])
+    is_like = PostLikes.objects.filter(user=request.user).filter(post=post).count()
+    if is_like > 0:
+        like = PostLikes.objects.get(user=request.user, post__id=kwargs['pk'])
+        like.delete()
+        post.like_count -= 1
+        post.save()
+        return redirect(reverse_lazy('instagram:home'))
+    post.like_count += 1
+    post.save()
+    post_like = PostLikes()
+    post_like.user = request.user
+    post_like.post = post
+    post_like.save()
+    return redirect(reverse_lazy('instagram:home'))

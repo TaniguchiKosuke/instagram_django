@@ -20,7 +20,7 @@
   
       <h1 class="jumbotron-heading">{{ user.username }}</h1>
       {% if user.name %}
-      <h3 class="jumbotron-heading">{{ user.name }}</h3>
+      <h4>{{ user.name }}</h4>
       {% endif %}
       <p class="ff-layout">
         <a href="" class="following">フォロー</a>
@@ -53,8 +53,8 @@
           <p class="card-text"></p>
           <div class="d-flex justify-content-between align-items-center">
             <div class="btn-group">
-                <a href="" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
-                <a href="" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+                <a href="{% url 'like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+                <a href="{% url 'like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
                 <p class="good-count">{{ post.like_count }}件のいいね</p>
               <a href="" class="see-more">もっと見る</a>
             </div>
