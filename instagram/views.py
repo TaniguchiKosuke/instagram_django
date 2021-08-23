@@ -10,12 +10,12 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import PostLikes, Posts
+from .models import CommentToPost, PostLikes, Posts
 from .forms import PostForm, UserProfileUpdateForm, CommentToPostForm
 from django.contrib.auth.decorators import login_required
 
 
-class HomeView(ListView):
+class HomeView(LoginRequiredMixin, ListView):
     template_name = 'home.html'
     queryset = Posts
 
@@ -41,7 +41,7 @@ class PostView(LoginRequiredMixin, CreateView):
         return super(PostView, self).form_valid(form)
 
 
-class UserProfileView(TemplateView):
+class UserProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'user_profile.html'
 
     def get_context_data(self, **kwargs):
@@ -89,6 +89,17 @@ class CommentToPostView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         author = self.request.user
         post = Posts.objects.get(pk=self.kwargs['pk'])
-        form.instance.user = author
+        form.instance.author = author
         form.instance.post = post
         return super().form_valid(form)
+
+
+class PostDetailView(LoginRequiredMixin, DetailView):
+    template_name = 'post_detail.html'
+    model = Posts
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = CommentToPost.objects.filter(post=self.kwargs['pk'])
+        context['request_user'] = self.request.user
+        return context
