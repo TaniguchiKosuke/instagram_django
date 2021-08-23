@@ -7,6 +7,6 @@
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">編集を保存</button>
-    <a href="" class="see-more">編集をやめる</a>
+    <a href="{{request.META.HTTP_REFERER}}" class="see-more">編集をやめる</a>
 </form>
 {% endblock content %}r

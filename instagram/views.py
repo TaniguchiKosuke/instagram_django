@@ -1,3 +1,4 @@
+from typing import Text
 from django.db.models import query
 from django.http import request
 from django.views.generic.base import TemplateView
@@ -13,6 +14,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import CommentToPost, PostLikes, Posts
 from .forms import PostForm, UserProfileUpdateForm, CommentToPostForm
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -22,6 +24,9 @@ class HomeView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.objects.order_by('-post_date')
+        query = self.request.GET.get('query')
+        if query:
+            queryset = queryset.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -84,7 +89,6 @@ def like_post(request, *args, **kwargs):
 class CommentToPostView(LoginRequiredMixin, CreateView):
     template_name = 'comment_to_post.html'
     form_class = CommentToPostForm
-    success_url = reverse_lazy('instagram:home')
 
     def form_valid(self, form):
         author = self.request.user
@@ -92,6 +96,9 @@ class CommentToPostView(LoginRequiredMixin, CreateView):
         form.instance.author = author
         form.instance.post = post
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('instagram:post_detail', kwargs={'pk':self.kwargs['pk']})
 
 
 class PostDetailView(LoginRequiredMixin, DetailView):
