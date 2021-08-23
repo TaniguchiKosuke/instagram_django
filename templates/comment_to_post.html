@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form method='POST' class="form-signin">
+    <h2 class="page-header">コメント</h2>
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">コメントする</button>
+      <a href="" class="see-more">戻る</a>
+</form>
+{% endblock content %}

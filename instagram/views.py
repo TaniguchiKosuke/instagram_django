@@ -11,7 +11,7 @@ from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import PostLikes, Posts
-from .forms import PostForm, UserProfileUpdateForm
+from .forms import PostForm, UserProfileUpdateForm, CommentToPostForm
 from django.contrib.auth.decorators import login_required
 
 
@@ -82,4 +82,13 @@ def like_post(request, *args, **kwargs):
 
 
 class CommentToPostView(LoginRequiredMixin, CreateView):
-    pass
+    template_name = 'comment_to_post.html'
+    form_class = CommentToPostForm
+    success_url = reverse_lazy('instagram:home')
+
+    def form_valid(self, form):
+        author = self.request.user
+        post = Posts.objects.get(pk=self.kwargs['pk'])
+        form.instance.user = author
+        form.instance.post = post
+        return super().form_valid(form)

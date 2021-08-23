@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Posts
+from .models import CommentToPost, Posts
 
 
 @admin.register(Posts)
@@ -9,3 +9,6 @@ class PostsAdmin(admin.ModelAdmin):
     def get_author(self, obj):
         return obj.author
     get_author.short_description = 'Author'
+
+
+admin.site.register(CommentToPost)
