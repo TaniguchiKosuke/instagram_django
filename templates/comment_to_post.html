@@ -6,6 +6,6 @@
       {% csrf_token %}
       {{ form.as_p }}
       <button type="submit">コメントする</button>
-      <a href="" class="see-more">戻る</a>
+      <a href="{{request.META.HTTP_REFERER}}" class="see-more">戻る</a>
 </form>
 {% endblock content %}
