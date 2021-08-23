@@ -20,10 +20,12 @@
       <a href="" class="following">フォロワー{{ follower }}人</a>
     </p>
 
-    {% if connected %}
-    <a href="{% url 'instagram:unfollow' pk=user_profile.pk %}" class="btn btn-dark">フォロー解除</a>
-    {% else %}
-    <a href="{% url 'instagram:follow' pk=user_profile.pk %}" class="btn btn-light">フォロー</a>
+    {% if request_user != user_profile %}
+      {% if connected %}
+      <a href="{% url 'instagram:unfollow' pk=user_profile.pk %}" class="btn btn-dark">フォロー解除</a>
+      {% else %}
+      <a href="{% url 'instagram:follow' pk=user_profile.pk %}" class="btn btn-outline-dark">フォロー</a>
+      {% endif %}
     {% endif %}
 
     {% if request_user.pk == user_profile.pk %}

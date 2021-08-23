@@ -159,3 +159,14 @@ def unfollow_view(request, *args, **kwargs):
     except FriendShip.DoesNotExist:
         messages.warning(request, 'フォローしてません')
     return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
+
+
+class FolloweeListView(LoginRequiredMixin, ListView):
+    template_name = 'followee_list.html'
+    queryset = User
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = User.objects.get(pk=self.kwargs['pk'])
+        queryset = User.objects.filter(followers=user)
+        return queryset
