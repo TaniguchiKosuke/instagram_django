@@ -58,6 +58,7 @@ footer p {
 
 .title-of-app:hover {
   color: black;
+  text-decoration: none;
 }
 
 .top-image-of-user {
