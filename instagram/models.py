@@ -21,14 +21,14 @@ class Posts(models.Model):
 class PostLikes(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(timezone.now)
 
 
 class CommentToPost(models.Model):
     text = models.CharField(max_length=300)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.author
@@ -37,7 +37,7 @@ class CommentToPost(models.Model):
 class FriendShip(models.Model):
     followee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower_friendships')
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followee_friendships')
-    create_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         unique_together = ('followee', 'follower')

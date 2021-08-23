@@ -23,8 +23,8 @@
       <h4>{{ user.name }}</h4>
       {% endif %}
       <p class="ff-layout">
-        <a href="" class="following">フォロー</a>
-        <a href="" class="following">フォロワー</a>
+        <a href="" class="following">フォロー{{ followee }}人</a>
+        <a href="" class="following">フォロワー{{ follower }}人</a>
       </p>
       <p>
         <a href="{% url 'instagram:post' %}" class="btn btn-primary my-2">投稿</a>
