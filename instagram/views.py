@@ -110,3 +110,5 @@ class PostDetailView(LoginRequiredMixin, DetailView):
         context['comments'] = CommentToPost.objects.filter(post=self.kwargs['pk'])
         context['request_user'] = self.request.user
         return context
+
+

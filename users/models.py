@@ -84,11 +84,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     user_image = models.ImageField(upload_to='images/', null=True, blank=True)
     #フォローとフォロワーの外部キーだが、うまく動かず保留
     # followees = models.ManyToManyField(
-    #     'User', verbose_name='フォロー中のユーザー', through='FriendShip',
+    #     'self', verbose_name='フォロー中のユーザー', through='FriendShip',
     #     related_name='+', through_fields=('follower', 'followee')
     # )
     # followers = models.ManyToManyField(
-    #     'User', verbose_name='フォローされているユーザー', through='FriendShip', 
+    #     'self', verbose_name='フォローされているユーザー', through='FriendShip', 
     #     related_name='+', through_fields=('followee', 'follower')
     # )
 
