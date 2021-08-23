@@ -1,10 +1,9 @@
 from os import name
 from django.db import models
+from django.db.models.fields import related
 from django.urls.base import translate_url
 from django.utils import timezone
 from users.models import User
-# import sys
-# sys.path.append('../')
 
 
 class Posts(models.Model):
@@ -33,3 +32,15 @@ class CommentToPost(models.Model):
 
     def __str__(self):
         return self.author
+
+
+class FriendShip(models.Model):
+    followee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower_friendships')
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followee_friendships')
+    create_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('followee', 'follower')
+
+    def __str__(self):
+        return f'{self.follower} follows {self.followee}'

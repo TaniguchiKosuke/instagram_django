@@ -82,6 +82,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=100, blank=True)
     text = models.CharField(max_length=300, blank=True)
     user_image = models.ImageField(upload_to='images/', null=True, blank=True)
+    # followees = models.ManyToManyField(
+    #     'User', verbose_name='フォロー中のユーザー', through='FriendShip',
+    #     related_name='+', through_fields=('follower', 'followee')
+    # )
+    # followers = models.ManyToManyField(
+    #     'User', verbose_name='フォローされているユーザー', through='FriendShip', 
+    #     related_name='+', through_fields=('followee', 'follower')
+    # )
 
     objects = UserManager()
 
