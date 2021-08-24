@@ -16,7 +16,7 @@
     <h4>{{ user_profile.name }}</h4>
     {% endif %}
     <p class="ff-layout">
-      <a href="" class="following">フォロー{{ followee }}人</a>
+      <a href="{% url 'instagram:followee_list' pk=user_profile.pk %}" class="following">フォロー{{ followee }}人</a>
       <a href="" class="following">フォロワー{{ follower }}人</a>
     </p>
 

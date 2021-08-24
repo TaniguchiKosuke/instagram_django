@@ -12,8 +12,8 @@
   <section class="jumbotron text-center home-profile">
     <div class="container">
   
-      {% if user.image %}
-      <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ user.image }}" alt=""></a>
+      {% if user.user_image %}
+      <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ user.user_image }}" alt=""></a>
       {% else %}
       <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}images/default-user-image.png" alt=""></a>
       {% endif %}
@@ -23,7 +23,7 @@
       <h4>{{ user.name }}</h4>
       {% endif %}
       <p class="ff-layout">
-        <a href="" class="following">フォロー{{ followee }}人</a>
+        <a href="{% url 'instagram:followee_list' pk=user.pk %}" class="following">フォロー{{ followee }}人</a>
         <a href="" class="following">フォロワー{{ follower }}人</a>
       </p>
       <p>

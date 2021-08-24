@@ -21,7 +21,7 @@ class Posts(models.Model):
 class PostLikes(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
 
 
 class CommentToPost(models.Model):
