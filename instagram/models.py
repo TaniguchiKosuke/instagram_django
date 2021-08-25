@@ -37,6 +37,7 @@ class CommentToPost(models.Model):
 class FriendShip(models.Model):
     followee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower_friendships')
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followee_friendships')
+    is_connected = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
