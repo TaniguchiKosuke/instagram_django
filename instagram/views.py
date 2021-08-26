@@ -137,9 +137,9 @@ def follow_view(request, *args, **kwargs):
         _, created = FriendShip.objects.get_or_create(followee=followee, follower=follower)
         if created:
             #request_userがフォローした人をrequest_userのfolloweeに追加。さらに、followされたuserのfollowersにrequest_userを追加する処理
-            followee = follower(followees=followee)
+            followee = follower.followees.create(username=followee)
             followee.save()
-            follower = followee(followers=follower)
+            follower = followee.followers.create(username=follower)
             follower.save()
             messages.warning(request, 'フォローしました')
         else:
@@ -157,6 +157,13 @@ def unfollow_view(request, *args, **kwargs):
         else:
             unfollow = FriendShip.objects.get(followee=followee, follower=follower)
             unfollow.delete()
+            #ここから下の、フォロー、フォロワー削除処理がうまく動かない
+            followee = follower.followees.get(username=followee)
+            followee.clear()
+            followee.save()
+            follower = followee.followers.get(username=follower)
+            follower.clear()
+            follower.save()
             messages.success(request, 'フォローを外しました')
     except User.DoesNotExist:
         messages.warning(request, 'ユーザーが存在しません')
