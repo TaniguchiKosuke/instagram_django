@@ -41,7 +41,11 @@
                     </div>
                   </td>
                   <td class="candidate-list-favourite-time text-center">
+                    {% if request_user in user.followers %}
                     <a href="{% url 'instagram:follow' pk=user.pk %}" class="btn btn-outline-dark">フォロー</a>
+                    {% else %}
+                    <a href="{% url 'instagram:follow' pk=user.pk %}" class="btn btn-outline-dark">フォロー中</a>
+                    {% endif %}
                   </td>
                 </tr>
                 {% endfor %}

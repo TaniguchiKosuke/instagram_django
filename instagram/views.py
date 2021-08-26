@@ -136,6 +136,11 @@ def follow_view(request, *args, **kwargs):
     else:
         _, created = FriendShip.objects.get_or_create(followee=followee, follower=follower)
         if created:
+            #request_userがフォローした人をrequest_userのfolloweeに追加。さらに、followされたuserのfollowersにrequest_userを追加する処理
+            followee = follower(followees=followee)
+            followee.save()
+            follower = followee(followers=follower)
+            follower.save()
             messages.warning(request, 'フォローしました')
         else:
             messages.warning(request, 'あなたは既にフォローしています')
@@ -170,3 +175,8 @@ class FolloweeListView(LoginRequiredMixin, ListView):
         user = User.objects.get(pk=self.kwargs['pk'])
         queryset = User.objects.filter(followers=user)
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['request_user'] = self.request.user
+        return context
