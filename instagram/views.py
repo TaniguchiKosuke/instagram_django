@@ -12,8 +12,8 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import CommentToPost, FriendShip, PostLikes, Posts
-from .forms import PostForm, UserProfileUpdateForm, CommentToPostForm
+from .models import CommentToPost, FriendShip, Message, PostLikes, Posts
+from .forms import MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
@@ -191,3 +191,33 @@ class FollowerListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['request_user'] = self.request.user
         return context
+
+
+class MessagesView(LoginRequiredMixin, ListView):
+    template_name = 'messages.html'
+    queryset = Message
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        request_user = self.request.user
+        queryset = Message.objects.filter(to_user=self.kwargs['pk']).filter(from_user=request_user.pk)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        request_user = self.request.user
+        context['request_user'] = request_user
+        context['to_user'] = Message.objects.filter(to_user=self.kwargs['pk']).filter(from_user=request_user)
+        context['users'] = User.objects.filter(followers=request_user)[:10]
+        context['message_form'] = MessageForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        message_form = MessageForm(request.POST or None)
+        if message_form.is_valid():
+            to_user = User.objects.get(pk=self.kwargs['pk'])
+            from_user = self.request.user
+            message = Message(to_user=to_user, from_user=from_user, **message_form.cleaned_data)
+            message.save()
+            return redirect('instagram:messages', pk=to_user.pk)
+        return super(MessagesView, self).post(request, *args, **kwargs)

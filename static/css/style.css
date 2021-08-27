@@ -269,6 +269,8 @@ text-decoration: underline;
 
 
 
+
+
 /* followee_list.htmlのためのcss */
 
 body{
@@ -283,7 +285,7 @@ body{
 .shadow-sm {
   box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
 }    
-}
+
 /* user-dashboard-info-box */
 .user-dashboard-info-box .candidates-list .thumb {
   margin-right: 20px;
@@ -446,4 +448,57 @@ body{
 
 .user-dashboard-info-box .candidates-list .thumb {
   margin-right: 20px;
+}
+
+
+
+
+
+
+
+/* messages.htmlのためのCSS */
+body{margin-top:20px;}
+
+.chat-online {
+    color: #34ce57
+}
+
+.chat-offline {
+    color: #e4606d
+}
+
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+    max-height: 800px;
+    overflow-y: scroll
+}
+
+.chat-message-left,
+.chat-message-right {
+    display: flex;
+    flex-shrink: 0
+}
+
+.chat-message-left {
+    margin-right: auto
+}
+
+.chat-message-right {
+    flex-direction: row-reverse;
+    margin-left: auto
+}
+.py-3 {
+    padding-top: 1rem!important;
+    padding-bottom: 1rem!important;
+}
+.px-4 {
+    padding-right: 1.5rem!important;
+    padding-left: 1.5rem!important;
+}
+.flex-grow-0 {
+    flex-grow: 0!important;
+}
+.border-top {
+    border-top: 1px solid #dee2e6!important;
 }

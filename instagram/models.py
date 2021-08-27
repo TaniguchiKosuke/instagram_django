@@ -1,5 +1,6 @@
 from os import name
 from django.db import models
+from django.db.models.base import ModelState
 from django.db.models.fields import related
 from django.urls.base import translate_url
 from django.utils import timezone
@@ -45,3 +46,16 @@ class FriendShip(models.Model):
 
     def __str__(self):
         return f'{self.follower} follows {self.followee}'
+
+
+class Message(models.Model):
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='message_to_user')
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='dm_from_user')
+    text = models.CharField(max_length=300)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Message from {self.from_user} to {self.to_user}'
