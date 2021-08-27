@@ -200,7 +200,8 @@ class MessagesView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         request_user = self.request.user
-        queryset = Message.objects.filter(Q(to_user=self.kwargs['pk']) | Q(from_user=self.kwargs['pk'])).filter(Q(from_user=request_user.pk) | Q(to_user=request_user))
+        queryset = Message.objects.filter(Q(to_user=self.kwargs['pk']) | Q(from_user=self.kwargs['pk']))\
+                    .filter(Q(from_user=request_user.pk) | Q(to_user=request_user))
         return queryset
 
     def get_context_data(self, **kwargs):
