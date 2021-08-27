@@ -136,11 +136,6 @@ def follow_view(request, *args, **kwargs):
     else:
         _, created = FriendShip.objects.get_or_create(followee=followee, follower=follower)
         if created:
-            #request_userがフォローした人をrequest_userのfolloweeに追加。さらに、followされたuserのfollowersにrequest_userを追加する処理
-            followee = follower.followees.create(username=followee)
-            followee.save()
-            follower = followee.followers.create(username=follower)
-            follower.save()
             messages.warning(request, 'フォローしました')
         else:
             messages.warning(request, 'あなたは既にフォローしています')
@@ -157,13 +152,6 @@ def unfollow_view(request, *args, **kwargs):
         else:
             unfollow = FriendShip.objects.get(followee=followee, follower=follower)
             unfollow.delete()
-            #ここから下の、フォロー、フォロワー削除処理がうまく動かない
-            followee = follower.followees.get(username=followee)
-            followee.clear()
-            followee.save()
-            follower = followee.followers.get(username=follower)
-            follower.clear()
-            follower.save()
             messages.success(request, 'フォローを外しました')
     except User.DoesNotExist:
         messages.warning(request, 'ユーザーが存在しません')
@@ -181,6 +169,22 @@ class FolloweeListView(LoginRequiredMixin, ListView):
         queryset = super().get_queryset()
         user = User.objects.get(pk=self.kwargs['pk'])
         queryset = User.objects.filter(followers=user)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['request_user'] = self.request.user
+        return context
+
+
+class FollowerListView(LoginRequiredMixin, ListView):
+    template_name = 'follower_list.html'
+    queryset = User
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = User.objects.get(pk=self.kwargs['pk'])
+        queryset = User.objects.filter(followees=user)
         return queryset
 
     def get_context_data(self, **kwargs):
