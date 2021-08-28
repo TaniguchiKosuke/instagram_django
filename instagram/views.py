@@ -26,6 +26,7 @@ class HomeView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.objects.order_by('-post_date')
+        #投稿を検索する処理
         query = self.request.GET.get('query')
         if query:
             queryset = queryset.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
@@ -201,18 +202,22 @@ class MessagesView(LoginRequiredMixin, ListView):
         queryset = super().get_queryset()
         request_user = self.request.user
         queryset = Message.objects.filter(Q(to_user=self.kwargs['pk']) | Q(from_user=self.kwargs['pk']))\
-                    .filter(Q(from_user=request_user.pk) | Q(to_user=request_user))
+                    .filter(Q(from_user=request_user.pk) | Q(to_user=request_user)).order_by('created_at')
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         request_user = self.request.user
         context['request_user'] = request_user
-        context['to_user'] = Message.objects.filter(to_user=self.kwargs['pk']).filter(from_user=request_user)
-        context['users'] = User.objects.filter(followers=request_user)[:10]
+        context['to_user'] = User.objects.get(pk=self.kwargs['pk'])
+        context['reccomended_users'] = User.objects.filter(followers=request_user)[:10]
         context['message_form'] = MessageForm()
+        #メッセージを送る相手を検索する処理
+        query = self.request.GET.get('query')
+        if query:
+            context['reccomended_users'] = User.objects.filter(followers=request_user).filter(Q(username__icontains=query) | Q(name__icontains=query))[:10]
         return context
-
+    #メッセージを送る処理
     def post(self, request, *args, **kwargs):
         message_form = MessageForm(request.POST or None)
         if message_form.is_valid():

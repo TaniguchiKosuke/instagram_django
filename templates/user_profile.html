@@ -32,6 +32,10 @@
     <p>
       <a href="{% url 'instagram:user_profile_update' pk=request_user.pk %}" class="btn btn-primary my-2">編集</a>
     </p>
+    {% else %}
+    <p>
+      <a href="{% url 'instagram:messages' pk=user_profile.pk %}" class="btn btn-outline-secondary my-2">メッセージを送る</a>
+    </p>
     {% endif %}
     {% if user_profile.text %}
       <p>
