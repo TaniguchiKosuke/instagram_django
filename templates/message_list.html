@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<main class="content" style="margin-top: 64px;">
+    <div class="container p-0">
+
+		<h1 class="h3 mb-3">Messages</h1>
+
+		<div class="card">
+			<div class="row g-0">
+				<div class="col-12 col-lg-5 col-xl-3 border-right">
+
+					<div class="px-4 d-none d-md-block">
+						<div class="d-flex align-items-center">
+							<div class="flex-grow-1">
+								<form method="GET" action="{% url 'instagram:messages' pk=1 %}">
+									<input class="form-control my-3" type="text" placeholder="Search" aria-label="Search" value="{{ request.GET.query }}" name="query">
+								</form>
+							</div>
+						</div>
+					</div>
+
+          {% if object_list %}
+          {% for user in object_list %}
+					<a href="{% url 'instagram:messages' pk=user.pk %}" class="list-group-item list-group-item-action border-0">
+					<div class="d-flex align-items-start">
+          {% if user.user_image %}
+					<img src="{{ MEDIA_URL }}{{ user.user_image }}" class="rounded-circle mr-1" width="40" height="40">
+          {% else %}
+          <img src="{{ MEDIA_URL }}images/default-user-image.png" class="rounded-circle mr-1" width="40" height="40">
+          {% endif %}
+					<div class="flex-grow-1 ml-3">
+					{{ user.username }}
+          {% if user.name %}
+					<div class="small">{{ user.name }}</div>
+          {% endif %}
+					</div>
+					</div>
+					</a>
+					{% endfor %}
+					{% else %}
+					<p>フォローしているユーザーがいません</p>
+					{% endif %}
+
+					<hr class="d-block d-lg-none mt-1 mb-0">
+				</div>
+
+				<div class="col-12 col-lg-7 col-xl-9">
+					<div class="position-relative">
+             <div class="chat-messages p-4">
+               <p>誰かにメッセージを送ろう</p>
+						</div>
+					</div>     
+				</div>
+			</div>
+          </div>
+		</div>
+	</div>
+</main>
+
+{% endblock content %}

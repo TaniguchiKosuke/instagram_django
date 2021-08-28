@@ -227,3 +227,17 @@ class MessagesView(LoginRequiredMixin, ListView):
             message.save()
             return redirect('instagram:messages', pk=to_user.pk)
         return super(MessagesView, self).post(request, *args, **kwargs)
+
+#メッセージ画面（送信先未定）
+class MessageListView(LoginRequiredMixin, ListView):
+    template_name = 'message_list.html'
+    queryset = User
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        request_user = self.request.user
+        queryset = User.objects.filter(followers=request_user)[:10]
+        query = self.request.GET.get('query')
+        if query:
+            queryset = User.objects.filter(followers=request_user).filter(Q(username__icontains=query) | Q(name__icontains=query))[:10]
+        return queryset
