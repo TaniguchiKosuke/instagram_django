@@ -10,7 +10,7 @@ from users.models import User
 class PostForm(forms.ModelForm):
     text = forms.CharField(widget=forms.Textarea, label='')
     image = forms.ImageField(label='')
-    tag = forms.CharField(label='')
+    tag = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Tag'}))
 
     def __init__(self, *args, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)

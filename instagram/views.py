@@ -22,6 +22,7 @@ from django.contrib import messages
 class HomeView(LoginRequiredMixin, ListView):
     template_name = 'home.html'
     queryset = Posts
+    paginate_by = 8
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -165,6 +166,7 @@ def unfollow_view(request, *args, **kwargs):
 class FolloweeListView(LoginRequiredMixin, ListView):
     template_name = 'followee_list.html'
     queryset = User
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -175,12 +177,14 @@ class FolloweeListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['request_user'] = self.request.user
+        context['user_profile'] = User.objects.get(pk=self.kwargs['pk'])
         return context
 
 
 class FollowerListView(LoginRequiredMixin, ListView):
     template_name = 'follower_list.html'
     queryset = User
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -191,6 +195,7 @@ class FollowerListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['request_user'] = self.request.user
+        context['user_profile'] = User.objects.get(pk=self.kwargs['pk'])
         return context
 
 

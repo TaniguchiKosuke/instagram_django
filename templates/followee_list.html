@@ -3,6 +3,57 @@
 
 {% block content %}
 {% if object_list %}
+<section class="jumbotron text-center home-profile">
+  <div class="container">
+
+    {% if user_profile.user_image %}
+    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ user_profile.user_image }}" alt=""></a>
+    {% else %}
+    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}images/default-user-image.png" alt=""></a>
+    {% endif %}
+
+    <h1 class="jumbotron-heading">{{ user_profile.username }}</h1>
+    {% if user_profile.name %}
+    <h4>{{ user_profile.name }}</h4>
+    {% endif %}
+    <p class="ff-layout">
+      <a href="{% url 'instagram:followee_list' pk=user_profile.pk %}" class="following">フォロー{{ followee }}人</a>
+      <a href="{% url 'instagram:follower_list' pk=user_profile.pk %}" class="following">フォロワー{{ follower }}人</a>
+    </p>
+
+    {% if request_user != user_profile %}
+      {% if connected %}
+      <a href="{% url 'instagram:unfollow' pk=user_profile.pk %}" class="btn btn-dark">フォロー解除</a>
+      {% else %}
+      <a href="{% url 'instagram:follow' pk=user_profile.pk %}" class="btn btn-outline-dark">フォロー</a>
+      {% endif %}
+    {% endif %}
+
+    {% if request_user.pk == user_profile.pk %}
+    <p>
+      <a href="{% url 'instagram:message_list' %}" class="btn btn-outline-secondary my-2">メッセージ</a>
+      <a href="{% url 'instagram:user_profile_update' pk=request_user.pk %}" class="btn btn-primary my-2">編集</a>
+    </p>
+    {% else %}
+    <p>
+      <a href="{% url 'instagram:messages' pk=user_profile.pk %}" class="btn btn-outline-secondary my-2">メッセージ</a>
+    </p>
+    {% endif %}
+    {% if user_profile.text %}
+      <p>
+        {{ user_profile.text }}
+      </p>
+    {% else %}
+    {% endif %}
+    <p>
+    <a href="" class="see-more">過去の投稿</a>
+    {% if request_user == user_profile %}
+    <a href="" class="see-more">いいねした投稿</a>
+    {% endif %}
+  </p>
+  </div>
+  </section>
+
 <div class="container mt-3 mb-4">
   <div class="col-lg-9 mt-4 mt-lg-0">
       <div class="row">
@@ -51,15 +102,11 @@
               </tbody>
             </table>
             <div class="text-center mt-3 mt-sm-3">
-              <ul class="pagination justify-content-center mb-0">
-                <li class="page-item disabled"> <span class="page-link">Prev</span> </li>
-                <li class="page-item active" aria-current="page"><span class="page-link">1 </span> <span class="sr-only">(current)</span></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">...</a></li>
-                <li class="page-item"><a class="page-link" href="#">25</a></li>
-                <li class="page-item"> <a class="page-link" href="#">Next</a> </li>
-              </ul>
+              <div class="col-6 offset-3 justify-content-center">
+                {% if is_paginated %}
+                    {% include 'pagination.html' %}
+                {% endif %}
+              </div>
             </div>
           </div>
         </div>

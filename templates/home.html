@@ -54,7 +54,7 @@
           <p>{{ post.text }}</p>
           {% endif %}
           {% if post.tag%}
-          <p>{{ post.tag }}</p>
+          <a href="" style="text-decoration: none; color: rgb(48, 96, 230);">{{ post.tag }}</a>
           {% endif %}
         </div>
         <div class="card-body">
@@ -76,6 +76,14 @@
     {% else %}
     <p>投稿はありません</p>
     {% endif %}
+
+    <div class="col-6 offset-3 justify-content-center">
+      {% if is_paginated %}
+          {% include 'pagination.html' %}
+      {% endif %}
+    </div>
+
   </div>
+
   
   {% endblock content %}
