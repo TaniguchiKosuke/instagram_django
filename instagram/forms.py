@@ -1,11 +1,21 @@
+from typing import Text
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
+from django.core.files.base import File
 from django.db.models import fields
 from .models import CommentToPost, Message, Posts
 from users.models import User
 
 
 class PostForm(forms.ModelForm):
+    text = forms.CharField(widget=forms.Textarea, label='')
+    image = forms.ImageField(label='')
+    tag = forms.CharField(label='')
+
+    def __init__(self, *args, **kwargs):
+        super(PostForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
     class Meta:
         model = Posts
@@ -13,6 +23,15 @@ class PostForm(forms.ModelForm):
 
 
 class UserProfileUpdateForm(forms.ModelForm):
+    username = forms.CharField(label='')
+    name = forms.CharField(label='')
+    text = forms.CharField(widget=forms.Textarea, label='')
+    user_image = forms.ImageField(label='')
+
+    def __init__(self, *args, **kwargs):
+        super(UserProfileUpdateForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
     class Meta:
         model = User
@@ -20,6 +39,12 @@ class UserProfileUpdateForm(forms.ModelForm):
 
 
 class CommentToPostForm(forms.ModelForm):
+    text = forms.CharField(widget=forms.Textarea, label='')
+
+    def __init__(self, *args, **kwargs):
+        super(CommentToPostForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
     class Meta:
         model = CommentToPost

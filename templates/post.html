@@ -6,7 +6,7 @@
     <h1 class="page-header">投稿</h1>
       {% csrf_token %}
       {{ form.as_p }}
+    <button class="btn-sm btn-primary" type="submit">投稿</button>
     <a href="{{request.META.HTTP_REFERER}}" class="see-more">戻る</a>
-    <button type="submit">投稿</button>
 </form>
 {% endblock content %}
