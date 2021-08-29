@@ -1,3 +1,4 @@
+from os import name
 from typing import Text
 from django.core.checks import messages
 from django.db.models import query
@@ -12,7 +13,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import CommentToPost, FriendShip, Message, PostLikes, Posts
+from .models import CommentToPost, FriendShip, Message, PostLikes, Posts, Tag
 from .forms import MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -30,7 +31,10 @@ class HomeView(LoginRequiredMixin, ListView):
         #投稿を検索する処理
         query = self.request.GET.get('query')
         if query:
-            queryset = queryset.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
+            if not query.startswith('#'):
+                queryset = queryset.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
+            else:
+                queryset = Posts.objects.none()
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -39,6 +43,10 @@ class HomeView(LoginRequiredMixin, ListView):
         context['user'] = user
         context['followee'] = FriendShip.objects.filter(follower__username=user).count()
         context['follower'] = FriendShip.objects.filter(followee__username=user).count()
+        query = self.request.GET.get('query')
+        if query:
+            if query.startswith('#'):
+                context['tags'] = Tag.objects.filter(Q(name__icontains=query))[:16]
         return context
 
 
@@ -50,6 +58,16 @@ class PostView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         author = self.request.user
         form.instance.author = author
+        # tag = self.request.POST['tag']
+        # if tag:
+        #     all_tags = Tag.objects.all()
+        #     all_tags_list = []
+        #     for tag in all_tags:
+        #         all_tags_list.append(tag.name)
+        #     if not tag.name in all_tags_list:
+        #         tag =Tag.objects.create(name=tag.name)
+        #         tag.instance. = tag
+        #     form.instance.tag = tag
         return super(PostView, self).form_valid(form)
 
 

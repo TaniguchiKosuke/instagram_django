@@ -1,12 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block search %}
-  <form class="d-flex" method="POST">
-
-  </form>
-{% endblock search %}
-
 
 {% block content %}
   <section class="jumbotron text-center home-profile">
@@ -43,36 +37,64 @@
 
   
   <div class="all-posts-area">
-    {% if object_list %}
-    {% for post in object_list %}
-    <div class="posts-area">
-      <div class="card post-card mb-4 shadow-sm">
-        <h5><a href="{% url 'instagram:user_profile' pk=post.author.pk %}" class="post-username-a">{{ post.author }}</a></h5>
-        <div>
-          <img  src="{{ MEDIA_URL }}{{ post.image }}" class="post-image bd-placeholder-img card-img-top" >
-          {% if post.text %}
-          <p>{{ post.text }}</p>
-          {% endif %}
-          {% if post.tag%}
-          <a href="" style="text-decoration: none; color: rgb(48, 96, 230);">{{ post.tag }}</a>
-          {% endif %}
-        </div>
-        <div class="card-body">
-          <p class="card-text"></p>
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="btn-group">
-                <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
-                <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
-                <p class="good-count">{{ post.like_count }}件のいいね</p>
-              <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメントする</a>
-              <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">もっと見る</a>
+    {% if tags %}
+    <table class="table manage-candidates-top mb-0">
+      <thead>
+        <tr>
+          <th>Tags</th>
+        </tr>
+      </thead>
+      {% for tag in tags %}
+        <tbody>
+          <tr class="candidates-list">
+            <td class="title">
+              <div class="thumb">
+                <a href="{% url 'instagram:home' %}"><img class="img-fluid" src="{{ MEDIA_URL }}/app_images/hashtag.jpeg" style="width: 40px; height: 40px;" alt=""></a>
+              </div>
+            </td>
+            <td>
+              <div class="candidate-list-details">
+                <div class="candidate-list-info">
+                  <div class="candidate-list-title">
+                    <p class="mb-0"><a href="{% url 'instagram:home' %}" style="text-decoration: none; color: black;">{{ tag.name }}</a></p>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% elif object_list %}
+      {% for post in object_list %}
+      <div class="posts-area">
+        <div class="card post-card mb-4 shadow-sm">
+          <h5><a href="{% url 'instagram:user_profile' pk=post.author.pk %}" class="post-username-a">{{ post.author }}</a></h5>
+          <div>
+            <img  src="{{ MEDIA_URL }}{{ post.image }}" class="post-image bd-placeholder-img card-img-top" >
+            {% if post.text %}
+            <p>{{ post.text }}</p>
+            {% endif %}
+            {% if post.tag%}
+            <a href="" style="text-decoration: none; color: rgb(48, 96, 230);">{{ post.tag }}</a>
+            {% endif %}
+          </div>
+          <div class="card-body">
+            <p class="card-text"></p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="btn-group">
+                  <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+                  <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+                  <p class="good-count">{{ post.like_count }}件のいいね</p>
+                <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメントする</a>
+                <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">もっと見る</a>
+              </div>
+              <small class="text-muted"></small>
             </div>
-            <small class="text-muted"></small>
           </div>
         </div>
       </div>
-    </div>
-    {% endfor %}
+      {% endfor %}
     {% else %}
     <p>投稿はありません</p>
     {% endif %}

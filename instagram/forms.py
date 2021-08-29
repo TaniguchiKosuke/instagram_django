@@ -8,9 +8,9 @@ from users.models import User
 
 
 class PostForm(forms.ModelForm):
-    text = forms.CharField(widget=forms.Textarea, label='')
+    text = forms.CharField(widget=forms.Textarea, label='', required=False)
     image = forms.ImageField(label='')
-    tag = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Tag'}))
+    tag = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Tag'}), required=False)
 
     def __init__(self, *args, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)
