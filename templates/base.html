@@ -38,6 +38,7 @@
                 <a class="p-2 text-dark" style="text-decoration: none;" href="{% url 'instagram:user_profile' pk=user.pk %}"><img class="user-image-icon" src="{{ MEDIA_URL }}images/default-user-image.png" alt=""></a>
               {%endif%}
             {% endif %}
+            <a href="{% url 'instagram:post' %}"><img src="{{ MEDIA_URL }}app_images/post.svg" width="28" height="28"></a>
             <a class="p-2 text-dark" style="text-decoration: none;" href="{% url 'users:signup' %}">新規アカウント</a>
           </nav>
           {% block search %}

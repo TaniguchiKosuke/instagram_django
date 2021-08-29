@@ -51,6 +51,7 @@ class FriendShip(models.Model):
 class Message(models.Model):
     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='message_to_user')
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='dm_from_user')
+    # chat = models.ForeignKey('Chat', on_delete=models.CASCADE, related_name='messages')
     text = models.CharField(max_length=300)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -59,3 +60,12 @@ class Message(models.Model):
 
     def __str__(self):
         return f'Message from {self.from_user} to {self.to_user}'
+
+
+# class Chat(models.Model):
+#     admin = models.ForeignKey(User, on_delete=models.CASCADE)
+#     participants = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chats')
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return self.admin
