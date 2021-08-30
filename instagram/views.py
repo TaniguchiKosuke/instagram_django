@@ -58,25 +58,13 @@ class PostView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         author = self.request.user
         form.instance.author = author
+        tag = form.instance.tag
+        if tag:
+            tag_exist = Tag.objects.filter(name=tag)
+            if not tag_exist:
+                print('そんなタグは存在しません')
+                Tag.objects.create(name=tag)
         return super(PostView, self).form_valid(form)
-
-    # def form_valid(self, form):
-    #     instance = form.save(commit=False)
-    #     print(instance)
-    #     if instance.tag:
-    #         all_tags = Tag.objects.all()
-    #         print(all_tags)
-    #         all_tags_list = []
-    #         for tag in all_tags:
-    #             all_tags_list.append(tag.name)
-    #         print(all_tags_list)
-    #         if not instance.tag in all_tags_list:
-    #             Tag.objects.create(name=instance.tag)
-    #             instance.tag.add(instance.tag)
-    #             form.save()
-    #         instance.tag.add(instance.tag)
-    #         form.save()
-    #     return super(PostForm, self).form_valid(form)
 
 
 class UserProfileView(LoginRequiredMixin, TemplateView):
