@@ -55,20 +55,41 @@ class PostView(LoginRequiredMixin, CreateView):
     form_class = PostForm
     success_url = reverse_lazy('instagram:home')
 
+    # def form_valid(self, form):
+    #     author = self.request.user
+    #     form.instance.author = author
+    #     tag = self.request.POST['tag']
+    #     print(tag)
+    #     if tag:
+    #         all_tags = Tag.objects.all()
+    #         print(all_tags)
+    #         all_tags_list = []
+    #         for tag in all_tags:
+    #             all_tags_list.append(tag.name)
+    #             print(all_tags_list)
+    #         if not tag in all_tags_list:
+    #             tag =Tag.objects.create(name=tag)
+    #             model.tag.add(tag)
+    #         model.tag.add(tag)
+    #     return super(PostView, self).form_valid(form)
+
     def form_valid(self, form):
-        author = self.request.user
-        form.instance.author = author
-        # tag = self.request.POST['tag']
-        # if tag:
-        #     all_tags = Tag.objects.all()
-        #     all_tags_list = []
-        #     for tag in all_tags:
-        #         all_tags_list.append(tag.name)
-        #     if not tag.name in all_tags_list:
-        #         tag =Tag.objects.create(name=tag.name)
-        #         tag.instance. = tag
-        #     form.instance.tag = tag
-        return super(PostView, self).form_valid(form)
+        instance = form.save(commit=False)
+        print(instance)
+        if instance.tag:
+            all_tags = Tag.objects.all()
+            print(all_tags)
+            all_tags_list = []
+            for tag in all_tags:
+                all_tags_list.append(tag.name)
+            print(all_tags_list)
+            if not instance.tag in all_tags_list:
+                Tag.objects.create(name=instance.tag)
+                instance.tag.add(instance.tag)
+                form.save()
+            instance.tag.add(instance.tag)
+            form.save()
+        return super(PostForm, self).form_valid(form)
 
 
 class UserProfileView(LoginRequiredMixin, TemplateView):

@@ -1,4 +1,5 @@
 from os import name
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.deletion import CASCADE
@@ -6,6 +7,7 @@ from django.db.models.fields import related
 from django.urls.base import translate_url
 from django.utils import timezone
 from users.models import User
+import uuid
 
 
 class Tag(models.Model):
@@ -16,6 +18,7 @@ class Tag(models.Model):
 
 
 class Posts(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     text = models.TextField(max_length=200, null=True, blank=True)
     image = models.ImageField(upload_to='images/')
     tag = models.ManyToManyField(Tag, null=True, blank=True, through='PostTagRelation')
