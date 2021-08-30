@@ -298,3 +298,8 @@ class MessageListView(LoginRequiredMixin, ListView):
         if query:
             queryset = User.objects.filter(followers=request_user).filter(Q(username__icontains=query) | Q(name__icontains=query))[:10]
         return queryset
+
+
+class TagPostListView(LoginRequiredMixin, ListView):
+    template_name = 'tag_post_list.html'
+    queryset = Posts

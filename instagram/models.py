@@ -7,27 +7,26 @@ from django.db.models.fields import related
 from django.urls.base import translate_url
 from django.utils import timezone
 from users.models import User
-import uuid
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 class Posts(models.Model):
     text = models.TextField(max_length=200, null=True, blank=True)
     image = models.ImageField(upload_to='images/')
-    tag = models.CharField(max_length=100, null=True, blank=True)
+    # tag = models.CharField(max_length=100, null=True, blank=True)
+    tag = models.ManyToManyField(Tag, null=True, blank=True)
     post_date = models.DateTimeField(default=timezone.now, null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     like_count = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = 'Post'
-
-
-class Tag(models.Model):
-    name = models.CharField(max_length=100)
-    post = models.ManyToManyField(Posts, related_name='post')
-
-    def __str__(self):
-        return self.name
 
 
 class PostTagRelation(models.Model):

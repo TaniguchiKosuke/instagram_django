@@ -6,6 +6,7 @@ app_name = 'instagram'
 urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),
     path('post/', views.PostView.as_view(), name='post'),
+    # path('post/', views.post_view, name='post'),
     path('user_profile/<int:pk>/', views.UserProfileView.as_view(), name='user_profile'),
     path('user_profile_update/<int:pk>/', views.UserProfileUpdateView.as_view(), name='user_profile_update'),
     path('like_post/<int:pk>/', views.like_post, name='like_post'),
@@ -17,4 +18,5 @@ urlpatterns = [
     path('follower_list/<int:pk>/', views.FollowerListView.as_view(), name='follower_list'),
     path('messages/<int:pk>/', views.MessagesView.as_view(), name='messages'),
     path('message_list', views.MessageListView.as_view(), name='message_list'),
+    path('tag_post_list/', views.TagPostListView.as_view(), name='tag_post_list')
 ]

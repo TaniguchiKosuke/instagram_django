@@ -19,7 +19,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Posts
-        fields = ('text', 'image', 'tag',)
+        fields = ('text', 'image', 'tag')
 
 
 class UserProfileUpdateForm(forms.ModelForm):
