@@ -268,7 +268,7 @@ class MessageListView(LoginRequiredMixin, ListView):
         queryset = super().get_queryset()
         request_user = self.request.user
         queryset = User.objects.filter(followers=request_user)[:10]
-        #もしDMが来てるもしくは、リクエストユーザーが誰かにDMをオッくている場合はその人を優先的にリストアップする処理
+        #もしDMが来てるもしくは、リクエストユーザーが誰かにDMを送っている場合はその人を優先的にリストアップする処理
         messages = Message.objects.filter(Q(to_user=request_user) | Q(from_user=request_user))
         if messages:
             from_user_list = []
