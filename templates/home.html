@@ -45,7 +45,7 @@
         </tr>
       </thead>
       {% for tag in tags %}
-        <tbody>
+        <tbody style="background-color: #fff;">
           <tr class="candidates-list">
             <td class="title">
               <div class="thumb">
@@ -56,7 +56,7 @@
               <div class="candidate-list-details">
                 <div class="candidate-list-info">
                   <div class="candidate-list-title">
-                    <p class="mb-0"><a href="{% url 'instagram:home' %}" style="text-decoration: none; color: black;">{{ tag.name }}</a></p>
+                    <p class="mb-0"><a href="{% url 'instagram:tag_post_list' tag=tag.name %}" style="text-decoration: none; color: black;">{{ tag.name }}</a></p>
                   </div>
                 </div>
               </div>

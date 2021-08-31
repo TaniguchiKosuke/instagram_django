@@ -3,25 +3,45 @@
 {% block content %}
 
 
+<section class="jumbotron text-center" style="background-color: #f8f9fa; margin-top:0;">
+    <div class="container d-flex">
+      <div>
+        <img  class="top-image-of-user" src="{{ MEDIA_URL }}app_images/hashtag.jpeg" alt="">
+      </div>
+  
+      <div style="margin-left: 100px;">
+        <h1 class="jumbotron-heading">{{ tag }}</h1>
+        <p>
+          <h5>{{ num_of_posts }}</h5>
+          <p>posts</p>
+        </p>
+      </div>
+    </div>
+  </section>
+
+
 <div class="container blog-page">
     <div class="row clearfix">
-        <div class="col-lg-4 col-md-12" style="margin-top: 20px;">
-
-
+        
+        {% if object_list %}
+        {% for post in object_list %}
+        <div class="col-lg-4 col-md-12">
             <div class="card single_post">
-                <div class="body">
-                    <p>taniguchi</p>
+                <div class="body" style="padding: 0;">
+                    <p>{{ post.author }}</p>
                 </div>
-                <div class="body">
-                    <div class="img-post m-b-15">
-                        <img src="https://bootdey.com/img/Content/avatar/avatar5.png" alt="Awesome Image">
+                <div class="body" style="padding: 0; margin:0 auto;">
+                    <div class="img-post m-b-15" style="margin: 0 auto;">
+                        <img src="{{ MEDIA_URL }}{{ post.image }}" alt="Awesome Image">
                     </div>
-                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal</p>
                 </div>
             </div>
-
-
         </div>
+            {% endfor %}
+            {% else %}
+            <div>投稿がありません</div>
+            {% endif %}
+
     </div>
 </div>
 {% endblock content %}

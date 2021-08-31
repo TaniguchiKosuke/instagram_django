@@ -610,7 +610,6 @@ body{
   font-size: 14px;
   border: 1px solid #ccc;
   padding: 6px 10px;
-  border-radius: 3px;
   color: #242424
 }
 
@@ -677,7 +676,6 @@ body{
   margin-bottom: 30px;
   transition: .5s;
   border: 0;
-  border-radius: .55rem;
   position: relative;
   width: 100%;
   box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);

@@ -291,3 +291,16 @@ class MessageListView(LoginRequiredMixin, ListView):
 class TagPostListView(LoginRequiredMixin, ListView):
     template_name = 'tag_post_list.html'
     queryset = Posts
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        tag = self.kwargs['tag']
+        queryset = Posts.objects.filter(tag=tag)
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tag = self.kwargs['tag']
+        context['tag'] = tag
+        context['num_of_posts'] = Posts.objects.filter(tag=tag).count()
+        return context
