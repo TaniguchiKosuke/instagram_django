@@ -57,45 +57,59 @@
 </section>
 
 <div class="all-posts-area">
-  {% if posts %}
-  {% for post in posts %}
-  <div class="posts-area">
-    <div class="card post-card mb-4 shadow-sm">
-      <h5><a href="{% url 'instagram:user_profile' pk=post.author.pk %}" class="post-username-a">{{ post.author }}</a></h5>
-      <div>
-        <img  src="{{ MEDIA_URL }}{{ post.image }}" class="post-image bd-placeholder-img card-img-top" >
-        {% if post.text %}
-        <p>{{ post.text }}</p>
-        {% endif %}
-        {% if post.tag%}
-        <a href="" style="text-decoration: none; color: rgb(48, 96, 230);">{{ post.tag }}</a>
-        {% endif %}
-      </div>
-      <div class="card-body">
-        <p class="card-text"></p>
-        <div class="d-flex justify-content-between align-items-center">
-          <div class="btn-group">
-              <a href="" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
-              <a href="" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
-              <p class="good-count">{{ post.like_count }}件のいいね</p>
-              <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメントする</a>
-              <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">もっと見る</a>
-          </div>
-          <small class="text-muted"></small>
+  <div class="container blog-page">
+    <div class="row clearfix">
+        
+        {% if posts%}
+        {% for post in posts %}
+        <div class="col-lg-4 col-md-12">
+            <div class="card single_post">
+                <div class="body" style="padding: 0;">
+                  <h5><a href="{% url 'instagram:user_profile' pk=post.author.pk %}" class="post-username-a">{{ post.author }}</a></h5>
+                </div>
+                <div class="body" style="padding: 0; margin:0 auto;">
+                    <div class="img-post m-b-15" style="margin: 0 auto;">
+                        <img src="{{ MEDIA_URL }}{{ post.image }}" alt="Awesome Image">
+                        {% if post.text %}
+                        <p>{{ post.text }}</p>
+                        {% endif %}
+                        {% if post.tag%}
+                        <a href="" style="text-decoration: none; color: rgb(48, 96, 230);">{{ post.tag }}</a>
+                        {% endif %}
+                    </div>
+  
+                    <div class="card-body">
+                      <p class="card-text"></p>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <a href="" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+                            <a href="" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+                            <p class="good-count">{{ post.like_count }}件</p>
+                            <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメント
+                            </a>
+                            <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">more</a>
+                        </div>
+                        <small class="text-muted"></small>
+                      </div>
+                    </div>
+  
+                </div>
+            </div>
         </div>
-      </div>
+        {% endfor %}
+        {% else %}
+        <div>投稿がありません</div>
+        {% endif %}
+  
+        <div class="col-6 offset-3 justify-content-center">
+          {% if is_paginated %}
+              {% include 'pagination.html' %}
+          {% endif %}
+        </div>
+  
     </div>
   </div>
-  {% endfor %}
-  {% else %}
-  <p>投稿はありません</p>
-  {% endif %}
-
-  <div class="col-6 offset-3 justify-content-center">
-    {% if is_paginated %}
-        {% include 'pagination.html' %}
-    {% endif %}
-  </div>
-
 </div>
+
+
 {% endblock content %}
