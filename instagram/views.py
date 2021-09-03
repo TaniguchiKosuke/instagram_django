@@ -33,7 +33,7 @@ class HomeView(LoginRequiredMixin, ListView):
         if request_user.followees.all():
             print(request_user.followees.all())
             for followee in request_user.followees.all():
-                queryset = queryset.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-post_date')
+                queryset = queryset.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
         elif query:
             #投稿を検索する処理
             if not query.startswith('#'):
@@ -42,7 +42,7 @@ class HomeView(LoginRequiredMixin, ListView):
                 queryset = Posts.objects.none()
         else:
             print('all users')
-            queryset = queryset.objects.order_by('-post_date')
+            queryset = queryset.objects.order_by('-created_at')
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -84,13 +84,21 @@ class PostView(LoginRequiredMixin, CreateView):
         return super(PostView, self).form_valid(form)
 
 
-class UserProfileView(LoginRequiredMixin, TemplateView):
+class UserProfileView(LoginRequiredMixin, ListView):
     template_name = 'user_profile.html'
+    queryset = Posts
+    context_object_name = 'posts'
+    paginate_by = 15
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = User.objects.get(pk=self.kwargs['pk'])
+        queryset = queryset.objects.filter(author=user).order_by('-created_at')
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = User.objects.get(pk=self.kwargs['pk'])
-        context['posts'] = Posts.objects.filter(author=user)
         context['user_profile'] = User.objects.get(pk=user.pk)
         context['request_user'] = self.request.user
         context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
@@ -327,11 +335,12 @@ class MessageListView(LoginRequiredMixin, ListView):
 class TagPostListView(LoginRequiredMixin, ListView):
     template_name = 'tag_post_list.html'
     queryset = Posts
+    paginate_by = 15
 
     def get_queryset(self):
         queryset = super().get_queryset()
         tag = self.kwargs['tag']
-        queryset = Posts.objects.filter(tag=tag)
+        queryset = Posts.objects.filter(tag=tag).order_by('-like_count')
         return queryset
     
     def get_context_data(self, **kwargs):
