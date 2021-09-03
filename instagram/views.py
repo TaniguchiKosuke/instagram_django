@@ -37,9 +37,9 @@ class HomeView(LoginRequiredMixin, ListView):
         elif query:
             #投稿を検索する処理
             if not query.startswith('#'):
-                queryset = queryset.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
-            else:
-                queryset = Posts.objects.none()
+                queryset = queryset.objects.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
+            elif query.startswith('#'):
+                queryset = Tag.objects.filter(Q(name__icontains=query))
         else:
             print('all users')
             queryset = queryset.objects.order_by('-created_at')
@@ -54,8 +54,12 @@ class HomeView(LoginRequiredMixin, ListView):
         context['comment_from_post_list_form'] = CommentFromPostListForm()
         query = self.request.GET.get('query')
         if query:
+            context['query_exist'] = True
+            #入力された文字列がタグか否かを判定し、テンプレートにフラグを返す処理。
+            # つまり、get_context_dataで入力された文字列をフラグとしてわたし、オブジェクトはget_querysetで返す。
             if query.startswith('#'):
-                context['tags'] = Tag.objects.filter(Q(name__icontains=query))[:16]
+                context['tags'] = Tag.objects.filter(Q(name__icontains=query))
+
         return context
 
     # def post(self, request, *args, **kwargs):

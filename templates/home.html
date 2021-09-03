@@ -44,7 +44,7 @@
           <th>Tags</th>
         </tr>
       </thead>
-      {% for tag in tags %}
+      {% for tag in object_list %}
         <tbody style="background-color: #fff;">
           <tr class="candidates-list">
             <td class="title">
@@ -66,6 +66,9 @@
         </tbody>
       </table>
     {% elif object_list %}
+      {% if query_exist %}
+      <h5><a href="" class="see-more">友達を探す</a></h5>
+      {% endif %}
       {% for post in object_list %}
       <div class="posts-area">
         <div class="card post-card mb-4 shadow-sm">
