@@ -71,6 +71,16 @@ class HomeView(LoginRequiredMixin, ListView):
     #     return super(HomeView, self).post(request, *args, **kwargs)
 
 
+def search_friends(request):
+    """
+    うまく行くかはわからないけど、この関数で、「友達を探す」が押された時に
+    フォームに入力されている文字列から友達を探す。そのためには、この関数で、
+    現在フォームに入力されているqueryを取得して、HomeViewに渡す必要がある。
+    また、この関数は、入力フォームのactionで呼ばれる世にすれば良いと思う。
+    """
+    pass
+
+
 class PostView(LoginRequiredMixin, CreateView):
     template_name = 'post.html'
     form_class = PostForm
