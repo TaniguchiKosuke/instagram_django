@@ -1,5 +1,3 @@
-from os import name
-from typing import Text
 from django.core.checks import messages
 from django.db.models import query
 from django.forms.utils import to_current_timezone
