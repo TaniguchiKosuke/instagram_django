@@ -33,7 +33,7 @@ class HomeView(LoginRequiredMixin, ListView):
         if request_user.followees.all():
             print(request_user.followees.all())
             for followee in request_user.followees.all():
-                queryset = queryset.objects.filter(author=followee).order_by('-post_date')
+                queryset = queryset.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-post_date')
         elif query:
             #投稿を検索する処理
             if not query.startswith('#'):
@@ -136,6 +136,8 @@ class CommentToPostView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         author = self.request.user
         post = Posts.objects.get(pk=self.kwargs['pk'])
+        post.comment_count += 1
+        post.save()
         form.instance.author = author
         form.instance.post = post
         return super().form_valid(form)
@@ -148,12 +150,11 @@ class CommentToPostView(LoginRequiredMixin, CreateView):
 def comment_from_post_list(request, pk):
     form = CommentFromPostListForm(request.POST or None)
     if form.is_valid():
-        print(form)
-        print('==============================================')
         text = request.POST['text']
-        print(text)
         author = request.user
         post = Posts.objects.get(pk=pk)
+        post.comment_count += 1
+        post.save()
         CommentToPost.objects.create(
             text=text,
             author=author,

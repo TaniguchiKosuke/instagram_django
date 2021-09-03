@@ -86,7 +86,7 @@
                   <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
                   <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
                   <p class="good-count">{{ post.like_count }}件のいいね</p>
-                <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメントする</a>
+                <p class="see-more" style="text-decoration: none;">コメント{{ post.comment_count }}件</p>
                 <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">more</a>
               </div>
               <small class="text-muted"></small>

@@ -23,6 +23,7 @@ class Posts(models.Model):
     post_date = models.DateTimeField(default=timezone.now, null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     like_count = models.IntegerField(default=0)
+    comment_count = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = 'Post'
@@ -47,7 +48,7 @@ class CommentToPost(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return self.author
+        return f'{self.author} {self.text}'
 
 
 class FriendShip(models.Model):
