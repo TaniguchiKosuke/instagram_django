@@ -27,14 +27,22 @@ class HomeView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.objects.order_by('-post_date')
-        #投稿を検索する処理
+        #ユーザーが誰かフォローしている場合はその人の投稿を優先的に表示
+        request_user = self.request.user
         query = self.request.GET.get('query')
-        if query:
+        if request_user.followees.all():
+            print(request_user.followees.all())
+            for followee in request_user.followees.all():
+                queryset = queryset.objects.filter(author=followee).order_by('-post_date')
+        elif query:
+            #投稿を検索する処理
             if not query.startswith('#'):
                 queryset = queryset.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
             else:
                 queryset = Posts.objects.none()
+        else:
+            print('all users')
+            queryset = queryset.objects.order_by('-post_date')
         return queryset
 
     def get_context_data(self, **kwargs):
