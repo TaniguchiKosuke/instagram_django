@@ -73,3 +73,4 @@ class CommentFromPostListForm(forms.Form):
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
             field.widget.attrs["name"] = "text"
+            field.widget.attrs['placeholder'] = 'コメントを送る'
