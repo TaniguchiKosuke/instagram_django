@@ -28,7 +28,7 @@
         <div class="col-lg-4 col-md-12">
             <div class="card single_post">
                 <div class="body" style="padding: 0;">
-                    <p>{{ post.author }}</p>
+                    <a href="{% url 'instagram:user_profile' pk=post.author.pk %}" style="color:black;">{{ post.author }}</a>
                 </div>
                 <div class="body" style="padding: 0; margin:0 auto;">
                     <div class="img-post m-b-15" style="margin: 0 auto;">

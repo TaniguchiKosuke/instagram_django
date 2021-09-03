@@ -76,7 +76,7 @@
             <p>{{ post.text }}</p>
             {% endif %}
             {% if post.tag%}
-            <a href="" style="text-decoration: none; color: rgb(48, 96, 230);">{{ post.tag }}</a>
+            <a href="{% url 'instagram:tag_post_list' tag=post.tag %}" style="text-decoration: none; color: rgb(48, 96, 230);">{{ post.tag }}</a>
             {% endif %}
           </div>
           <div class="card-body">
@@ -87,10 +87,18 @@
                   <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
                   <p class="good-count">{{ post.like_count }}件のいいね</p>
                 <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメントする</a>
-                <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">もっと見る</a>
+                <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">more</a>
               </div>
               <small class="text-muted"></small>
+
             </div>
+            <form method="POST" class="form-inline" action="{% url 'instagram:comment_from_post_list' pk=post.pk %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                  {{ comment_from_post_list_form }}
+                  <button type="submit" class="btn btn-outline-primary">Post</button>
+                </div>
+            </form>
           </div>
         </div>
       </div>

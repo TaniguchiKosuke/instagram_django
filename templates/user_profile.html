@@ -26,7 +26,7 @@
   
       {% if request_user != user_profile %}
         {% if connected %}
-        <a href="{% url 'instagram:unfollow' pk=user_profile.pk %}" class="btn btn-dark">フォロー解除</a>
+        <a href="{% url 'instagram:unfollow' pk=user_profile.pk %}" class="btn btn-dark">フォロー中</a>
         {% else %}
         <a href="{% url 'instagram:follow' pk=user_profile.pk %}" class="btn btn-outline-dark">フォロー</a>
         {% endif %}

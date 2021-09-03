@@ -2,6 +2,7 @@ from os import name
 from typing import Text
 from django.core.checks import messages
 from django.db.models import query
+from django.forms.utils import to_current_timezone
 from django.http import request
 from django.views.generic.base import TemplateView
 from users.models import User
@@ -14,10 +15,11 @@ from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import CommentToPost, FriendShip, Message, PostLikes, Posts, Tag
-from .forms import MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm
+from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_protect
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -43,11 +45,20 @@ class HomeView(LoginRequiredMixin, ListView):
         context['user'] = user
         context['followee'] = FriendShip.objects.filter(follower__username=user).count()
         context['follower'] = FriendShip.objects.filter(followee__username=user).count()
+        context['comment_from_post_list_form'] = CommentFromPostListForm()
         query = self.request.GET.get('query')
         if query:
             if query.startswith('#'):
                 context['tags'] = Tag.objects.filter(Q(name__icontains=query))[:16]
         return context
+
+    # def post(self, request, *args, **kwargs):
+    #     if self.request.POST.get('comment', None):
+    #         text = self.request.POST.get('comment', None)
+    #         author = self.request.user
+    #         post = 
+
+    #     return super(HomeView, self).post(request, *args, **kwargs)
 
 
 class PostView(LoginRequiredMixin, CreateView):
@@ -125,6 +136,24 @@ class CommentToPostView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse('instagram:post_detail', kwargs={'pk':self.kwargs['pk']})
+
+
+@csrf_protect
+def comment_from_post_list(request, pk):
+    form = CommentFromPostListForm(request.POST or None)
+    if form.is_valid():
+        print(form)
+        print('==============================================')
+        text = request.POST['text']
+        print(text)
+        author = request.user
+        post = Posts.objects.get(pk=pk)
+        CommentToPost.objects.create(
+            text=text,
+            author=author,
+            post=post,
+        )
+    return redirect(reverse_lazy('instagram:home'))
 
 
 class PostDetailView(LoginRequiredMixin, DetailView):
