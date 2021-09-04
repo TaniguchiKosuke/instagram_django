@@ -13,7 +13,7 @@ from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import CommentToPost, FriendShip, Message, PostLikes, Posts, Tag
-from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm
+from .forms import CommentFromPostListForm, MessageForm, PostForm, SearchFriendsForm, UserProfileUpdateForm, CommentToPostForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
@@ -30,8 +30,8 @@ class HomeView(LoginRequiredMixin, ListView):
         #ユーザーが誰かフォローしている場合はその人の投稿を優先的に表示
         request_user = self.request.user
         query = self.request.GET.get('query')
+        friend_query = self.request.GET.get('friend_query')
         if request_user.followees.all():
-            print(request_user.followees.all())
             for followee in request_user.followees.all():
                 queryset = queryset.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
         elif query:
@@ -40,8 +40,9 @@ class HomeView(LoginRequiredMixin, ListView):
                 queryset = queryset.objects.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
             elif query.startswith('#'):
                 queryset = Tag.objects.filter(Q(name__icontains=query))
+        elif friend_query:
+            queryset = User.objects.filter(Q(username__icontains=friend_query) | Q(name__icontains=friend_query))
         else:
-            print('all users')
             queryset = queryset.objects.order_by('-created_at')
         return queryset
 
@@ -53,13 +54,21 @@ class HomeView(LoginRequiredMixin, ListView):
         context['follower'] = FriendShip.objects.filter(followee__username=user).count()
         context['comment_from_post_list_form'] = CommentFromPostListForm()
         query = self.request.GET.get('query')
+        print(query)
+        friends = {'text': query}
+        context['search_friends_form'] = SearchFriendsForm(initial=friends)
+        print(context['search_friends_form'])
+        friend_query = self.request.GET.get('friend_query')
+        print('friend query =============================================')
+        print(friend_query)
         if query:
             context['query_exist'] = True
             #入力された文字列がタグか否かを判定し、テンプレートにフラグを返す処理。
             # つまり、get_context_dataで入力された文字列をフラグとしてわたし、オブジェクトはget_querysetで返す。
             if query.startswith('#'):
                 context['tags'] = Tag.objects.filter(Q(name__icontains=query))
-
+        elif friend_query:
+            context['friend_query_exist'] = True
         return context
 
     # def post(self, request, *args, **kwargs):

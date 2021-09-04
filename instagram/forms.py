@@ -1,4 +1,3 @@
-from typing import Text
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.core.files.base import File
@@ -74,3 +73,16 @@ class CommentFromPostListForm(forms.Form):
             field.widget.attrs["class"] = "form-control"
             field.widget.attrs["name"] = "text"
             field.widget.attrs['placeholder'] = 'コメントを送る'
+
+
+class SearchFriendsForm(forms.Form):
+    text = forms.CharField(label='', widget=forms.HiddenInput)
+
+    # def __init__(self, *args, **kwargs):
+    #     super(SearchFriendsForm, self).__init__(*args, **kwargs)
+    #     self.fields['text'].widget.attrs['name'] = 'friend_query'
+
+    def __init__(self, *args, **kwargs):
+        super(SearchFriendsForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs["name"] = "friend_query"

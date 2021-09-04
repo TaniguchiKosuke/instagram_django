@@ -65,9 +65,18 @@
           {% endfor %}
         </tbody>
       </table>
+
+    {% elif friend_query_exist %}
+      {% for user in object_list %}
+      <p>{{ user.username }}</p>
+      {% endfor %}
     {% elif object_list %}
       {% if query_exist %}
-      <h5><a href="" class="see-more">友達を探す</a></h5>
+      <form action="{% url 'instagram:home' %}" method="GET">
+        {% csrf_token %}
+        {{ search_friends_form }}
+        <button type="submit" class="btn btn-link see-more">友達を探す</button>
+      </form>
       {% endif %}
       {% for post in object_list %}
       <div class="posts-area">
