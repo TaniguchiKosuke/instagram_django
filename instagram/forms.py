@@ -78,10 +78,6 @@ class CommentFromPostListForm(forms.Form):
 class SearchFriendsForm(forms.Form):
     text = forms.CharField(label='', widget=forms.HiddenInput)
 
-    # def __init__(self, *args, **kwargs):
-    #     super(SearchFriendsForm, self).__init__(*args, **kwargs)
-    #     self.fields['text'].widget.attrs['name'] = 'friend_query'
-
     def __init__(self, *args, **kwargs):
         super(SearchFriendsForm, self).__init__(*args, **kwargs)
         for field in self.fields.values():

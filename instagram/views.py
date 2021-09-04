@@ -41,6 +41,9 @@ class HomeView(LoginRequiredMixin, ListView):
             elif query.startswith('#'):
                 queryset = Tag.objects.filter(Q(name__icontains=query))
         elif friend_query:
+            print('friend_query========================================')
+            print(friend_query)
+            print(type(friend_query))
             queryset = User.objects.filter(Q(username__icontains=friend_query) | Q(name__icontains=friend_query))
         else:
             queryset = queryset.objects.order_by('-created_at')
@@ -54,20 +57,21 @@ class HomeView(LoginRequiredMixin, ListView):
         context['follower'] = FriendShip.objects.filter(followee__username=user).count()
         context['comment_from_post_list_form'] = CommentFromPostListForm()
         query = self.request.GET.get('query')
-        print(query)
-        friends = {'text': query}
-        context['search_friends_form'] = SearchFriendsForm(initial=friends)
-        print(context['search_friends_form'])
+        # friends = {'text': query}
+        context['search_friends_form'] = SearchFriendsForm()
         friend_query = self.request.GET.get('friend_query')
-        print('friend query =============================================')
-        print(friend_query)
         if query:
             context['query_exist'] = True
             #入力された文字列がタグか否かを判定し、テンプレートにフラグを返す処理。
-            # つまり、get_context_dataで入力された文字列をフラグとしてわたし、オブジェクトはget_querysetで返す。
+            # つまり、get_context_dataで入力された文字列をフラグとしてわたし、オブジェクトはget_querysetで返す。(paginationしやすいため)
+            friends = {'text': query}
+            print(friends)
+            context['search_friends_form'] = SearchFriendsForm(initial=friends)
+            print(context['search_friends_form'])
             if query.startswith('#'):
                 context['tags'] = Tag.objects.filter(Q(name__icontains=query))
         elif friend_query:
+            print('friend query exist')
             context['friend_query_exist'] = True
         return context
 
