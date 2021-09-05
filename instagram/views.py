@@ -1,3 +1,4 @@
+from os import name
 from django.core.checks import messages
 from django.db.models import query
 from django.forms.utils import to_current_timezone
@@ -237,7 +238,7 @@ class FolloweeListView(LoginRequiredMixin, ListView):
 class FollowerListView(LoginRequiredMixin, ListView):
     template_name = 'follower_list.html'
     queryset = User
-    paginate_by = 10
+    paginate_by = 16
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -343,4 +344,24 @@ class TagPostListView(LoginRequiredMixin, ListView):
         tag = self.kwargs['tag']
         context['tag'] = tag
         context['num_of_posts'] = Posts.objects.filter(tag=tag).count()
+        return context
+
+
+class SearchFriendsView(LoginRequiredMixin, ListView):
+    template_name = 'search_friends.html'
+    queryset = User
+    paginate_by = 16
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+        queryset = User.objects.filter(followees=user)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['request_user'] = self.request.user
+        search_friends = self.request.GET.get('search_friends')
+        if search_friends:
+            context['object_list'] = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
         return context
