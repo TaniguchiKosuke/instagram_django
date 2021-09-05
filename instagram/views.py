@@ -31,7 +31,6 @@ class HomeView(LoginRequiredMixin, ListView):
         #ユーザーが誰かフォローしている場合はその人の投稿を優先的に表示
         request_user = self.request.user
         query = self.request.GET.get('query')
-        friend_query = self.request.GET.get('friend_query')
         if request_user.followees.all():
             for followee in request_user.followees.all():
                 queryset = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
@@ -55,7 +54,6 @@ class HomeView(LoginRequiredMixin, ListView):
         context['follower'] = followers.count()
         context['comment_from_post_list_form'] = CommentFromPostListForm()
         query = self.request.GET.get('query')
-        # friends = {'text': query}
         if query:
             context['query_exist'] = True
             if query.startswith('#'):
@@ -67,10 +65,14 @@ class HomeView(LoginRequiredMixin, ListView):
             followee = followee.followee
             if followee in reccomended_users:
                 continue
+            elif user == followee:
+                continue
             reccomended_users.append(followee)
         for follower in followers:
             follower = follower.followee
             if follower in reccomended_users:
+                continue
+            elif user == follower:
                 continue
             reccomended_users.append(follower)
         context['reccomended_users'] = reccomended_users
