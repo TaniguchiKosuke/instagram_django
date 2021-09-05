@@ -92,6 +92,11 @@
 							</div>
               {% endfor %}
 						</div>
+						<div class="col-6 offset-3 justify-content-center">
+							{% if is_paginated %}
+									{% include 'pagination.html' %}
+							{% endif %}
+						</div>
 					</div>
                     
 					<div class="flex-grow-0 py-3 px-4 border-top">

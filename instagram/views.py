@@ -34,32 +34,46 @@ class HomeView(LoginRequiredMixin, ListView):
         friend_query = self.request.GET.get('friend_query')
         if request_user.followees.all():
             for followee in request_user.followees.all():
-                queryset = queryset.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
+                queryset = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
         elif query:
             #投稿を検索する処理
             if not query.startswith('#'):
-                queryset = queryset.objects.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
+                queryset = Posts.objects.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
             elif query.startswith('#'):
                 queryset = Tag.objects.filter(Q(name__icontains=query))
         else:
-            queryset = queryset.objects.order_by('-created_at')
+            queryset = Posts.objects.order_by('-created_at')
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         context['user'] = user
-        context['followee'] = FriendShip.objects.filter(follower__username=user).count()
-        context['follower'] = FriendShip.objects.filter(followee__username=user).count()
+        followees = FriendShip.objects.filter(follower__username=user)
+        followers = FriendShip.objects.filter(followee__username=user)
+        context['followee'] = followees.count()
+        context['follower'] = followers.count()
         context['comment_from_post_list_form'] = CommentFromPostListForm()
         query = self.request.GET.get('query')
         # friends = {'text': query}
         if query:
             context['query_exist'] = True
-            #入力された文字列がタグか否かを判定し、テンプレートにフラグを返す処理。
-            # つまり、get_context_dataで入力された文字列をフラグとしてわたし、オブジェクトはget_querysetで返す。(paginationしやすいため)
             if query.startswith('#'):
                 context['tags'] = Tag.objects.filter(Q(name__icontains=query))
+
+        #「知り合いかも」にフォローしてる、もしくはフォローされてる友達のフォローしてる人をおすすめとして表示させるための処理
+        reccomended_users = []
+        for followee in followees:
+            followee = followee.followee
+            if followee in reccomended_users:
+                continue
+            reccomended_users.append(followee)
+        for follower in followers:
+            follower = follower.followee
+            if follower in reccomended_users:
+                continue
+            reccomended_users.append(follower)
+        context['reccomended_users'] = reccomended_users
         return context
 
 
@@ -256,6 +270,7 @@ class FollowerListView(LoginRequiredMixin, ListView):
 class MessagesView(LoginRequiredMixin, ListView):
     template_name = 'messages.html'
     queryset = Message
+    paginate_by=20
 
     def get_queryset(self):
         queryset = super().get_queryset()

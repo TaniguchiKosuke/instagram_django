@@ -33,10 +33,39 @@
       <h4>通知一覧</h4>
       <p>メッセージがきています</p>
     </div>
+
+    <div style="margin-top: 12px;">
+      <h4>知り合いかも</h4>
+      {% if reccomended_users %}
+      <table class="table table-hover" style="width: 76%;">
+
+        <tbody>
+          {% for user in reccomended_users%}
+          <tr>
+            {% if user.user_image %}
+            <th scope="row"><img src="{{ MEDIA_URL }}{{ user.user_image }}" alt=""></th>
+            {% else %}
+            <th scope="row"><img src="{{ MEDIA_URL }}images/default-user-image.png" alt="" style="width: 32px; border-radius: 50%;"></th>
+            {% endif %}
+            <td><a href="{% url 'instagram:user_profile' pk=user.pk %}" class="see-more" style="color: black;">{{ user.username }}</a></td>
+            <td>Otto</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>知り合いのユーザーが見つかりません</p>
+      {% endif %}
+
+
+    </div>
+
+    </div>
     </section>
 
   
   <div class="all-posts-area">
+    <a href="{% url 'instagram:search_friends' %}" class="btn btn-primary">友達を探す</a>
     {% if tags %}
     <table class="table manage-candidates-top mb-0">
       <thead>
