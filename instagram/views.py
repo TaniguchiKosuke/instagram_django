@@ -1,4 +1,4 @@
-from os import name
+import random
 from django import contrib
 from django.core.checks import messages
 from django.db.models import query
@@ -93,6 +93,17 @@ class HomeView(LoginRequiredMixin, ListView):
                     continue
                 reccomended_users.append(follower_friend_follower)
         #reccomended_usersはシャッフルしたい
+        if len(reccomended_users) < 1:
+            reccomended_users = reccomended_users
+        elif len(reccomended_users) < 2:
+            reccomended_users = random.sample(reccomended_users, 1)
+        elif len(reccomended_users) < 3:
+            reccomended_users = random.sample(reccomended_users, 2)
+        elif len(reccomended_users) < 4:
+            reccomended_users = random.sample(reccomended_users, 3)
+        else:
+            reccomended_users = random.sample(reccomended_users, 4)
+        print(type(reccomended_users))
         context['reccomended_users'] = reccomended_users
         return context
 
