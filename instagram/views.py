@@ -13,7 +13,7 @@ from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import CommentToPost, FriendShip, Message, PostLikes, Posts, Tag
-from .forms import CommentFromPostListForm, MessageForm, PostForm, SearchFriendsForm, UserProfileUpdateForm, CommentToPostForm
+from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
@@ -40,11 +40,6 @@ class HomeView(LoginRequiredMixin, ListView):
                 queryset = queryset.objects.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
             elif query.startswith('#'):
                 queryset = Tag.objects.filter(Q(name__icontains=query))
-        elif friend_query:
-            print('friend_query========================================')
-            print(friend_query)
-            print(type(friend_query))
-            queryset = User.objects.filter(Q(username__icontains=friend_query) | Q(name__icontains=friend_query))
         else:
             queryset = queryset.objects.order_by('-created_at')
         return queryset
@@ -58,40 +53,13 @@ class HomeView(LoginRequiredMixin, ListView):
         context['comment_from_post_list_form'] = CommentFromPostListForm()
         query = self.request.GET.get('query')
         # friends = {'text': query}
-        context['search_friends_form'] = SearchFriendsForm()
-        friend_query = self.request.GET.get('friend_query')
         if query:
             context['query_exist'] = True
             #入力された文字列がタグか否かを判定し、テンプレートにフラグを返す処理。
             # つまり、get_context_dataで入力された文字列をフラグとしてわたし、オブジェクトはget_querysetで返す。(paginationしやすいため)
-            friends = {'text': query}
-            print(friends)
-            context['search_friends_form'] = SearchFriendsForm(initial=friends)
-            print(context['search_friends_form'])
             if query.startswith('#'):
                 context['tags'] = Tag.objects.filter(Q(name__icontains=query))
-        elif friend_query:
-            print('friend query exist')
-            context['friend_query_exist'] = True
         return context
-
-    # def post(self, request, *args, **kwargs):
-    #     if self.request.POST.get('comment', None):
-    #         text = self.request.POST.get('comment', None)
-    #         author = self.request.user
-    #         post = 
-
-    #     return super(HomeView, self).post(request, *args, **kwargs)
-
-
-def search_friends(request):
-    """
-    うまく行くかはわからないけど、この関数で、「友達を探す」が押された時に
-    フォームに入力されている文字列から友達を探す。そのためには、この関数で、
-    現在フォームに入力されているqueryを取得して、HomeViewに渡す必要がある。
-    また、この関数は、入力フォームのactionで呼ばれる世にすれば良いと思う。
-    """
-    pass
 
 
 class PostView(LoginRequiredMixin, CreateView):
