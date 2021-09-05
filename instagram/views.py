@@ -1,4 +1,5 @@
 from os import name
+from django import contrib
 from django.core.checks import messages
 from django.db.models import query
 from django.forms.utils import to_current_timezone
@@ -48,10 +49,10 @@ class HomeView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         context['user'] = user
-        followees = FriendShip.objects.filter(follower__username=user)
-        followers = FriendShip.objects.filter(followee__username=user)
-        context['followee'] = followees.count()
-        context['follower'] = followers.count()
+        followee_friendships = FriendShip.objects.filter(follower__username=user)
+        follower_friendships = FriendShip.objects.filter(followee__username=user)
+        context['followee'] = followee_friendships.count()
+        context['follower'] = follower_friendships.count()
         context['comment_from_post_list_form'] = CommentFromPostListForm()
         query = self.request.GET.get('query')
         if query:
@@ -61,20 +62,37 @@ class HomeView(LoginRequiredMixin, ListView):
 
         #「知り合いかも」にフォローしてる、もしくはフォローされてる友達のフォローしてる人をおすすめとして表示させるための処理
         reccomended_users = []
-        for followee in followees:
-            followee = followee.followee
-            if followee in reccomended_users:
-                continue
-            elif user == followee:
-                continue
-            reccomended_users.append(followee)
-        for follower in followers:
-            follower = follower.followee
-            if follower in reccomended_users:
-                continue
-            elif user == follower:
-                continue
-            reccomended_users.append(follower)
+        for relation in followee_friendships:
+            followee_friend_followees = relation.followee.followees.all()
+            followee_friend_followers = relation.followee.followers.all()
+            for followee_friend_followee in followee_friend_followees:
+                if followee_friend_followee in reccomended_users:
+                    continue
+                elif user == followee_friend_followee:
+                    continue
+                reccomended_users.append(followee_friend_followee)
+            for followee_friend_follower in followee_friend_followers:
+                if followee_friend_follower in reccomended_users:
+                    continue
+                elif user == followee_friend_follower:
+                    continue
+                reccomended_users.append(followee_friend_follower)
+        for relation in follower_friendships:
+            follower_friend_followees = relation.follower.followees.all()
+            follower_friend_followers = relation.follower.followers.all()
+            for follower_friend_followee in follower_friend_followees:
+                if follower_friend_followee in reccomended_users:
+                    continue
+                elif user == follower_friend_followee:
+                    continue
+                reccomended_users.append(follower_friend_followee)
+            for follower_friend_follower in follower_friend_followers:
+                if follower_friend_follower in reccomended_users:
+                    continue
+                elif user == follower_friend_follower:
+                    continue
+                reccomended_users.append(follower_friend_follower)
+        #reccomended_usersはシャッフルしたい
         context['reccomended_users'] = reccomended_users
         return context
 
