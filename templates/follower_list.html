@@ -35,7 +35,7 @@
     </p>
     {% else %}
     <p>
-      <a href="{% url 'instagram:messages' pk=user_profile.pk %}" class="btn btn-outline-secondary my-2">メッセージ</a>
+      <a href="{% url 'instagram:messages' pk=user_profile.pk %}" class="btn btn-secondary my-2">メッセージ</a>
     </p>
     {% endif %}
     {% if user_profile.text %}
