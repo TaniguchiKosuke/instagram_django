@@ -1,7 +1,8 @@
-from os import name
-from typing import Text
+import random
+from django import contrib
 from django.core.checks import messages
 from django.db.models import query
+from django.forms.utils import to_current_timezone
 from django.http import request
 from django.views.generic.base import TemplateView
 from users.models import User
@@ -14,10 +15,11 @@ from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import CommentToPost, FriendShip, Message, PostLikes, Posts, Tag
-from .forms import MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm
+from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_protect
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -27,26 +29,82 @@ class HomeView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.objects.order_by('-post_date')
-        #投稿を検索する処理
+        #ユーザーが誰かフォローしている場合はその人の投稿を優先的に表示
+        request_user = self.request.user
         query = self.request.GET.get('query')
-        if query:
+        if request_user.followees.all():
+            for followee in request_user.followees.all():
+                queryset = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
+        elif query:
+            #投稿を検索する処理
             if not query.startswith('#'):
-                queryset = queryset.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
-            else:
-                queryset = Posts.objects.none()
+                queryset = Posts.objects.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
+            elif query.startswith('#'):
+                queryset = Tag.objects.filter(Q(name__icontains=query))
+        else:
+            queryset = Posts.objects.order_by('-created_at')
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         context['user'] = user
-        context['followee'] = FriendShip.objects.filter(follower__username=user).count()
-        context['follower'] = FriendShip.objects.filter(followee__username=user).count()
+        followee_friendships = FriendShip.objects.filter(follower__username=user)
+        follower_friendships = FriendShip.objects.filter(followee__username=user)
+        context['followee'] = followee_friendships.count()
+        context['follower'] = follower_friendships.count()
+        context['comment_from_post_list_form'] = CommentFromPostListForm()
         query = self.request.GET.get('query')
         if query:
+            context['query_exist'] = True
             if query.startswith('#'):
-                context['tags'] = Tag.objects.filter(Q(name__icontains=query))[:16]
+                context['tags'] = Tag.objects.filter(Q(name__icontains=query))
+
+        #「知り合いかも」にフォローしてる、もしくはフォローされてる友達のフォローしてる人をおすすめとして表示させるための処理
+        reccomended_users = []
+        for relation in followee_friendships:
+            followee_friend_followees = relation.followee.followees.all()
+            followee_friend_followers = relation.followee.followers.all()
+            for followee_friend_followee in followee_friend_followees:
+                if followee_friend_followee in reccomended_users:
+                    continue
+                elif user == followee_friend_followee:
+                    continue
+                reccomended_users.append(followee_friend_followee)
+            for followee_friend_follower in followee_friend_followers:
+                if followee_friend_follower in reccomended_users:
+                    continue
+                elif user == followee_friend_follower:
+                    continue
+                reccomended_users.append(followee_friend_follower)
+        for relation in follower_friendships:
+            follower_friend_followees = relation.follower.followees.all()
+            follower_friend_followers = relation.follower.followers.all()
+            for follower_friend_followee in follower_friend_followees:
+                if follower_friend_followee in reccomended_users:
+                    continue
+                elif user == follower_friend_followee:
+                    continue
+                reccomended_users.append(follower_friend_followee)
+            for follower_friend_follower in follower_friend_followers:
+                if follower_friend_follower in reccomended_users:
+                    continue
+                elif user == follower_friend_follower:
+                    continue
+                reccomended_users.append(follower_friend_follower)
+        #reccomended_usersはシャッフルしたい
+        if len(reccomended_users) < 1:
+            reccomended_users = reccomended_users
+        elif len(reccomended_users) < 2:
+            reccomended_users = random.sample(reccomended_users, 1)
+        elif len(reccomended_users) < 3:
+            reccomended_users = random.sample(reccomended_users, 2)
+        elif len(reccomended_users) < 4:
+            reccomended_users = random.sample(reccomended_users, 3)
+        else:
+            reccomended_users = random.sample(reccomended_users, 4)
+        print(type(reccomended_users))
+        context['reccomended_users'] = reccomended_users
         return context
 
 
@@ -67,13 +125,21 @@ class PostView(LoginRequiredMixin, CreateView):
         return super(PostView, self).form_valid(form)
 
 
-class UserProfileView(LoginRequiredMixin, TemplateView):
+class UserProfileView(LoginRequiredMixin, ListView):
     template_name = 'user_profile.html'
+    queryset = Posts
+    context_object_name = 'posts'
+    paginate_by = 15
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = User.objects.get(pk=self.kwargs['pk'])
+        queryset = queryset.objects.filter(author=user).order_by('-created_at')
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = User.objects.get(pk=self.kwargs['pk'])
-        context['posts'] = Posts.objects.filter(author=user)
         context['user_profile'] = User.objects.get(pk=user.pk)
         context['request_user'] = self.request.user
         context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
@@ -119,12 +185,31 @@ class CommentToPostView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         author = self.request.user
         post = Posts.objects.get(pk=self.kwargs['pk'])
+        post.comment_count += 1
+        post.save()
         form.instance.author = author
         form.instance.post = post
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse('instagram:post_detail', kwargs={'pk':self.kwargs['pk']})
+
+
+@csrf_protect
+def comment_from_post_list(request, pk):
+    form = CommentFromPostListForm(request.POST or None)
+    if form.is_valid():
+        text = request.POST['text']
+        author = request.user
+        post = Posts.objects.get(pk=pk)
+        post.comment_count += 1
+        post.save()
+        CommentToPost.objects.create(
+            text=text,
+            author=author,
+            post=post,
+        )
+    return redirect(reverse_lazy('instagram:home'))
 
 
 class PostDetailView(LoginRequiredMixin, DetailView):
@@ -180,7 +265,7 @@ def unfollow_view(request, *args, **kwargs):
 class FolloweeListView(LoginRequiredMixin, ListView):
     template_name = 'followee_list.html'
     queryset = User
-    paginate_by = 10
+    paginate_by = 16
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -190,15 +275,18 @@ class FolloweeListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = User.objects.get(pk=self.kwargs['pk'])
         context['request_user'] = self.request.user
-        context['user_profile'] = User.objects.get(pk=self.kwargs['pk'])
+        context['user_profile'] = user
+        context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
+        context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
         return context
 
 
 class FollowerListView(LoginRequiredMixin, ListView):
     template_name = 'follower_list.html'
     queryset = User
-    paginate_by = 10
+    paginate_by = 16
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -208,14 +296,18 @@ class FollowerListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = User.objects.get(pk=self.kwargs['pk'])
         context['request_user'] = self.request.user
-        context['user_profile'] = User.objects.get(pk=self.kwargs['pk'])
+        context['user_profile'] = user
+        context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
+        context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
         return context
 
 
 class MessagesView(LoginRequiredMixin, ListView):
     template_name = 'messages.html'
     queryset = Message
+    paginate_by=20
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -291,11 +383,12 @@ class MessageListView(LoginRequiredMixin, ListView):
 class TagPostListView(LoginRequiredMixin, ListView):
     template_name = 'tag_post_list.html'
     queryset = Posts
+    paginate_by = 15
 
     def get_queryset(self):
         queryset = super().get_queryset()
         tag = self.kwargs['tag']
-        queryset = Posts.objects.filter(tag=tag)
+        queryset = Posts.objects.filter(tag=tag).order_by('-like_count')
         return queryset
     
     def get_context_data(self, **kwargs):
@@ -303,4 +396,24 @@ class TagPostListView(LoginRequiredMixin, ListView):
         tag = self.kwargs['tag']
         context['tag'] = tag
         context['num_of_posts'] = Posts.objects.filter(tag=tag).count()
+        return context
+
+
+class SearchFriendsView(LoginRequiredMixin, ListView):
+    template_name = 'search_friends.html'
+    queryset = User
+    paginate_by = 16
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+        queryset = User.objects.filter(followees=user)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['request_user'] = self.request.user
+        search_friends = self.request.GET.get('search_friends')
+        if search_friends:
+            context['object_list'] = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
         return context

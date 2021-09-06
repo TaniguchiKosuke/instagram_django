@@ -4,7 +4,7 @@ from .models import CommentToPost, Message, Posts, Tag
 
 @admin.register(Posts)
 class PostsAdmin(admin.ModelAdmin):
-    list_display = ('get_author', 'post_date',)
+    list_display = ('get_author', 'created_at',)
 
     def get_author(self, obj):
         return obj.author

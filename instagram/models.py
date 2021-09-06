@@ -9,52 +9,56 @@ from django.utils import timezone
 from users.models import User
 
 
-class Tag(models.Model):
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(default=timezone.now)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class Tag(TimeStampedModel):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
 
 
-class Posts(models.Model):
+class Posts(TimeStampedModel):
     text = models.TextField(max_length=200, null=True, blank=True)
     image = models.ImageField(upload_to='images/')
     tag = models.CharField(max_length=100, null=True, blank=True)
-    post_date = models.DateTimeField(default=timezone.now, null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     like_count = models.IntegerField(default=0)
+    comment_count = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = 'Post'
 
 
-class PostTagRelation(models.Model):
+class PostTagRelation(TimeStampedModel):
     tag = models.ForeignKey('Tag', on_delete=models.CASCADE)
     post = models.ForeignKey('Posts', on_delete=models.CASCADE)
-    cerated_at = models.DateTimeField(auto_now_add=True)
 
 
-class PostLikes(models.Model):
+class PostLikes(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=timezone.now)
 
 
-class CommentToPost(models.Model):
+class CommentToPost(TimeStampedModel):
     text = models.CharField(max_length=300)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return self.author
+        return f'{self.author} {self.text}'
 
 
-class FriendShip(models.Model):
+class FriendShip(TimeStampedModel):
     followee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower_friendships')
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followee_friendships')
     is_connected = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         unique_together = ('followee', 'follower')
@@ -63,24 +67,13 @@ class FriendShip(models.Model):
         return f'{self.follower} follows {self.followee}'
 
 
-class Message(models.Model):
+class Message(TimeStampedModel):
     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='message_to_user')
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='dm_from_user')
-    # chat = models.ForeignKey('Chat', on_delete=models.CASCADE, related_name='messages')
     text = models.CharField(max_length=300)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-created_at']
 
     def __str__(self):
         return f'Message from {self.from_user} to {self.to_user}'
-
-
-# class Chat(models.Model):
-#     admin = models.ForeignKey(User, on_delete=models.CASCADE)
-#     participants = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chats')
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return self.admin
