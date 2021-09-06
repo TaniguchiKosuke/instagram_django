@@ -32,15 +32,15 @@ class HomeView(LoginRequiredMixin, ListView):
         #ユーザーが誰かフォローしている場合はその人の投稿を優先的に表示
         request_user = self.request.user
         query = self.request.GET.get('query')
-        if request_user.followees.all():
-            for followee in request_user.followees.all():
-                queryset = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
-        elif query:
+        if query:
             #投稿を検索する処理
             if not query.startswith('#'):
                 queryset = Posts.objects.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
             elif query.startswith('#'):
                 queryset = Tag.objects.filter(Q(name__icontains=query))
+        elif request_user.followees.all():
+            for followee in request_user.followees.all():
+                queryset = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
         else:
             queryset = Posts.objects.order_by('-created_at')
         return queryset
