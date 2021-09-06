@@ -30,7 +30,7 @@
 
     {% if request_user.pk == user_profile.pk %}
     <p>
-      <a href="{% url 'instagram:message_list' %}" class="btn btn-outline-secondary my-2">メッセージ</a>
+      <a href="{% url 'instagram:message_list' %}" class="btn btn-secondary my-2">メッセージ</a>
       <a href="{% url 'instagram:user_profile_update' pk=request_user.pk %}" class="btn btn-primary my-2">編集</a>
     </p>
     {% else %}

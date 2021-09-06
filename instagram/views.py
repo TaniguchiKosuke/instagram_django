@@ -265,7 +265,7 @@ def unfollow_view(request, *args, **kwargs):
 class FolloweeListView(LoginRequiredMixin, ListView):
     template_name = 'followee_list.html'
     queryset = User
-    paginate_by = 10
+    paginate_by = 16
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -275,8 +275,11 @@ class FolloweeListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = User.objects.get(pk=self.kwargs['pk'])
         context['request_user'] = self.request.user
-        context['user_profile'] = User.objects.get(pk=self.kwargs['pk'])
+        context['user_profile'] = user
+        context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
+        context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
         return context
 
 
@@ -293,8 +296,11 @@ class FollowerListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = User.objects.get(pk=self.kwargs['pk'])
         context['request_user'] = self.request.user
-        context['user_profile'] = User.objects.get(pk=self.kwargs['pk'])
+        context['user_profile'] = user
+        context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
+        context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
         return context
 
 
