@@ -61,6 +61,7 @@ class HomeView(LoginRequiredMixin, ListView):
                 context['tags'] = Tag.objects.filter(Q(name__icontains=query))
 
         #「知り合いかも」にフォローしてる、もしくはフォローされてる友達のフォローしてる人をおすすめとして表示させるための処理
+        alrealdy_followees = list(user.followees.all())
         reccomended_users = []
         for relation in followee_friendships:
             followee_friend_followees = relation.followee.followees.all()
@@ -70,11 +71,15 @@ class HomeView(LoginRequiredMixin, ListView):
                     continue
                 elif user == followee_friend_followee:
                     continue
+                elif followee_friend_followee in alrealdy_followees:
+                    continue
                 reccomended_users.append(followee_friend_followee)
             for followee_friend_follower in followee_friend_followers:
                 if followee_friend_follower in reccomended_users:
                     continue
                 elif user == followee_friend_follower:
+                    continue
+                elif followee_friend_follower in alrealdy_followees:
                     continue
                 reccomended_users.append(followee_friend_follower)
         for relation in follower_friendships:
@@ -85,11 +90,15 @@ class HomeView(LoginRequiredMixin, ListView):
                     continue
                 elif user == follower_friend_followee:
                     continue
+                elif follower_friend_followee in alrealdy_followees:
+                    continue
                 reccomended_users.append(follower_friend_followee)
             for follower_friend_follower in follower_friend_followers:
                 if follower_friend_follower in reccomended_users:
                     continue
                 elif user == follower_friend_follower:
+                    continue
+                elif follower_friend_follower in alrealdy_followees:
                     continue
                 reccomended_users.append(follower_friend_follower)
         #reccomended_usersはシャッフルしたい
@@ -103,7 +112,6 @@ class HomeView(LoginRequiredMixin, ListView):
             reccomended_users = random.sample(reccomended_users, 3)
         else:
             reccomended_users = random.sample(reccomended_users, 4)
-        print(type(reccomended_users))
         context['reccomended_users'] = reccomended_users
         return context
 
