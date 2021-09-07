@@ -420,7 +420,10 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['request_user'] = self.request.user
+        user = self.request.user
+        context['request_user'] = user
+        context['followee'] = FriendShip.objects.filter(follower=user).count()
+        context['follower'] = FriendShip.objects.filter(followee=user).count()
         search_friends = self.request.GET.get('search_friends')
         if search_friends:
             context['object_list'] = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
