@@ -31,7 +31,11 @@
 
     <div>
       <h4>通知一覧</h4>
+      {% if message_notice %}
       <p>メッセージがきています</p>
+      {% else %}
+      <p>通知はありません</p>
+      {% endif %}
     </div>
 
     <div style="margin-top: 12px;">

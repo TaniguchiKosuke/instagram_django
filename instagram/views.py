@@ -20,6 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
+from django.contrib import messages
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -113,6 +114,11 @@ class HomeView(LoginRequiredMixin, ListView):
         else:
             reccomended_users = random.sample(reccomended_users, 4)
         context['reccomended_users'] = reccomended_users
+
+        #メッセージを受け取っていたら、ホーム画面に通知する処理
+        messages = Message.objects.filter(to_user=user)
+        if messages:
+            context['message_notice'] = True
         return context
 
 
