@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load templates_func %}
 {% block content %}
 <section class="jumbotron text-center home-profile">
   <div class="container">
@@ -86,7 +86,11 @@
                   </td>
                   <td class="candidate-list-favourite-time text-center">
                     {% if user == request_user %}
-                    <h5>自分</h5>
+                    <h5>You</h5>
+                    {% elif request_user|judge_following:user.followers %}
+                    <a href="{% url 'instagram:unfollow' pk=user.pk %}" class="btn btn-dark">フォロー中</a>
+                    {% elif not request_user|judge_following:user.followers %}
+                    <a href="{% url 'instagram:follow' pk=user.pk %}" class="btn btn-outline-dark">フォロー</a>
                     {% endif %}
                   </td>
                 </tr>

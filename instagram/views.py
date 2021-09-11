@@ -271,7 +271,9 @@ def follow_view(request, *args, **kwargs):
             messages.warning(request, 'フォローしました')
         else:
             messages.warning(request, 'あなたは既にフォローしています')
-    return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
+    # return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
+    #前の画面に遷移
+    return redirect(request.META['HTTP_REFERER'])
 
 
 @login_required
@@ -290,7 +292,9 @@ def unfollow_view(request, *args, **kwargs):
         return redirect(reverse_lazy('instagram:home'))
     except FriendShip.DoesNotExist:
         messages.warning(request, 'フォローしてません')
-    return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
+    # return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
+    #前の画面に遷移
+    return redirect(request.META['HTTP_REFERER'])
 
 
 class FolloweeListView(LoginRequiredMixin, ListView):
