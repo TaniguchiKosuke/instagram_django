@@ -1,7 +1,7 @@
 import random
 from django import contrib
 from django.core.checks import messages
-from django.db.models import query
+from django.db.models import fields, query
 from django.forms.utils import to_current_timezone
 from django.http import request
 from django.views.generic.base import TemplateView
@@ -20,6 +20,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
+from django.contrib import messages
+from itertools import chain
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -32,15 +34,17 @@ class HomeView(LoginRequiredMixin, ListView):
         #ユーザーが誰かフォローしている場合はその人の投稿を優先的に表示
         request_user = self.request.user
         query = self.request.GET.get('query')
-        if request_user.followees.all():
-            for followee in request_user.followees.all():
-                queryset = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
-        elif query:
+        if query:
             #投稿を検索する処理
             if not query.startswith('#'):
                 queryset = Posts.objects.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
             elif query.startswith('#'):
                 queryset = Tag.objects.filter(Q(name__icontains=query))
+        elif request_user.followees.all():
+            for followee in request_user.followees.all():
+                friend_posts = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
+                other_posts = Posts.objects.order_by('-created_at')
+                queryset = list(chain(friend_posts, other_posts))
         else:
             queryset = Posts.objects.order_by('-created_at')
         return queryset
@@ -61,51 +65,78 @@ class HomeView(LoginRequiredMixin, ListView):
                 context['tags'] = Tag.objects.filter(Q(name__icontains=query))
 
         #「知り合いかも」にフォローしてる、もしくはフォローされてる友達のフォローしてる人をおすすめとして表示させるための処理
-        reccomended_users = []
-        for relation in followee_friendships:
-            followee_friend_followees = relation.followee.followees.all()
-            followee_friend_followers = relation.followee.followers.all()
-            for followee_friend_followee in followee_friend_followees:
-                if followee_friend_followee in reccomended_users:
-                    continue
-                elif user == followee_friend_followee:
-                    continue
-                reccomended_users.append(followee_friend_followee)
-            for followee_friend_follower in followee_friend_followers:
-                if followee_friend_follower in reccomended_users:
-                    continue
-                elif user == followee_friend_follower:
-                    continue
-                reccomended_users.append(followee_friend_follower)
-        for relation in follower_friendships:
-            follower_friend_followees = relation.follower.followees.all()
-            follower_friend_followers = relation.follower.followers.all()
-            for follower_friend_followee in follower_friend_followees:
-                if follower_friend_followee in reccomended_users:
-                    continue
-                elif user == follower_friend_followee:
-                    continue
-                reccomended_users.append(follower_friend_followee)
-            for follower_friend_follower in follower_friend_followers:
-                if follower_friend_follower in reccomended_users:
-                    continue
-                elif user == follower_friend_follower:
-                    continue
-                reccomended_users.append(follower_friend_follower)
-        #reccomended_usersはシャッフルしたい
-        if len(reccomended_users) < 1:
-            reccomended_users = reccomended_users
-        elif len(reccomended_users) < 2:
-            reccomended_users = random.sample(reccomended_users, 1)
-        elif len(reccomended_users) < 3:
-            reccomended_users = random.sample(reccomended_users, 2)
-        elif len(reccomended_users) < 4:
-            reccomended_users = random.sample(reccomended_users, 3)
-        else:
-            reccomended_users = random.sample(reccomended_users, 4)
-        print(type(reccomended_users))
+        reccomended_users = find_reccomended_users(user, followee_friendships, follower_friendships)
         context['reccomended_users'] = reccomended_users
+
+        #メッセージを受け取っていたら、ホーム画面に通知する処理
+        messages = Message.objects.filter(to_user=user)
+        if messages:
+            context['message_notice'] = True
         return context
+
+
+def find_reccomended_users(request_user, followee_friendships, follower_friendships):
+    """
+    「知り合いかも」にフォローしてる、
+    もしくはフォローされてる友達のフォローしてる人を
+    おすすめとして表示させるための処理
+    return: reccomended_users
+    type: list
+    """
+
+    alrealdy_followees = list(request_user.followees.all())
+    reccomended_users = []
+    for relation in followee_friendships:
+        followee_friend_followees = relation.followee.followees.all()
+        followee_friend_followers = relation.followee.followers.all()
+        for followee_friend_followee in followee_friend_followees:
+            if followee_friend_followee in reccomended_users:
+                continue
+            elif request_user == followee_friend_followee:
+                continue
+            elif followee_friend_followee in alrealdy_followees:
+                continue
+            reccomended_users.append(followee_friend_followee)
+        for followee_friend_follower in followee_friend_followers:
+            if followee_friend_follower in reccomended_users:
+                continue
+            elif request_user == followee_friend_follower:
+                continue
+            elif followee_friend_follower in alrealdy_followees:
+                continue
+            reccomended_users.append(followee_friend_follower)
+    for relation in follower_friendships:
+        follower_friend_followees = relation.follower.followees.all()
+        follower_friend_followers = relation.follower.followers.all()
+        for follower_friend_followee in follower_friend_followees:
+            if follower_friend_followee in reccomended_users:
+                continue
+            elif request_user == follower_friend_followee:
+                continue
+            elif follower_friend_followee in alrealdy_followees:
+                continue
+            reccomended_users.append(follower_friend_followee)
+        for follower_friend_follower in follower_friend_followers:
+            if follower_friend_follower in reccomended_users:
+                continue
+            elif request_user == follower_friend_follower:
+                continue
+            elif follower_friend_follower in alrealdy_followees:
+                continue
+            reccomended_users.append(follower_friend_follower)
+    #reccomended_usersはシャッフルしたい
+    if len(reccomended_users) < 1:
+        reccomended_users = reccomended_users
+    elif len(reccomended_users) < 2:
+        reccomended_users = random.sample(reccomended_users, 1)
+    elif len(reccomended_users) < 3:
+        reccomended_users = random.sample(reccomended_users, 2)
+    elif len(reccomended_users) < 4:
+        reccomended_users = random.sample(reccomended_users, 3)
+    else:
+        reccomended_users = random.sample(reccomended_users, 4)
+
+    return reccomended_users
 
 
 class PostView(LoginRequiredMixin, CreateView):
@@ -240,7 +271,9 @@ def follow_view(request, *args, **kwargs):
             messages.warning(request, 'フォローしました')
         else:
             messages.warning(request, 'あなたは既にフォローしています')
-    return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
+    # return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
+    #前の画面に遷移
+    return redirect(request.META['HTTP_REFERER'])
 
 
 @login_required
@@ -259,7 +292,9 @@ def unfollow_view(request, *args, **kwargs):
         return redirect(reverse_lazy('instagram:home'))
     except FriendShip.DoesNotExist:
         messages.warning(request, 'フォローしてません')
-    return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
+    # return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
+    #前の画面に遷移
+    return redirect(request.META['HTTP_REFERER'])
 
 
 class FolloweeListView(LoginRequiredMixin, ListView):
@@ -366,7 +401,7 @@ class MessageListView(LoginRequiredMixin, ListView):
             from_user_list = []
             for message in messages:
                 if message.from_user in from_user_list:
-                    break
+                    continue
                 else:
                     from_user = message.from_user
                     from_user_list.append(from_user)
@@ -408,12 +443,21 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
         queryset = super().get_queryset()
         user = self.request.user
         queryset = User.objects.filter(followees=user)
+        search_friends = self.request.GET.get('search_friends')
+        if search_friends:
+            queryset = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
+
+        #以下は友達を探すのユーザーリストのデフォルトとして、知り合いの知り合いまでリストアップする処理
+        else:
+            followee_friendships = FriendShip.objects.filter(follower__username=user)
+            follower_friendships = FriendShip.objects.filter(followee__username=user)
+            queryset = find_reccomended_users(user, followee_friendships, follower_friendships)
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['request_user'] = self.request.user
-        search_friends = self.request.GET.get('search_friends')
-        if search_friends:
-            context['object_list'] = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
+        user = self.request.user
+        context['request_user'] = user
+        context['followee'] = FriendShip.objects.filter(follower=user).count()
+        context['follower'] = FriendShip.objects.filter(followee=user).count()
         return context
