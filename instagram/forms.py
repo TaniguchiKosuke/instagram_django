@@ -1,6 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.core.files.base import File
+from django.db import reset_queries
 from django.db.models import fields
 from django.db.models.base import Model
 from .models import CommentToPost, Message, Posts
@@ -24,9 +25,9 @@ class PostForm(forms.ModelForm):
 
 class UserProfileUpdateForm(forms.ModelForm):
     username = forms.CharField(label='')
-    name = forms.CharField(label='')
-    text = forms.CharField(widget=forms.Textarea, label='')
-    user_image = forms.ImageField(label='')
+    name = forms.CharField(label='', required=False)
+    text = forms.CharField(widget=forms.Textarea, label='', required=False)
+    user_image = forms.ImageField(label='', required=False)
 
     def __init__(self, *args, **kwargs):
         super(UserProfileUpdateForm, self).__init__(*args, **kwargs)
