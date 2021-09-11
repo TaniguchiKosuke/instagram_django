@@ -380,7 +380,7 @@ class MessageListView(LoginRequiredMixin, ListView):
             from_user_list = []
             for message in messages:
                 if message.from_user in from_user_list:
-                    break
+                    continue
                 else:
                     from_user = message.from_user
                     from_user_list.append(from_user)
