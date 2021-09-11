@@ -428,6 +428,63 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
         search_friends = self.request.GET.get('search_friends')
         if search_friends:
             queryset = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
+
+        #以下は友達を探すのユーザーリストのデフォルトとして、知り合いの知り合いまでリストアップする処理
+        else:
+            followee_friendships = FriendShip.objects.filter(follower__username=user)
+            follower_friendships = FriendShip.objects.filter(followee__username=user)
+            alrealdy_followees = list(user.followees.all())
+            reccomended_users = []
+            for relation in followee_friendships:
+                followee_friend_followees = relation.followee.followees.all()
+                followee_friend_followers = relation.followee.followers.all()
+                for followee_friend_followee in followee_friend_followees:
+                    if followee_friend_followee in reccomended_users:
+                        continue
+                    elif user == followee_friend_followee:
+                        continue
+                    elif followee_friend_followee in alrealdy_followees:
+                        continue
+                    reccomended_users.append(followee_friend_followee)
+                for followee_friend_follower in followee_friend_followers:
+                    if followee_friend_follower in reccomended_users:
+                        continue
+                    elif user == followee_friend_follower:
+                        continue
+                    elif followee_friend_follower in alrealdy_followees:
+                        continue
+                    reccomended_users.append(followee_friend_follower)
+            for relation in follower_friendships:
+                follower_friend_followees = relation.follower.followees.all()
+                follower_friend_followers = relation.follower.followers.all()
+                for follower_friend_followee in follower_friend_followees:
+                    if follower_friend_followee in reccomended_users:
+                        continue
+                    elif user == follower_friend_followee:
+                        continue
+                    elif follower_friend_followee in alrealdy_followees:
+                        continue
+                    reccomended_users.append(follower_friend_followee)
+                for follower_friend_follower in follower_friend_followers:
+                    if follower_friend_follower in reccomended_users:
+                        continue
+                    elif user == follower_friend_follower:
+                        continue
+                    elif follower_friend_follower in alrealdy_followees:
+                        continue
+                    reccomended_users.append(follower_friend_follower)
+            #reccomended_usersはシャッフルしたい
+            if len(reccomended_users) < 1:
+                reccomended_users = reccomended_users
+            elif len(reccomended_users) < 2:
+                reccomended_users = random.sample(reccomended_users, 1)
+            elif len(reccomended_users) < 3:
+                reccomended_users = random.sample(reccomended_users, 2)
+            elif len(reccomended_users) < 4:
+                reccomended_users = random.sample(reccomended_users, 3)
+            else:
+                reccomended_users = random.sample(reccomended_users, 4)
+            queryset = reccomended_users
         return queryset
 
     def get_context_data(self, **kwargs):
