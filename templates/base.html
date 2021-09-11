@@ -37,6 +37,7 @@
           <form method="GET" action="{% url 'instagram:home' %}" class="d-flex search-form">
             <input class="form-control me-2" type="text" placeholder="Search" aria-label="Search" value="{{ request.GET.query }}" name="query">
             <button class="btn btn-outline-primary" type="submit" style="height: 40px;">Search</button>
+            <a href="{% url 'instagram:search_friends' %}" style="margin: 8px;"><img src="{{ MEDIA_URL }}app_images/search_friends_icon.svg" alt="" class="user-image-icon"></a>
           </form>
           <nav class="my-2 my-md-0 mr-md-3">
             {% if user.is_authenticated %}
