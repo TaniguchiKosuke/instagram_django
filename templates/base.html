@@ -36,7 +36,7 @@
           <h4 class="my-0 mr-md-auto font-weight-normal"><a href="{% url 'instagram:home' %}" class="title-of-app" style="text-decoration: none; font-family:Georgia, 'Times New Roman', Times, serif; font-weight:bold;">Instagram</a></h4>
           <form method="GET" action="{% url 'instagram:home' %}" class="d-flex search-form">
             <input class="form-control me-2" type="text" placeholder="Search" aria-label="Search" value="{{ request.GET.query }}" name="query">
-            <button class="btn btn-outline-primary" type="submit" style="height: 40px;">Search</button>
+            <input type="image" src="{{ MEDIA_URL }}app_images/search_icon.svg" alt="送信する" style="width: 20px;">
             <a href="{% url 'instagram:search_friends' %}" style="margin: 8px;"><img src="{{ MEDIA_URL }}app_images/search_friends_icon.svg" alt="" class="user-image-icon"></a>
           </form>
           <nav class="my-2 my-md-0 mr-md-3">
