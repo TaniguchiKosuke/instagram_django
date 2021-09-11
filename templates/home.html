@@ -47,7 +47,7 @@
           {% for user in reccomended_users%}
           <tr>
             {% if user.user_image %}
-            <th scope="row"><img src="{{ MEDIA_URL }}{{ user.user_image }}" alt=""></th>
+            <th scope="row"><img src="{{ MEDIA_URL }}{{ user.user_image }}" alt="" style="width: 32px; border-radius: 50%;"></th>
             {% else %}
             <th scope="row"><img src="{{ MEDIA_URL }}images/default-user-image.png" alt="" style="width: 32px; border-radius: 50%;"></th>
             {% endif %}

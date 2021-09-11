@@ -445,11 +445,31 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
         search_friends = self.request.GET.get('search_friends')
         if search_friends:
             #distinctによって検索結果の重複を避けている
-            friend = User.objects.filter(Q(followees=user) | Q(followers=user))\
+            friends = User.objects.filter(Q(followees=user) | Q(followers=user))\
                 .filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends)).distinct()
-            other_users = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))\
-                .exclude(Q(followees=user) | Q(followers=user))
-            queryset = list(chain(friend, other_users))
+            followee_friendships = FriendShip.objects.filter(follower__username=user)
+            follower_friendships = FriendShip.objects.filter(followee__username=user)
+            reccomended_users = find_reccomended_users(user, followee_friendships, follower_friendships)
+            acquaintance_list = []
+            friends_list = []
+            for friend in friends:
+                friends_list.append(friend.username)
+            for reccomended_user in reccomended_users:
+                if reccomended_user.username in friends_list:
+                    continue
+                else:
+                    if search_friends in reccomended_user.username:
+                        acquaintance_list.append(reccomended_user)
+                    else:
+                        continue
+            other_users = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
+            other_users_list = []
+            for other_user in other_users:
+                if (other_user in acquaintance_list) or (other_user in friends):
+                    continue
+                else:
+                    other_users_list.append(other_user)
+            queryset = list(chain(friends, acquaintance_list, other_users_list))
 
         #以下は友達を探すのユーザーリストのデフォルトとして、知り合いの知り合いまでリストアップする処理
         else:
