@@ -21,6 +21,7 @@ from django.db.models import Q
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
+from itertools import chain
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -41,7 +42,9 @@ class HomeView(LoginRequiredMixin, ListView):
                 queryset = Tag.objects.filter(Q(name__icontains=query))
         elif request_user.followees.all():
             for followee in request_user.followees.all():
-                queryset = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
+                friend_posts = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
+                other_posts = Posts.objects.order_by('-created_at')
+                queryset = list(chain(friend_posts, other_posts))
         else:
             queryset = Posts.objects.order_by('-created_at')
         return queryset
