@@ -1,7 +1,7 @@
 import random
 from django import contrib
 from django.core.checks import messages
-from django.db.models import query
+from django.db.models import fields, query
 from django.forms.utils import to_current_timezone
 from django.http import request
 from django.views.generic.base import TemplateView
@@ -422,6 +422,9 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
         queryset = super().get_queryset()
         user = self.request.user
         queryset = User.objects.filter(followees=user)
+        search_friends = self.request.GET.get('search_friends')
+        if search_friends:
+            queryset = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -430,7 +433,7 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
         context['request_user'] = user
         context['followee'] = FriendShip.objects.filter(follower=user).count()
         context['follower'] = FriendShip.objects.filter(followee=user).count()
-        search_friends = self.request.GET.get('search_friends')
-        if search_friends:
-            context['object_list'] = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
+        # search_friends = self.request.GET.get('search_friends')
+        # if search_friends:
+        #     context['object_list'] = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
         return context
