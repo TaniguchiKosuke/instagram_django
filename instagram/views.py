@@ -442,10 +442,14 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         user = self.request.user
-        queryset = User.objects.filter(followees=user)
         search_friends = self.request.GET.get('search_friends')
         if search_friends:
-            queryset = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
+            #distinctによって検索結果の重複を避けている
+            friend = User.objects.filter(Q(followees=user) | Q(followers=user))\
+                .filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends)).distinct()
+            other_users = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))\
+                .exclude(Q(followees=user) | Q(followers=user))
+            queryset = list(chain(friend, other_users))
 
         #以下は友達を探すのユーザーリストのデフォルトとして、知り合いの知り合いまでリストアップする処理
         else:
