@@ -503,5 +503,5 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
         return context
 
 
-class SettingsPageView(LoginRequiredMixin, TemplateView):
+class SettingsView(LoginRequiredMixin, TemplateView):
     template_name = 'settings.html'
