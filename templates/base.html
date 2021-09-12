@@ -40,7 +40,7 @@
             <a href="{% url 'instagram:search_friends' %}" style="margin: 8px;"><img src="{{ MEDIA_URL }}app_images/search_friends_icon.svg" alt="" class="user-image-icon"></a>
           </form>
           <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="{% url 'instagram:message_list' %}"><img src="{{ MEDIA_URL }}app_images/grid.svg" alt="" style="width: 28px;height:28px;"></a>
+            <a class="p-2 text-dark" href="{% url 'instagram:reccomended_posts' %}"><img src="{{ MEDIA_URL }}app_images/grid.svg" alt="" style="width: 28px;height:28px;"></a>
             <a href="{% url 'instagram:post' %}"><img src="{{ MEDIA_URL }}app_images/post.svg" width="28px" height="28px"></a>
             <a class="p-2 text-dark" href="{% url 'instagram:message_list' %}"><img src="{{ MEDIA_URL }}app_images/chatting.png" alt="" style="width: 28px;height:28px;"></a>
             {% if user.is_authenticated %}
@@ -57,7 +57,7 @@
 
 <main role="main">
 
-  <div class="album py-5 bg-light">
+  <div class="album py-4 bg-light">
     <div class="container">
 
       <div class="row">

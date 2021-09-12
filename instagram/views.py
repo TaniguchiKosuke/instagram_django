@@ -505,3 +505,9 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
 
 class SettingsView(LoginRequiredMixin, TemplateView):
     template_name = 'settings.html'
+
+
+class ReccomendedPostsView(LoginRequiredMixin, ListView):
+    template_name = 'reccomended_posts.html'
+    queryset = Posts.objects.all()
+    paginate_by = 27
