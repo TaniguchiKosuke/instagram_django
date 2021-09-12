@@ -2,7 +2,7 @@ import random
 from django import contrib
 from django.core.checks import messages
 from django.db.models import fields, query
-from django.forms.utils import to_current_timezone
+from django.forms.utils import pretty_name, to_current_timezone
 from django.http import request
 from django.views.generic.base import TemplateView
 from users.models import User
@@ -357,17 +357,24 @@ class MessagesView(LoginRequiredMixin, ListView):
         context['request_user'] = request_user
         context['to_user'] = User.objects.get(pk=self.kwargs['pk'])
         context['message_form'] = MessageForm()
-        #もしDMが来てるもしくは、リクエストユーザーが誰かにDMをオッくている場合はその人を優先的にリストアップする処理
+        #もしDMが来てるもしくは、リクエストユーザーが誰かにDMを送っている場合はその人を優先的にリストアップする処理
         messages = Message.objects.filter(Q(to_user=request_user) | Q(from_user=request_user))
         if messages:
-            from_user_list = []
+            to_user_list = []
             for message in messages:
-                if message.from_user in from_user_list:
-                    break
+                if message.from_user in to_user_list:
+                    continue
+                elif message.to_user == message.from_user:
+                    continue
                 else:
                     from_user = message.from_user
-                    from_user_list.append(from_user)
-            context['reccomended_users'] = from_user_list
+                    to_user = message.to_user
+                    to_user_list.append(from_user)
+                    to_user_list.append(to_user)
+            if request_user in to_user_list:
+                while request_user in to_user_list:
+                    to_user_list.remove(request_user)
+            context['reccomended_users'] = to_user_list
         else:
             context['reccomended_users'] = User.objects.filter(followers=request_user)[:10]
         #メッセージを送る相手を検索する処理
@@ -398,14 +405,21 @@ class MessageListView(LoginRequiredMixin, ListView):
         #もしDMが来てるもしくは、リクエストユーザーが誰かにDMを送っている場合はその人を優先的にリストアップする処理
         messages = Message.objects.filter(Q(to_user=request_user) | Q(from_user=request_user))
         if messages:
-            from_user_list = []
+            to_user_list = []
             for message in messages:
-                if message.from_user in from_user_list:
+                if message.from_user in to_user_list:
+                    continue
+                elif message.to_user == message.from_user:
                     continue
                 else:
                     from_user = message.from_user
-                    from_user_list.append(from_user)
-            queryset = from_user_list
+                    to_user = message.to_user
+                    to_user_list.append(from_user)
+                    to_user_list.append(to_user)
+            if request_user in to_user_list:
+                while request_user in to_user_list:
+                    to_user_list.remove(request_user)
+            queryset = to_user_list
         else:
             queryset = User.objects.filter(followers=request_user)[:10]
         #メッセージを送る相手を検索する処理
