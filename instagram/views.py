@@ -513,6 +513,31 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
     paginate_by = 27
 
     def get_queryset(self):
+        """
+        ログインユーザーへのおすすめの投稿を
+        ログインユーザーがいいねした投稿の
+        ハッシュタグをもとにリストアップする
+        """
         queryset = super().get_queryset()
-        queryset = Posts.objects.all()
+        request_user = self.request.user
+        liked_posts = PostLikes.objects.filter(user=request_user)
+        print(liked_posts)
+        liked_post_tag_list = []
+        for liked_post in liked_posts.all():
+            liked_post_tag = liked_post.post.tag
+            if liked_post_tag in liked_post_tag_list:
+                continue
+            else:
+                liked_post_tag_list.append(liked_post_tag)
+        reccomended_post_list = []
+        for liked_post_tag in liked_post_tag_list:
+            reccomended_posts = Posts.objects.filter(tag=liked_post_tag)
+            post_list = []
+            for reccomended_post in reccomended_posts:
+                if reccomended_post in reccomended_post_list:
+                    continue
+                else:
+                    post_list.append(reccomended_post)
+            reccomended_post_list = list(chain(reccomended_post_list, post_list))
+        queryset = reccomended_post_list
         return queryset
