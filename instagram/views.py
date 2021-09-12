@@ -501,3 +501,7 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
         context['followee'] = FriendShip.objects.filter(follower=user).count()
         context['follower'] = FriendShip.objects.filter(followee=user).count()
         return context
+
+
+class SettingsPageView(LoginRequiredMixin, TemplateView):
+    template_name = 'settings.html'
