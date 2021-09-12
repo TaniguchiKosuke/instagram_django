@@ -361,6 +361,7 @@ class MessagesView(LoginRequiredMixin, ListView):
         messages = Message.objects.filter(Q(to_user=request_user) | Q(from_user=request_user))
         if messages:
             to_user_list = []
+            #誰かと既にメッセージをしている場合はその相手をリストアップする
             for message in messages:
                 if message.from_user in to_user_list:
                     continue
@@ -371,6 +372,15 @@ class MessagesView(LoginRequiredMixin, ListView):
                     to_user = message.to_user
                     to_user_list.append(from_user)
                     to_user_list.append(to_user)
+            following_users = User.objects.filter(followers=request_user)[:10]
+            following_user_list = []
+            for user in following_users:
+                if user in to_user_list:
+                    continue
+                else:
+                    following_user_list.append(user)
+            to_user_list = list(chain(to_user_list, following_user_list))
+            #送信先一覧に自分がいるバグを避けるため
             if request_user in to_user_list:
                 while request_user in to_user_list:
                     to_user_list.remove(request_user)
@@ -406,6 +416,7 @@ class MessageListView(LoginRequiredMixin, ListView):
         messages = Message.objects.filter(Q(to_user=request_user) | Q(from_user=request_user))
         if messages:
             to_user_list = []
+            #誰かと既にメッセージをしている場合はその相手をリストアップする
             for message in messages:
                 if message.from_user in to_user_list:
                     continue
@@ -416,6 +427,15 @@ class MessageListView(LoginRequiredMixin, ListView):
                     to_user = message.to_user
                     to_user_list.append(from_user)
                     to_user_list.append(to_user)
+            following_users = User.objects.filter(followers=request_user)[:10]
+            following_user_list = []
+            for user in following_users:
+                if user in to_user_list:
+                    continue
+                else:
+                    following_user_list.append(user)
+            to_user_list = list(chain(to_user_list, following_user_list))
+            #送信先一覧に自分がいるバグを避けるため
             if request_user in to_user_list:
                 while request_user in to_user_list:
                     to_user_list.remove(request_user)
