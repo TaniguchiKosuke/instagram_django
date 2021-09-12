@@ -539,5 +539,7 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
                 else:
                     post_list.append(reccomended_post)
             reccomended_post_list = list(chain(reccomended_post_list, post_list))
+        print(reccomended_post_list)
+        random.shuffle(reccomended_post_list)
         queryset = reccomended_post_list
         return queryset
