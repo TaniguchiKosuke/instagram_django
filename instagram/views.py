@@ -358,35 +358,7 @@ class MessagesView(LoginRequiredMixin, ListView):
         context['to_user'] = User.objects.get(pk=self.kwargs['pk'])
         context['message_form'] = MessageForm()
         #もしDMが来てるもしくは、リクエストユーザーが誰かにDMを送っている場合はその人を優先的にリストアップする処理
-        messages = Message.objects.filter(Q(to_user=request_user) | Q(from_user=request_user))
-        if messages:
-            to_user_list = []
-            #誰かと既にメッセージをしている場合はその相手をリストアップする
-            for message in messages:
-                if message.from_user in to_user_list:
-                    continue
-                elif message.to_user == message.from_user:
-                    continue
-                else:
-                    from_user = message.from_user
-                    to_user = message.to_user
-                    to_user_list.append(from_user)
-                    to_user_list.append(to_user)
-            following_users = User.objects.filter(followers=request_user)[:10]
-            following_user_list = []
-            for user in following_users:
-                if user in to_user_list:
-                    continue
-                else:
-                    following_user_list.append(user)
-            to_user_list = list(chain(to_user_list, following_user_list))
-            #送信先一覧に自分がいるバグを避けるため
-            if request_user in to_user_list:
-                while request_user in to_user_list:
-                    to_user_list.remove(request_user)
-            context['reccomended_users'] = to_user_list
-        else:
-            context['reccomended_users'] = User.objects.filter(followers=request_user)[:10]
+        context['reccomended_users'] = find_message_address(request_user)
         #メッセージを送る相手を検索する処理
         query = self.request.GET.get('query')
         if query:
@@ -413,40 +385,50 @@ class MessageListView(LoginRequiredMixin, ListView):
         request_user = self.request.user
         queryset = User.objects.filter(followers=request_user)[:10]
         #もしDMが来てるもしくは、リクエストユーザーが誰かにDMを送っている場合はその人を優先的にリストアップする処理
-        messages = Message.objects.filter(Q(to_user=request_user) | Q(from_user=request_user))
-        if messages:
-            to_user_list = []
-            #誰かと既にメッセージをしている場合はその相手をリストアップする
-            for message in messages:
-                if message.from_user in to_user_list:
-                    continue
-                elif message.to_user == message.from_user:
-                    continue
-                else:
-                    from_user = message.from_user
-                    to_user = message.to_user
-                    to_user_list.append(from_user)
-                    to_user_list.append(to_user)
-            following_users = User.objects.filter(followers=request_user)[:10]
-            following_user_list = []
-            for user in following_users:
-                if user in to_user_list:
-                    continue
-                else:
-                    following_user_list.append(user)
-            to_user_list = list(chain(to_user_list, following_user_list))
-            #送信先一覧に自分がいるバグを避けるため
-            if request_user in to_user_list:
-                while request_user in to_user_list:
-                    to_user_list.remove(request_user)
-            queryset = to_user_list
-        else:
-            queryset = User.objects.filter(followers=request_user)[:10]
+        queryset = find_message_address(request_user)
         #メッセージを送る相手を検索する処理
         query = self.request.GET.get('query')
         if query:
             queryset = User.objects.filter(followers=request_user).filter(Q(username__icontains=query) | Q(name__icontains=query))[:10]
         return queryset
+
+
+def find_message_address(request_user):
+    """
+    メッセージ画面で送信先のユーザー一覧を生成する関数
+    return: to_user_list
+    type: list or QuerySet
+    """
+    messages = Message.objects.filter(Q(to_user=request_user) | Q(from_user=request_user))
+    if messages:
+        to_user_list = []
+        #誰かと既にメッセージをしている場合はその相手をリストアップする
+        for message in messages:
+            if message.from_user in to_user_list:
+                continue
+            elif message.to_user == message.from_user:
+                continue
+            else:
+                from_user = message.from_user
+                to_user = message.to_user
+                to_user_list.append(from_user)
+                to_user_list.append(to_user)
+        following_users = User.objects.filter(followers=request_user)[:10]
+        following_user_list = []
+        for user in following_users:
+            if user in to_user_list:
+                continue
+            else:
+                following_user_list.append(user)
+        to_user_list = list(chain(to_user_list, following_user_list))
+        #送信先一覧に自分がいるバグを避けるため
+        if request_user in to_user_list:
+            while request_user in to_user_list:
+                to_user_list.remove(request_user)
+    else:
+        to_user_list = User.objects.filter(followers=request_user)[:10]
+
+    return to_user_list
 
 
 class TagPostListView(LoginRequiredMixin, ListView):
