@@ -40,6 +40,9 @@
             <a href="{% url 'instagram:search_friends' %}" style="margin: 8px;"><img src="{{ MEDIA_URL }}app_images/search_friends_icon.svg" alt="" class="user-image-icon"></a>
           </form>
           <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="{% url 'instagram:message_list' %}"><img src="{{ MEDIA_URL }}app_images/grid.svg" alt="" style="width: 28px;height:28px;"></a>
+            <a href="{% url 'instagram:post' %}"><img src="{{ MEDIA_URL }}app_images/post.svg" width="28px" height="28px"></a>
+            <a class="p-2 text-dark" href="{% url 'instagram:message_list' %}"><img src="{{ MEDIA_URL }}app_images/chatting.png" alt="" style="width: 28px;height:28px;"></a>
             {% if user.is_authenticated %}
               {% if user.user_image %}
                 <a class="p-2 text-dark" style="text-decoration: none;" href="{% url 'instagram:user_profile' pk=user.pk %}"><img class="user-image-icon" src="{{ MEDIA_URL }}{{ user.user_image }}" alt=""></a>
@@ -47,8 +50,6 @@
                 <a class="p-2 text-dark" style="text-decoration: none;" href="{% url 'instagram:user_profile' pk=user.pk %}"><img class="user-image-icon" src="{{ MEDIA_URL }}images/default-user-image.png" alt=""></a>
               {%endif%}
             {% endif %}
-            <a href="{% url 'instagram:post' %}"><img src="{{ MEDIA_URL }}app_images/post.svg" width="28px" height="28px"></a>
-            <a class="p-2 text-dark" href="{% url 'instagram:message_list' %}"><img src="{{ MEDIA_URL }}app_images/chatting.png" alt="" style="width: 28px;height:28px;"></a>
           </nav>
         </div>
       </div>
