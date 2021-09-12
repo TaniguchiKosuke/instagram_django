@@ -509,5 +509,10 @@ class SettingsView(LoginRequiredMixin, TemplateView):
 
 class ReccomendedPostsView(LoginRequiredMixin, ListView):
     template_name = 'reccomended_posts.html'
-    queryset = Posts.objects.all()
+    queryset = Posts
     paginate_by = 27
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = Posts.objects.all()
+        return queryset
