@@ -1,3 +1,4 @@
+import math
 import random
 from django import contrib
 from django.core.checks import messages
@@ -514,8 +515,7 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         """
         ログインユーザーへのおすすめの投稿を
-        ログインユーザーがいいねした投稿の
-        ハッシュタグをもとにリストアップする
+        リストアップするメソッド
         """
         queryset = super().get_queryset()
         request_user = self.request.user
@@ -536,6 +536,7 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
                     continue
                 else:
                     reccomended_posts_by_tag.append(reccomended_post)
+        #フォローしているユーザーの投稿を取得
         followees_posts = []
         for followee in request_user.followees.all():
             followee_posts = Posts.objects.filter(author=followee)
@@ -544,6 +545,12 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
                     continue
                 else:
                     followees_posts.extend(followee_posts)
+        #フォローしているユーザーの投稿をすべて返すのは多すぎるので、いいねした
+        #投稿の7分の1の数の投稿を返す
+        followees_posts_num = math.floor(len(reccomended_posts_by_tag)/7)
+        if len(followees_posts) < followees_posts_num:
+            followees_posts_num = len(followees_posts)
+        followees_posts = random.sample(followees_posts, followees_posts_num)
         reccomended_posts = list(chain(reccomended_posts_by_tag, followees_posts))
         random.shuffle(reccomended_posts)
         queryset = reccomended_posts
