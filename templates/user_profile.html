@@ -36,6 +36,7 @@
       <p>
         <a href="{% url 'instagram:message_list' %}" class="btn btn-secondary my-2">メッセージ</a>
         <a href="{% url 'instagram:user_profile_update' pk=request_user.pk %}" class="btn btn-primary my-2">編集</a>
+        <a href="{% url 'instagram:settings' %}"><img src="{{ MEDIA_URL }}app_images/settings_icon.svg" alt="" style="width: 24px;height:24px;"></a>
       </p>
       {% else %}
       <p>

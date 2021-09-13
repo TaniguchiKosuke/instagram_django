@@ -21,10 +21,10 @@
         <a href="{% url 'instagram:follower_list' pk=user.pk %}" class="following">フォロワー{{ follower }}人</a>
       </p>
       <p>
-        <a href="{% url 'instagram:post' %}" class="btn btn-primary my-2">投稿</a>
         <a href="{% url 'instagram:message_list' %}" class="btn btn-secondary my-2">メッセージ</a>
         {% if user.is_authenticated %}
         <a href="{% url 'instagram:user_profile' pk=user.pk %}" class="btn btn-secondary my-2">プロフィール</a>
+        <a href="{% url 'instagram:settings' %}"><img src="{{ MEDIA_URL }}app_images/settings_icon.svg" alt="" style="width: 24px;height:24px;"></a>
         {% endif %}
       </p>
     </div>
@@ -47,7 +47,7 @@
           {% for user in reccomended_users%}
           <tr>
             {% if user.user_image %}
-            <th scope="row"><img src="{{ MEDIA_URL }}{{ user.user_image }}" alt=""></th>
+            <th scope="row"><img src="{{ MEDIA_URL }}{{ user.user_image }}" alt="" style="width: 32px; border-radius: 50%;"></th>
             {% else %}
             <th scope="row"><img src="{{ MEDIA_URL }}images/default-user-image.png" alt="" style="width: 32px; border-radius: 50%;"></th>
             {% endif %}

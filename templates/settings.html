@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section style="margin-top: 20px;">
+  <h2>Settings</h2>
+  <div>
+    <h4>アカウント</h4>
+    <div>
+      <a style="text-decoration: none;" href="{% url 'users:logout' %}">ログアウト</a>
+      <a style="text-decoration: none;" href="{% url 'users:signup' %}">新規アカウント</a>
+    </div>
+  </div>
+</section>
+{% endblock content %}r

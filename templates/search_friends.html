@@ -43,7 +43,7 @@
     <div class="form-group mb-2">
       <input type="text" class="form-control" value="{{ request.GET.query }}" name="search_friends">
     </div>
-    <button type="submit" class="btn btn-outline-secondary mb-2">Search</button>
+    <input type="image" src="{{ MEDIA_URL }}app_images/search_icon.svg" alt="送信する" style="width: 20px;margin-left:8px;">
   </form>
 
 {% if object_list %}

@@ -1,8 +1,9 @@
+import math
 import random
 from django import contrib
 from django.core.checks import messages
 from django.db.models import fields, query
-from django.forms.utils import to_current_timezone
+from django.forms.utils import pretty_name, to_current_timezone
 from django.http import request
 from django.views.generic.base import TemplateView
 from users.models import User
@@ -151,7 +152,6 @@ class PostView(LoginRequiredMixin, CreateView):
         if tag:
             tag_exist = Tag.objects.filter(name=tag)
             if not tag_exist:
-                print('そんなタグは存在しません')
                 Tag.objects.create(name=tag)
         return super(PostView, self).form_valid(form)
 
@@ -357,19 +357,8 @@ class MessagesView(LoginRequiredMixin, ListView):
         context['request_user'] = request_user
         context['to_user'] = User.objects.get(pk=self.kwargs['pk'])
         context['message_form'] = MessageForm()
-        #もしDMが来てるもしくは、リクエストユーザーが誰かにDMをオッくている場合はその人を優先的にリストアップする処理
-        messages = Message.objects.filter(Q(to_user=request_user) | Q(from_user=request_user))
-        if messages:
-            from_user_list = []
-            for message in messages:
-                if message.from_user in from_user_list:
-                    break
-                else:
-                    from_user = message.from_user
-                    from_user_list.append(from_user)
-            context['reccomended_users'] = from_user_list
-        else:
-            context['reccomended_users'] = User.objects.filter(followers=request_user)[:10]
+        #もしDMが来てるもしくは、リクエストユーザーが誰かにDMを送っている場合はその人を優先的にリストアップする処理
+        context['reccomended_users'] = find_message_address(request_user)
         #メッセージを送る相手を検索する処理
         query = self.request.GET.get('query')
         if query:
@@ -396,23 +385,50 @@ class MessageListView(LoginRequiredMixin, ListView):
         request_user = self.request.user
         queryset = User.objects.filter(followers=request_user)[:10]
         #もしDMが来てるもしくは、リクエストユーザーが誰かにDMを送っている場合はその人を優先的にリストアップする処理
-        messages = Message.objects.filter(Q(to_user=request_user) | Q(from_user=request_user))
-        if messages:
-            from_user_list = []
-            for message in messages:
-                if message.from_user in from_user_list:
-                    continue
-                else:
-                    from_user = message.from_user
-                    from_user_list.append(from_user)
-            queryset = from_user_list
-        else:
-            queryset = User.objects.filter(followers=request_user)[:10]
+        queryset = find_message_address(request_user)
         #メッセージを送る相手を検索する処理
         query = self.request.GET.get('query')
         if query:
             queryset = User.objects.filter(followers=request_user).filter(Q(username__icontains=query) | Q(name__icontains=query))[:10]
         return queryset
+
+
+def find_message_address(request_user):
+    """
+    メッセージ画面で送信先のユーザー一覧を生成する関数
+    return: to_user_list
+    type: list or QuerySet
+    """
+    messages = Message.objects.filter(Q(to_user=request_user) | Q(from_user=request_user))
+    if messages:
+        to_user_list = []
+        #誰かと既にメッセージをしている場合はその相手をリストアップする
+        for message in messages:
+            if message.from_user in to_user_list:
+                continue
+            elif message.to_user == message.from_user:
+                continue
+            else:
+                from_user = message.from_user
+                to_user = message.to_user
+                to_user_list.append(from_user)
+                to_user_list.append(to_user)
+        following_users = User.objects.filter(followers=request_user)[:10]
+        following_user_list = []
+        for user in following_users:
+            if user in to_user_list:
+                continue
+            else:
+                following_user_list.append(user)
+        to_user_list = list(chain(to_user_list, following_user_list))
+        #送信先一覧に自分がいるバグを避けるため
+        if request_user in to_user_list:
+            while request_user in to_user_list:
+                to_user_list.remove(request_user)
+    else:
+        to_user_list = User.objects.filter(followers=request_user)[:10]
+
+    return to_user_list
 
 
 class TagPostListView(LoginRequiredMixin, ListView):
@@ -442,10 +458,34 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         user = self.request.user
-        queryset = User.objects.filter(followees=user)
         search_friends = self.request.GET.get('search_friends')
         if search_friends:
-            queryset = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
+            #distinctによって検索結果の重複を避けている
+            friends = User.objects.filter(Q(followees=user) | Q(followers=user))\
+                .filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends)).distinct()
+            followee_friendships = FriendShip.objects.filter(follower__username=user)
+            follower_friendships = FriendShip.objects.filter(followee__username=user)
+            reccomended_users = find_reccomended_users(user, followee_friendships, follower_friendships)
+            acquaintance_list = []
+            friends_list = []
+            for friend in friends:
+                friends_list.append(friend.username)
+            for reccomended_user in reccomended_users:
+                if reccomended_user.username in friends_list:
+                    continue
+                else:
+                    if search_friends in reccomended_user.username:
+                        acquaintance_list.append(reccomended_user)
+                    else:
+                        continue
+            other_users = User.objects.filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends))
+            other_users_list = []
+            for other_user in other_users:
+                if (other_user in acquaintance_list) or (other_user in friends):
+                    continue
+                else:
+                    other_users_list.append(other_user)
+            queryset = list(chain(friends, acquaintance_list, other_users_list))
 
         #以下は友達を探すのユーザーリストのデフォルトとして、知り合いの知り合いまでリストアップする処理
         else:
@@ -461,3 +501,57 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
         context['followee'] = FriendShip.objects.filter(follower=user).count()
         context['follower'] = FriendShip.objects.filter(followee=user).count()
         return context
+
+
+class SettingsView(LoginRequiredMixin, TemplateView):
+    template_name = 'settings.html'
+
+
+class ReccomendedPostsView(LoginRequiredMixin, ListView):
+    template_name = 'reccomended_posts.html'
+    queryset = Posts
+    paginate_by = 27
+
+    def get_queryset(self):
+        """
+        ログインユーザーへのおすすめの投稿を
+        リストアップするメソッド
+        """
+        queryset = super().get_queryset()
+        request_user = self.request.user
+        #ログインユーザーがいいねした投稿のタグに基づいて、おすすめの投稿を取得
+        liked_posts = PostLikes.objects.filter(user=request_user)
+        liked_post_tag_list = []
+        for liked_post in liked_posts.all():
+            liked_post_tag = liked_post.post.tag
+            if liked_post_tag in liked_post_tag_list:
+                continue
+            else:
+                liked_post_tag_list.append(liked_post_tag)
+        reccomended_posts_by_tag = []
+        for liked_post_tag in liked_post_tag_list:
+            reccomended_posts = Posts.objects.filter(tag=liked_post_tag)
+            for reccomended_post in reccomended_posts:
+                if reccomended_post in reccomended_posts_by_tag:
+                    continue
+                else:
+                    reccomended_posts_by_tag.append(reccomended_post)
+        #フォローしているユーザーの投稿を取得
+        followees_posts = []
+        for followee in request_user.followees.all():
+            followee_posts = Posts.objects.filter(author=followee)
+            for followee_post in followee_posts:
+                if followee_post in reccomended_posts_by_tag:
+                    continue
+                else:
+                    followees_posts.extend(followee_posts)
+        #フォローしているユーザーの投稿をすべて返すのは多すぎるので、いいねした
+        #投稿の7分の1の数の投稿を返す
+        followees_posts_num = math.floor(len(reccomended_posts_by_tag)/7)
+        if len(followees_posts) < followees_posts_num:
+            followees_posts_num = len(followees_posts)
+        followees_posts = random.sample(followees_posts, followees_posts_num)
+        reccomended_posts = list(chain(reccomended_posts_by_tag, followees_posts))
+        random.shuffle(reccomended_posts)
+        queryset = reccomended_posts
+        return queryset
