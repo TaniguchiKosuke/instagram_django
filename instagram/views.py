@@ -520,6 +520,7 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
         """
         queryset = super().get_queryset()
         request_user = self.request.user
+        #ログインユーザーがいいねした投稿のタグに基づいて、おすすめの投稿を取得
         liked_posts = PostLikes.objects.filter(user=request_user)
         print(liked_posts)
         liked_post_tag_list = []
@@ -529,17 +530,26 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
                 continue
             else:
                 liked_post_tag_list.append(liked_post_tag)
-        reccomended_post_list = []
+        reccomended_posts_by_tag = []
         for liked_post_tag in liked_post_tag_list:
             reccomended_posts = Posts.objects.filter(tag=liked_post_tag)
-            post_list = []
             for reccomended_post in reccomended_posts:
-                if reccomended_post in reccomended_post_list:
+                if reccomended_post in reccomended_posts_by_tag:
                     continue
                 else:
-                    post_list.append(reccomended_post)
-            reccomended_post_list = list(chain(reccomended_post_list, post_list))
-        print(reccomended_post_list)
-        random.shuffle(reccomended_post_list)
-        queryset = reccomended_post_list
+                    reccomended_posts_by_tag.append(reccomended_post)
+        followees_posts = []
+        for followee in request_user.followees.all():
+            followee_posts = Posts.objects.filter(author=followee)
+            for followee_post in followee_posts:
+                if followee_post in reccomended_posts_by_tag:
+                    continue
+                else:
+                    followees_posts.extend(followee_posts)
+        print('here')
+        print(followees_posts)
+        print(reccomended_posts_by_tag)
+        reccomended_posts = list(chain(reccomended_posts_by_tag, followees_posts))
+        random.shuffle(reccomended_posts)
+        queryset = reccomended_posts
         return queryset
