@@ -151,7 +151,6 @@ class PostView(LoginRequiredMixin, CreateView):
         if tag:
             tag_exist = Tag.objects.filter(name=tag)
             if not tag_exist:
-                print('そんなタグは存在しません')
                 Tag.objects.create(name=tag)
         return super(PostView, self).form_valid(form)
 
@@ -522,7 +521,6 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
         request_user = self.request.user
         #ログインユーザーがいいねした投稿のタグに基づいて、おすすめの投稿を取得
         liked_posts = PostLikes.objects.filter(user=request_user)
-        print(liked_posts)
         liked_post_tag_list = []
         for liked_post in liked_posts.all():
             liked_post_tag = liked_post.post.tag
@@ -546,9 +544,6 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
                     continue
                 else:
                     followees_posts.extend(followee_posts)
-        print('here')
-        print(followees_posts)
-        print(reccomended_posts_by_tag)
         reccomended_posts = list(chain(reccomended_posts_by_tag, followees_posts))
         random.shuffle(reccomended_posts)
         queryset = reccomended_posts
