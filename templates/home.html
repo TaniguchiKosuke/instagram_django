@@ -116,8 +116,13 @@
             <p class="card-text"></p>
             <div class="d-flex justify-content-between align-items-center">
               <div class="btn-group">
-                  <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
-                  <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+                  {% for post_like in post_likes %}
+                    {% if post is post_like.post %}
+                      <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+                    {% else %}
+                      <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+                    {% endif %}
+                  {% endfor %}
                   <p class="good-count">{{ post.like_count }}件のいいね</p>
                 <p class="see-more" style="text-decoration: none;">コメント{{ post.comment_count }}件</p>
                 <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">more</a>
