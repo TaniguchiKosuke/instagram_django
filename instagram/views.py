@@ -23,6 +23,7 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from itertools import chain
+from operator import attrgetter
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -48,7 +49,11 @@ class HomeView(LoginRequiredMixin, ListView):
                 friend_posts = Posts.objects.filter(author=followee).order_by('-created_at')
                 friend_posts_list = list(chain(friend_posts_list, friend_posts))
             my_posts = Posts.objects.filter(author=request_user).order_by('-created_at')
-            other_posts = Posts.objects.order_by('?')[:20]
+            all_posts_count = Posts.objects.all().count()
+            if all_posts_count > 20:
+                other_posts = Posts.objects.order_by('?')[:20]
+            else:
+                other_posts = Posts.objects.order_by('?')[:all_posts_count]
             other_posts_list = []
             for post in other_posts:
                 if (not post in friend_posts_list) and (not post in my_posts):
@@ -56,6 +61,8 @@ class HomeView(LoginRequiredMixin, ListView):
                 else:
                     continue
             queryset = list(chain(friend_posts_list, my_posts, other_posts_list))
+            # queryset.sort(key=attrgetter('created_at'), reverse=True)
+            queryset.sort(key=lambda x: x.created_at, reverse=True)
         else:
             queryset = Posts.objects.order_by('-created_at')
         return queryset
