@@ -88,11 +88,12 @@
               <div class="candidate-list-details">
                 <div class="candidate-list-info">
                   <div class="candidate-list-title">
-                    <p class="mb-0"><a href="{% url 'instagram:tag_post_list' tag=tag.name %}" style="text-decoration: none; color: black;">{{ tag.name }}</a></p>
+                    <p class="mb-0"><a href="{% url 'instagram:tag_post_list' tag=tag.name %}" style="text-decoration: none; color: black;">{{ tag.name }}</a></p>   
                   </div>
                 </div>
               </div>
             </td>
+            <td><p class="see-more" style="text-decoration: none;">{{ tag.name|count_tag }}posts</p></td>
           </tr>
           {% endfor %}
         </tbody>

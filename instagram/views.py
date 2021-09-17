@@ -495,6 +495,7 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
         user = self.request.user
         search_friends = self.request.GET.get('search_friends')
         if search_friends:
+            #ここでは既にフォローもしくはフォローされているユーザー、知り合いかもしれないユーザーを優先的に上位にリストアップするための処理
             #distinctによって検索結果の重複を避けている
             friends = User.objects.filter(Q(followees=user) | Q(followers=user))\
                 .filter(Q(username__icontains=search_friends) | Q(name__icontains=search_friends)).distinct()
