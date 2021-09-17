@@ -59,10 +59,6 @@ class HomeView(LoginRequiredMixin, ListView):
         context['followee'] = followee_friendships.count()
         context['follower'] = follower_friendships.count()
         context['comment_from_post_list_form'] = CommentFromPostListForm()
-        #ユーザーが投稿にいいねしたかを判定するためのコンテキストをテンプレートに渡す処理
-        post_likes = PostLikes.objects.filter(user=user)
-        if post_likes:
-            context['post_likes'] = post_likes
         query = self.request.GET.get('query')
         if query:
             context['query_exist'] = True
