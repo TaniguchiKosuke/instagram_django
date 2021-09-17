@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load templates_func %}
 {% block content %}
 <section class="jumbotron text-center home-profile">
   <div class="container">
@@ -34,8 +34,11 @@
       <p class="see-post-content">{{ object.text }}</p>
       <p class="see-post-content">{{ object.date_posted }}</p>
       <p class="border-under-post">
-        <a href="{% url 'instagram:like_post' pk=object.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
-        <a href="{% url 'instagram:like_post' pk=object.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+        {% if request_user|judge_likes:object %}
+          <a href="{% url 'instagram:like_post' pk=object.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+        {% else %}
+          <a href="{% url 'instagram:like_post' pk=object.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+        {% endif %}
         <p class="good-count">{{ object.like_count }}件のいいね</p>
         {% if request_user == object.author %}
         <a href="" class="see-more">投稿の削除</a>

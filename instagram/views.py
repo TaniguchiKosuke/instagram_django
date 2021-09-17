@@ -87,7 +87,7 @@ class HomeView(LoginRequiredMixin, ListView):
         reccomended_users = find_reccomended_users(user, followee_friendships, follower_friendships)
         context['reccomended_users'] = reccomended_users
 
-        #メッセージを受け取っていたら、ホーム画面に通知する処理
+        #今日メッセージを受け取っていたら、ホーム画面に通知する処理
         messages = Message.objects.filter(to_user=user)
         if messages:
             today = datetime.datetime.today().strftime('%Y-%m-%d')
@@ -481,6 +481,7 @@ class TagPostListView(LoginRequiredMixin, ListView):
         tag = self.kwargs['tag']
         context['tag'] = tag
         context['num_of_posts'] = Posts.objects.filter(tag=tag).count()
+        context['request_user'] = self.request.user
         return context
 
 
@@ -589,3 +590,8 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
         random.shuffle(reccomended_posts)
         queryset = reccomended_posts
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['request_user'] = self.request.user
+        return context
