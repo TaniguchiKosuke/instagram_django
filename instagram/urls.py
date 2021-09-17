@@ -18,5 +18,9 @@ urlpatterns = [
     path('follower_list/<int:pk>/', views.FollowerListView.as_view(), name='follower_list'),
     path('messages/<int:pk>/', views.MessagesView.as_view(), name='messages'),
     path('message_list', views.MessageListView.as_view(), name='message_list'),
-    path('tag_post_list/<str:tag>', views.TagPostListView.as_view(), name='tag_post_list')
+    path('tag_post_list/<str:tag>', views.TagPostListView.as_view(), name='tag_post_list'),
+    path('comment_from_post_list/<int:pk>/', views.comment_from_post_list, name='comment_from_post_list'),
+    path('search_friends/', views.SearchFriendsView.as_view(), name='search_friends'),
+    path('settings/', views.SettingsView.as_view(), name='settings'),
+    path('reccomended_posts/', views.ReccomendedPostsView.as_view(), name='reccomended_posts')
 ]

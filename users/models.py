@@ -79,8 +79,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    name = models.CharField(max_length=100, blank=True)
-    text = models.CharField(max_length=300, blank=True)
+    name = models.CharField(max_length=100, blank=True, null=True)
+    text = models.CharField(max_length=300, blank=True, null=True)
     user_image = models.ImageField(upload_to='images/', null=True, blank=True)
     followees = models.ManyToManyField(
         'self', verbose_name='フォロー中のユーザー', through='instagram.FriendShip',

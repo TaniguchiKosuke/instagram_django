@@ -2,34 +2,13 @@
 
 {% block content %}
 
-
-<section class="jumbotron text-center" style="background-color: #f8f9fa; margin-top:0;">
-    <div class="container d-flex">
-      <div>
-        <img  class="top-image-of-user" src="{{ MEDIA_URL }}app_images/hashtag.jpeg" alt="">
-      </div>
-  
-      <div style="margin-left: 100px;">
-        <h1 class="jumbotron-heading">{{ tag }}</h1>
-        <p>
-          <h5>{{ num_of_posts }}</h5>
-          <p>posts</p>
-        </p>
-      </div>
-    </div>
-  </section>
-
-
 <div class="container blog-page">
     <div class="row clearfix">
-        
+        <h3 style="margin: 16px;">{{ user.username }}さんへのおすすめの投稿</h3>
         {% if object_list %}
         {% for post in object_list %}
         <div class="col-lg-4 col-md-12">
           <div class="card single_post">
-            <div class="body" style="padding: 0;">
-              <h6><a href="{% url 'instagram:user_profile' pk=post.author.pk %}" class="see-more">{{ post.author }}</a></h6>
-            </div>
             <div class="body" style="padding: 0; margin:0 auto;">
                 <div class="img-post m-b-15" style="margin: 0 auto;">
                     <img src="{{ MEDIA_URL }}{{ post.image }}" alt="Awesome Image">

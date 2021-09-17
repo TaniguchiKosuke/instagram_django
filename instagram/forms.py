@@ -1,8 +1,9 @@
-from typing import Text
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.core.files.base import File
+from django.db import reset_queries
 from django.db.models import fields
+from django.db.models.base import Model
 from .models import CommentToPost, Message, Posts
 from users.models import User
 
@@ -24,9 +25,9 @@ class PostForm(forms.ModelForm):
 
 class UserProfileUpdateForm(forms.ModelForm):
     username = forms.CharField(label='')
-    name = forms.CharField(label='')
-    text = forms.CharField(widget=forms.Textarea, label='')
-    user_image = forms.ImageField(label='')
+    name = forms.CharField(label='', required=False)
+    text = forms.CharField(widget=forms.Textarea, label='', required=False)
+    user_image = forms.ImageField(label='', required=False)
 
     def __init__(self, *args, **kwargs):
         super(UserProfileUpdateForm, self).__init__(*args, **kwargs)
@@ -62,3 +63,14 @@ class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
         fields = ('text',)
+
+
+class CommentFromPostListForm(forms.Form):
+    text = forms.CharField(label='')
+
+    def __init__(self, *args, **kwargs):
+        super(CommentFromPostListForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs["class"] = "form-control"
+            field.widget.attrs["name"] = "text"
+            field.widget.attrs['placeholder'] = 'コメントを送る'

@@ -21,17 +21,49 @@
         <a href="{% url 'instagram:follower_list' pk=user.pk %}" class="following">フォロワー{{ follower }}人</a>
       </p>
       <p>
-        <a href="{% url 'instagram:post' %}" class="btn btn-primary my-2">投稿</a>
         <a href="{% url 'instagram:message_list' %}" class="btn btn-secondary my-2">メッセージ</a>
         {% if user.is_authenticated %}
         <a href="{% url 'instagram:user_profile' pk=user.pk %}" class="btn btn-secondary my-2">プロフィール</a>
+        <a href="{% url 'instagram:settings' %}"><img src="{{ MEDIA_URL }}app_images/settings_icon.svg" alt="" style="width: 24px;height:24px;"></a>
         {% endif %}
       </p>
     </div>
 
     <div>
       <h4>通知一覧</h4>
+      {% if message_notice %}
       <p>メッセージがきています</p>
+      {% else %}
+      <p>通知はありません</p>
+      {% endif %}
+    </div>
+
+    <div style="margin-top: 12px;">
+      <h4>知り合いかも</h4>
+      {% if reccomended_users %}
+      <table class="table table-hover" style="width: 76%;">
+
+        <tbody>
+          {% for user in reccomended_users%}
+          <tr>
+            {% if user.user_image %}
+            <th scope="row"><img src="{{ MEDIA_URL }}{{ user.user_image }}" alt="" style="width: 32px; border-radius: 50%;"></th>
+            {% else %}
+            <th scope="row"><img src="{{ MEDIA_URL }}images/default-user-image.png" alt="" style="width: 32px; border-radius: 50%;"></th>
+            {% endif %}
+            <td><a href="{% url 'instagram:user_profile' pk=user.pk %}" class="see-more" style="color: black;">{{ user.username }}</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        
+      </table>
+      {% else %}
+      <p>知り合いのユーザーが見つかりません</p>
+      {% endif %}
+
+
+    </div>
+
     </div>
     </section>
 
@@ -44,7 +76,7 @@
           <th>Tags</th>
         </tr>
       </thead>
-      {% for tag in tags %}
+      {% for tag in object_list %}
         <tbody style="background-color: #fff;">
           <tr class="candidates-list">
             <td class="title">
@@ -65,6 +97,7 @@
           {% endfor %}
         </tbody>
       </table>
+
     {% elif object_list %}
       {% for post in object_list %}
       <div class="posts-area">
@@ -76,7 +109,7 @@
             <p>{{ post.text }}</p>
             {% endif %}
             {% if post.tag%}
-            <a href="" style="text-decoration: none; color: rgb(48, 96, 230);">{{ post.tag }}</a>
+            <a href="{% url 'instagram:tag_post_list' tag=post.tag %}" style="text-decoration: none; color: rgb(48, 96, 230);">{{ post.tag }}</a>
             {% endif %}
           </div>
           <div class="card-body">
@@ -86,11 +119,19 @@
                   <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
                   <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
                   <p class="good-count">{{ post.like_count }}件のいいね</p>
-                <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメントする</a>
-                <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">もっと見る</a>
+                <p class="see-more" style="text-decoration: none;">コメント{{ post.comment_count }}件</p>
+                <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">more</a>
               </div>
               <small class="text-muted"></small>
+
             </div>
+            <form method="POST" class="form-inline" action="{% url 'instagram:comment_from_post_list' pk=post.pk %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                  {{ comment_from_post_list_form }}
+                  <button type="submit" class="btn btn-outline-primary">Post</button>
+                </div>
+            </form>
           </div>
         </div>
       </div>

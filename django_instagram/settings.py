@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'instagram.apps.InstagramConfig',
     'users.apps.UsersConfig',
     "bootstrap4",
+    'instagram.templatetags.templates_func',
 ]
 
 MIDDLEWARE = [
