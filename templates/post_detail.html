@@ -41,8 +41,8 @@
         {% endif %}
         <p class="good-count">{{ object.like_count }}件のいいね</p>
         {% if request_user == object.author %}
-        <a href="" class="see-more">投稿の削除</a>
-        <a href="" class="see-more">編集</a>
+        <a href="{% url 'instagram:delete_post' pk=object.pk %}" class="see-more">投稿の削除</a>
+        <a href="{% url 'instagram:update_post' pk=object.pk %}" class="see-more">編集</a>
         {% else %}
         {% endif %}
         <a href="{% url 'instagram:comment_to_post' pk=object.pk %}" class="see-more">コメントする</a>

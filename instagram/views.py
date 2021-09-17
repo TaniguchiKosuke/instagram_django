@@ -10,13 +10,13 @@ from users.models import User
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.urls.base import reverse, translate_url
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import CommentToPost, FriendShip, Message, PostLikes, Posts, Tag
-from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm
+from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm, UpdatePostForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
@@ -176,6 +176,22 @@ class PostView(LoginRequiredMixin, CreateView):
             if not tag_exist:
                 Tag.objects.create(name=tag)
         return super(PostView, self).form_valid(form)
+
+
+class DeletePostView(LoginRequiredMixin, DeleteView):
+    template_name = 'posts_confirm_delete.html'
+    model = Posts
+    success_url = reverse_lazy('instagram:home')
+
+
+class UpdatePostView(LoginRequiredMixin, UpdateView):
+    template_name = 'edit_post.html'
+    model = Posts
+    form_class = UpdatePostForm
+
+    def get_success_url(self):
+        return reverse('instagram:post_detail', kwargs={'pk': self.kwargs['pk']})
+
 
 
 class UserProfileView(LoginRequiredMixin, ListView):
@@ -468,7 +484,7 @@ def find_message_address(request_user):
 class TagPostListView(LoginRequiredMixin, ListView):
     template_name = 'tag_post_list.html'
     queryset = Posts
-    paginate_by = 15
+    paginate_by = 27
 
     def get_queryset(self):
         queryset = super().get_queryset()

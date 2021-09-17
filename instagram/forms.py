@@ -1,3 +1,4 @@
+from typing import Text
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.core.files.base import File
@@ -15,6 +16,21 @@ class PostForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
+    class Meta:
+        model = Posts
+        fields = ('text', 'image', 'tag')
+
+
+class UpdatePostForm(forms.ModelForm):
+    text = forms.CharField(label='', widget=forms.Textarea, required=False)
+    image = forms.ImageField(label='')
+    tag = forms.CharField(label='', required=False)
+    
+    def __init__(self, *args, **kwargs):
+        super(UpdatePostForm, self).__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
 

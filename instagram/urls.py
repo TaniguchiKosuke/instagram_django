@@ -22,5 +22,7 @@ urlpatterns = [
     path('comment_from_post_list/<int:pk>/', views.comment_from_post_list, name='comment_from_post_list'),
     path('search_friends/', views.SearchFriendsView.as_view(), name='search_friends'),
     path('settings/', views.SettingsView.as_view(), name='settings'),
-    path('reccomended_posts/', views.ReccomendedPostsView.as_view(), name='reccomended_posts')
+    path('reccomended_posts/', views.ReccomendedPostsView.as_view(), name='reccomended_posts'),
+    path('delete_post/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
+    path('update_post/<int:pk>/', views.UpdatePostView.as_view(), name='update_post'),
 ]
