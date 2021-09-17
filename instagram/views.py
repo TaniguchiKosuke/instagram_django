@@ -202,6 +202,9 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
 
 @login_required
 def like_post(request, *args, **kwargs):
+    """
+    いいね機能のための関数
+    """
     post = Posts.objects.get(pk=kwargs['pk'])
     is_like = PostLikes.objects.filter(user=request.user).filter(post=post).count()
     if is_like > 0:
@@ -238,6 +241,9 @@ class CommentToPostView(LoginRequiredMixin, CreateView):
 
 @csrf_protect
 def comment_from_post_list(request, pk):
+    """
+    投稿一覧画面から直接コメントをするための関数
+    """
     form = CommentFromPostListForm(request.POST or None)
     if form.is_valid():
         text = request.POST['text']
@@ -266,6 +272,9 @@ class PostDetailView(LoginRequiredMixin, DetailView):
 
 @login_required
 def follow_view(request, *args, **kwargs):
+    """
+    ユーザーをフォローするための関数
+    """
     try:
         follower = User.objects.get(pk=request.user.pk)
         followee = User.objects.get(pk=kwargs['pk'])
@@ -288,6 +297,9 @@ def follow_view(request, *args, **kwargs):
 
 @login_required
 def unfollow_view(request, *args, **kwargs):
+    """
+    既にフォローしているユーザーのフォローを解除するための関数
+    """
     try:
         follower = User.objects.get(pk=request.user.pk)
         followee = User.objects.get(pk=kwargs['pk'])
