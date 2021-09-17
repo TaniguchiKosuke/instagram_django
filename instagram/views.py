@@ -24,6 +24,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from itertools import chain
 from operator import attrgetter
+import datetime
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -89,7 +90,11 @@ class HomeView(LoginRequiredMixin, ListView):
         #メッセージを受け取っていたら、ホーム画面に通知する処理
         messages = Message.objects.filter(to_user=user)
         if messages:
-            context['message_notice'] = True
+            today = datetime.datetime.today().strftime('%Y-%m-%d')
+            for message in messages:
+                message_created_at = message.created_at.strftime('%Y-%m-%d')
+                if message_created_at == today:
+                    context['message_notice_today'] = True
         return context
 
 
