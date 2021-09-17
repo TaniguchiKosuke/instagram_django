@@ -34,18 +34,28 @@ class HomeView(LoginRequiredMixin, ListView):
         queryset = super().get_queryset()
         #ユーザーが誰かフォローしている場合はその人の投稿を優先的に表示
         request_user = self.request.user
+        #投稿を検索する処理
         query = self.request.GET.get('query')
         if query:
-            #投稿を検索する処理
             if not query.startswith('#'):
                 queryset = Posts.objects.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
             elif query.startswith('#'):
                 queryset = Tag.objects.filter(Q(name__icontains=query))
+        #フォローしているユーザーがいる場合は、それらを考慮に入れておすすめの投稿を表示する
         elif request_user.followees.all():
+            friend_posts_list = []
             for followee in request_user.followees.all():
-                friend_posts = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
-                other_posts = Posts.objects.order_by('-created_at')
-                queryset = list(chain(friend_posts, other_posts))
+                friend_posts = Posts.objects.filter(author=followee).order_by('-created_at')
+                friend_posts_list = list(chain(friend_posts_list, friend_posts))
+            my_posts = Posts.objects.filter(author=request_user).order_by('-created_at')
+            other_posts = Posts.objects.order_by('?')[:20]
+            other_posts_list = []
+            for post in other_posts:
+                if (not post in friend_posts_list) and (not post in my_posts):
+                    other_posts_list.append(post)
+                else:
+                    continue
+            queryset = list(chain(friend_posts_list, my_posts, other_posts_list))
         else:
             queryset = Posts.objects.order_by('-created_at')
         return queryset
