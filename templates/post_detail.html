@@ -31,7 +31,7 @@
     <div class="card post-card mb-4 shadow-sm">
       <h5><a href="" class="see-post-author">{{ object.author }}</a></h5>
       <img  src="{{ MEDIA_URL }}{{ object.image }}" class="bd-placeholder-img card-img-top">
-      <p style="margin: 0;">{{ object.text }}</p>
+      <p style="margin: 0;">{{ object.text | linebreaksbr |urlize }}</p>
       <div>
         {% for tag in object.tag|split_tags %}
           <a href="{% url 'instagram:tag_post_list' tag=tag %}" style="text-decoration: none; color: rgb(48, 96, 230);">{{ tag }}</a>
@@ -56,9 +56,9 @@
 
       {% if comments %}
       {% for comment in comments %}
-      <div class='post-comment'>
+      <div class='post-comment' style="padding: 0;">
         <h5><a href="" class="comment-author">{{ comment.author }}</a></h5>
-        <p>{{ comment.text }}</p>
+        <p style="margin: 0;">{{ comment.text | linebreaksbr }}</p>
         {% if request_user == comment.author %}
            <a href="" class="see-more">削除</a>
         {% endif %}

@@ -40,7 +40,7 @@
     {% endif %}
     {% if user_profile.text %}
     <p>
-      {{ user_profile.text }}
+      {{ user_profile.text | linebreaksbr |urlize }}
     </p>
     {% else %}
     {% endif %}

@@ -109,7 +109,7 @@
           <div>
             <img  src="{{ MEDIA_URL }}{{ post.image }}" class="post-image bd-placeholder-img card-img-top" >
             {% if post.text %}
-            <p>{{ post.text }}</p>
+            <p>{{ post.text | linebreaksbr |urlize }}</p>
             {% endif %}
             {% if post.tag%}
    

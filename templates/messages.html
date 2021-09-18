@@ -87,7 +87,7 @@
                   {% else %}
                   <div class="font-weight-bold mb-1">{{ message.from_user.username }}</div>
                   {% endif %}
-									{{ message.text }}
+									{{ message.text | linebreaksbr |urlize }}
 								</div>
 							</div>
               {% endfor %}
