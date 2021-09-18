@@ -60,7 +60,7 @@
         <h5><a href="" class="comment-author">{{ comment.author }}</a></h5>
         <p style="margin: 0;">{{ comment.text | linebreaksbr }}</p>
         {% if request_user == comment.author %}
-           <a href="" class="see-more">削除</a>
+           <a href="{% url 'instagram:delete_comment' pk=comment.pk %}" class="see-more">削除</a>
         {% endif %}
       </div>
       {% endfor %}

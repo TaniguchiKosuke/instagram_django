@@ -47,3 +47,10 @@ def split_tags(tag_str):
     #tag_listの0番目の要素はただの＃だからこれを削除
     tag_list.pop(0)
     return tag_list
+
+
+@register.filter
+def count_comment(post):
+    from ..models import CommentToPost
+    comment_count = CommentToPost.objects.filter(post=post).count()
+    return comment_count

@@ -299,6 +299,12 @@ class CommentToPostView(LoginRequiredMixin, CreateView):
         return reverse('instagram:post_detail', kwargs={'pk':self.kwargs['pk']})
 
 
+class DeleteCommentView(LoginRequiredMixin, DeleteView):
+    template_name = 'comment_confirm_delete.html'
+    model = CommentToPost
+    success_url = reverse_lazy('instagram:home')
+
+
 @csrf_protect
 def comment_from_post_list(request, pk):
     """
