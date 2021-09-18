@@ -29,8 +29,8 @@ def judge_likes(user, post):
 @register.filter
 def count_tag(tag_name):
     #importの問題(循環importかな？)を回避するためにここでimport
-    from ..models import Posts
-    tag_count = Posts.objects.filter(tag=tag_name).count()
+    from ..models import PostTagRelation
+    tag_count = PostTagRelation.objects.filter(tag__name=tag_name).count()
     return tag_count
 
 

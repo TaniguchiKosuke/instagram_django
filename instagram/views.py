@@ -1,4 +1,5 @@
 import math
+from os import name
 import random
 from django import contrib
 from django.core.checks import messages
@@ -41,7 +42,15 @@ class HomeView(LoginRequiredMixin, ListView):
             if not query.startswith('#'):
                 queryset = Posts.objects.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
             elif query.startswith('#'):
-                queryset = Tag.objects.filter(Q(name__icontains=query))
+                # queryset = Tag.objects.filter(Q(name__icontains=query))
+                post_tag_relation = PostTagRelation.objects.filter(tag__name__icontains=query)
+                post_tag_list = []
+                for post_tag in post_tag_relation:
+                    if not post_tag.tag in post_tag_list:
+                        post_tag_list.append(post_tag.tag)
+                    else:
+                        continue
+                queryset = post_tag_list
         #フォローしているユーザーがいる場合は、それらを考慮に入れておすすめの投稿を表示する
         elif request_user.followees.all():
             friend_posts_list = []
@@ -80,11 +89,12 @@ class HomeView(LoginRequiredMixin, ListView):
         if query:
             context['query_exist'] = True
             if query.startswith('#'):
-                context['tags'] = Tag.objects.filter(Q(name__icontains=query))
+                # context['tags'] = Tag.objects.filter(Q(name__icontains=query))
+                context['tags'] = PostTagRelation.objects.filter(tag__name__icontains=query)
 
         #「知り合いかも」にフォローしてる、もしくはフォローされてる友達のフォローしてる人をおすすめとして表示させるための処理
         reccomended_users = find_reccomended_users(user, followee_friendships, follower_friendships)
-        #reccomended_usersはシャッフルしたい
+        #reccomended_usersをシャッフルする処理
         if len(reccomended_users) < 1:
             reccomended_users = reccomended_users
         elif len(reccomended_users) < 2:
@@ -181,7 +191,7 @@ class PostView(LoginRequiredMixin, CreateView):
                 if not tag_exist:
                     Tag.objects.create(name=tag)
                 tag = Tag.objects.get(name=tag)
-                PostTagRelation.objects.create(post=post, tag=tag)
+                PostTagRelation.objects.get_or_create(post=post, tag=tag_obj)
         return super(PostView, self).form_valid(form)
 
 
@@ -195,6 +205,21 @@ class UpdatePostView(LoginRequiredMixin, UpdateView):
     template_name = 'edit_post.html'
     model = Posts
     form_class = UpdatePostForm
+
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        tags = post.tag
+        if tags:
+            tags_list = tags.split('#')
+            tags_list.pop(0)
+            for tag in tags_list:
+                tag = '#' + tag
+                tag_exist = Tag.objects.filter(name=tag)
+                if not tag_exist:
+                    Tag.objects.create(name=tag)
+                tag = Tag.objects.get(name=tag)
+                PostTagRelation.objects.get_or_create(post=post, tag=tag)
+        return super(UpdatePostView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('instagram:post_detail', kwargs={'pk': self.kwargs['pk']})
