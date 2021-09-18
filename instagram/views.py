@@ -85,6 +85,17 @@ class HomeView(LoginRequiredMixin, ListView):
 
         #「知り合いかも」にフォローしてる、もしくはフォローされてる友達のフォローしてる人をおすすめとして表示させるための処理
         reccomended_users = find_reccomended_users(user, followee_friendships, follower_friendships)
+        #reccomended_usersはシャッフルしたい
+        if len(reccomended_users) < 1:
+            reccomended_users = reccomended_users
+        elif len(reccomended_users) < 2:
+            reccomended_users = random.sample(reccomended_users, 1)
+        elif len(reccomended_users) < 3:
+            reccomended_users = random.sample(reccomended_users, 2)
+        elif len(reccomended_users) < 4:
+            reccomended_users = random.sample(reccomended_users, 3)
+        else:
+            reccomended_users = random.sample(reccomended_users, 4)
         context['reccomended_users'] = reccomended_users
 
         #今日メッセージを受け取っていたら、ホーム画面に通知する処理
@@ -147,17 +158,6 @@ def find_reccomended_users(request_user, followee_friendships, follower_friendsh
             elif follower_friend_follower in alrealdy_followees:
                 continue
             reccomended_users.append(follower_friend_follower)
-    #reccomended_usersはシャッフルしたい
-    if len(reccomended_users) < 1:
-        reccomended_users = reccomended_users
-    elif len(reccomended_users) < 2:
-        reccomended_users = random.sample(reccomended_users, 1)
-    elif len(reccomended_users) < 3:
-        reccomended_users = random.sample(reccomended_users, 2)
-    elif len(reccomended_users) < 4:
-        reccomended_users = random.sample(reccomended_users, 3)
-    else:
-        reccomended_users = random.sample(reccomended_users, 4)
 
     return reccomended_users
 
@@ -617,10 +617,14 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
 class SeeAllReccomendedUsersView(LoginRequiredMixin, ListView):
     template_name = 'see_all_reccomended_users.html'
     queryset = User
+    paginate_by = 16
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = User.objects.all()
+        request_user = self.request.user
+        followee_friendships = FriendShip.objects.filter(follower__username=request_user)
+        follower_friendships = FriendShip.objects.filter(followee__username=request_user)
+        queryset = find_reccomended_users(request_user, followee_friendships, follower_friendships)
         return queryset
 
     def get_context_data(self, **kwargs):
