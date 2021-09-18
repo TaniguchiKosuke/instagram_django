@@ -28,9 +28,22 @@ def judge_likes(user, post):
 
 @register.filter
 def count_tag(tag_name):
-    print(tag_name)
     #importの問題(循環importかな？)を回避するためにここでimport
     from ..models import Posts
     tag_count = Posts.objects.filter(tag=tag_name).count()
-    print(tag_count)
     return tag_count
+
+
+@register.filter
+def split_tags(tag_str):
+    """
+    tagを#で分割してテンプレートにlistとして渡す
+    """
+    tags_list = tag_str.split('#')
+    tag_list = []
+    for tag in tags_list:
+        tag = '#' + tag
+        tag_list.append(tag)
+    #tag_listの0番目の要素はただの＃だからこれを削除
+    tag_list.pop(0)
+    return tag_list

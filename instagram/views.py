@@ -15,7 +15,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import CommentToPost, FriendShip, Message, PostLikes, Posts, Tag
+from .models import CommentToPost, FriendShip, Message, PostLikes, PostTagRelation, Posts, Tag
 from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm, UpdatePostForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -34,7 +34,6 @@ class HomeView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        #ユーザーが誰かフォローしている場合はその人の投稿を優先的に表示
         request_user = self.request.user
         #投稿を検索する処理
         query = self.request.GET.get('query')
@@ -168,13 +167,21 @@ class PostView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('instagram:home')
 
     def form_valid(self, form):
+        post = form.save(commit=False)
         author = self.request.user
-        form.instance.author = author
-        tag = form.instance.tag
-        if tag:
-            tag_exist = Tag.objects.filter(name=tag)
-            if not tag_exist:
-                Tag.objects.create(name=tag)
+        post.author = author
+        tags = post.tag
+        post.save()
+        if tags:
+            tags_list = tags.split('#')
+            tags_list.pop(0)
+            for tag in tags_list:
+                tag = '#' + tag
+                tag_exist = Tag.objects.filter(name=tag)
+                if not tag_exist:
+                    Tag.objects.create(name=tag)
+                tag = Tag.objects.get(name=tag)
+                PostTagRelation.objects.create(post=post, tag=tag)
         return super(PostView, self).form_valid(form)
 
 

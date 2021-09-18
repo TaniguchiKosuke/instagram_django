@@ -34,6 +34,9 @@ class Posts(TimeStampedModel):
 
     class Meta:
         verbose_name = 'Post'
+    
+    def __str__(self):
+        return f'posted by {self.author}'
 
 
 class PostTagRelation(TimeStampedModel):
