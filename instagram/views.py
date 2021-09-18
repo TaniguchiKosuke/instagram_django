@@ -14,7 +14,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import CommentToPost, FriendShip, Message, PostLikes, Posts, Tag
 from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm, UpdatePostForm
 from django.contrib.auth.decorators import login_required
@@ -625,5 +625,10 @@ class SeeAllReccomendedUsersView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['request_user'] = self.request.user
+        request_user = self.request.user
+        context['request_user'] = request_user
+        followee = User.objects.filter(followers=request_user).count()
+        follower = User.objects.filter(followees=request_user).count()
+        context['followee'] = followee
+        context['follower'] = follower
         return context
