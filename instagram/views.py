@@ -668,3 +668,8 @@ class SeeAllReccomendedUsersView(LoginRequiredMixin, ListView):
         context['followee'] = followee
         context['follower'] = follower
         return context
+
+
+class LikedPostListView(LoginRequiredMixin, ListView):
+    template_name = 'liked_post_list.html'
+    queryset = Posts
