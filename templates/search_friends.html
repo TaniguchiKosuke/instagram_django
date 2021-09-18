@@ -39,15 +39,15 @@
   </div>
   </section>
 
-  <form method="GET" action="{% url 'instagram:search_friends' %}"  class="form-inline" style="margin-top: 20px;">
-    <div class="form-group mb-2">
-      <input type="text" class="form-control" value="{{ request.GET.query }}" name="search_friends">
-    </div>
-    <input type="image" src="{{ MEDIA_URL }}app_images/search_icon.svg" alt="送信する" style="width: 20px;margin-left:8px;">
-  </form>
-
-<div>
-  <h3 style="margin: 16px auto 0; width:80%;">users</h3>
+  
+  <div>
+    <h3 style="margin: 16px auto 0; width:80%;">users</h3>
+    <form method="GET" action="{% url 'instagram:search_friends' %}"  class="form-inline" style="width:80%; margin:0 auto;">
+      <div class="form-group mb-2">
+        <input type="text" class="form-control" value="{{ request.GET.query }}" name="search_friends" placeholder="search friends">
+      </div>
+      <input type="image" src="{{ MEDIA_URL }}app_images/search_icon.svg" alt="送信する" style="width: 20px;margin-left:8px;">
+    </form>
   {% if object_list %}
   <div class="container mt-3 mb-4">
     <div class="col-lg-9 mt-4 mt-lg-0">
@@ -127,7 +127,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td>フォローしている友達はいません
+                    <td>
                     </td>
                   </tr>
                 </tbody>
