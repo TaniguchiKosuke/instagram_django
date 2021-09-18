@@ -29,26 +29,26 @@
         <div class="col-lg-4 col-md-12">
           <div class="card single_post">
             <div class="body" style="padding: 0;">
-              <h6><a href="{% url 'instagram:user_profile' pk=post.author.pk %}" class="see-more">{{ post.author }}</a></h6>
+              <h6><a href="{% url 'instagram:user_profile' pk=post.post.author.pk %}" class="see-more">{{ post.post.author }}</a></h6>
             </div>
             <div class="body" style="padding: 0; margin:0 auto;">
                 <div class="img-post m-b-15" style="margin: 0 auto;">
-                    <img src="{{ MEDIA_URL }}{{ post.image }}" alt="Awesome Image">
+                    <img src="{{ MEDIA_URL }}{{ post.post.image }}" alt="Awesome Image">
                 </div>
 
                 <div class="card-body">
                   <p class="card-text"></p>
                   <div class="d-flex justify-content-between align-items-center">
                     <div class="btn-group">
-                        {% if request_user|judge_likes:post %}
-                          <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+                        {% if request_user|judge_likes:post.post %}
+                          <a href="{% url 'instagram:like_post' pk=post.post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
                         {% else %}
-                          <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+                          <a href="{% url 'instagram:like_post' pk=post.post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
                         {% endif %}
-                        <p class="good-count">{{ post.like_count }}件</p>
-                        <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメント
+                        <p class="good-count">{{ post.post.like_count }}件</p>
+                        <a href="{% url 'instagram:comment_to_post' pk=post.post.pk %}" class="see-more">コメント
                         </a>
-                        <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">more</a>
+                        <a href="{% url 'instagram:post_detail' pk=post.post.pk %}" class="see-more">more</a>
                     </div>
                     <small class="text-muted"></small>
                   </div>

@@ -191,7 +191,7 @@ class PostView(LoginRequiredMixin, CreateView):
                 if not tag_exist:
                     Tag.objects.create(name=tag)
                 tag = Tag.objects.get(name=tag)
-                PostTagRelation.objects.get_or_create(post=post, tag=tag_obj)
+                PostTagRelation.objects.get_or_create(post=post, tag=tag)
         return super(PostView, self).form_valid(form)
 
 
@@ -521,14 +521,14 @@ class TagPostListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         tag = self.kwargs['tag']
-        queryset = Posts.objects.filter(tag=tag).order_by('-like_count')
+        queryset = PostTagRelation.objects.filter(tag__name=tag)
         return queryset
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tag = self.kwargs['tag']
         context['tag'] = tag
-        context['num_of_posts'] = Posts.objects.filter(tag=tag).count()
+        context['num_of_posts'] = PostTagRelation.objects.filter(tag__name=tag).count()
         context['request_user'] = self.request.user
         return context
 
