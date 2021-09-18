@@ -25,4 +25,5 @@ urlpatterns = [
     path('reccomended_posts/', views.ReccomendedPostsView.as_view(), name='reccomended_posts'),
     path('delete_post/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
     path('update_post/<int:pk>/', views.UpdatePostView.as_view(), name='update_post'),
+    path('see_all_reccomended_users/', views.SeeAllReccomendedUsersView.as_view(), name='see_all_reccomended_users'),
 ]

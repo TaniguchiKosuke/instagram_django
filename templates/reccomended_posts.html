@@ -4,7 +4,7 @@
 {% block content %}
 
 <div class="container blog-page">
-    <div class="row clearfix">
+    <div class="row clearfix" style="margin-top: 0;">
         <h3 style="margin: 16px;">{{ user.username }}さんへのおすすめの投稿</h3>
         {% if object_list %}
         {% for post in object_list %}

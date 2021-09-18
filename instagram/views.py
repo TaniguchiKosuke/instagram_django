@@ -612,3 +612,18 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['request_user'] = self.request.user
         return context
+
+
+class SeeAllReccomendedUsersView(LoginRequiredMixin, ListView):
+    template_name = 'see_all_reccomended_users.html'
+    queryset = User
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = User.objects.all()
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['request_user'] = self.request.user
+        return context

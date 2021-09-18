@@ -41,7 +41,7 @@
     <div style="margin-top: 12px;">
       <div class="d-flex" style="width: 44%;margin:0 auto;">
         <h4>知り合いかも</h4>
-        <a href="" class="see-more" style="font-weight:bold;color:rgb(40, 112, 245);">see all</a>
+        <a href="{% url 'instagram:see_all_reccomended_users' %}" class="see-more" style="font-weight:bold;color:rgb(40, 112, 245);">see all</a>
       </div>
       {% if reccomended_users %}
       <table class="table table-hover" style="width: 76%;">
