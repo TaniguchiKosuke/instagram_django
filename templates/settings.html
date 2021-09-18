@@ -6,7 +6,7 @@
   <h2>Settings</h2>
   <div>
     <h4>アカウント</h4>
-    <p><a href="" style="text-decoration: none;">いいねした投稿</a></p>
+    <p><a href="{% url 'instagram:liked_post_list' %}" style="text-decoration: none;">いいねした投稿</a></p>
     <p>
       <a style="text-decoration: none;" href="{% url 'users:logout' %}">ログアウト</a>
     </p>

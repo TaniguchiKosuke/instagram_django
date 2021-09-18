@@ -673,3 +673,20 @@ class SeeAllReccomendedUsersView(LoginRequiredMixin, ListView):
 class LikedPostListView(LoginRequiredMixin, ListView):
     template_name = 'liked_post_list.html'
     queryset = Posts
+    paginate_by = 27
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        request_user = self.request.user
+        post_likes = PostLikes.objects.filter(user=request_user).order_by('-created_at')
+        liked_post_list = []
+        for post_like in post_likes:
+            liked_post_list.append(post_like.post)
+        queryset = liked_post_list
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        request_user = self.request.user
+        context['request_user'] = request_user
+        return context

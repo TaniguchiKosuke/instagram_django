@@ -31,13 +31,18 @@
     <div class="card post-card mb-4 shadow-sm">
       <h5><a href="" class="see-post-author">{{ object.author }}</a></h5>
       <img  src="{{ MEDIA_URL }}{{ object.image }}" class="bd-placeholder-img card-img-top">
-      <p class="see-post-content">{{ object.text }}</p>
-      <p class="see-post-content">{{ object.date_posted }}</p>
-      <p class="border-under-post">
+      <p style="margin: 0;">{{ object.text }}</p>
+      <div>
+        {% for tag in object.tag|split_tags %}
+          <a href="{% url 'instagram:tag_post_list' tag=tag %}" style="text-decoration: none; color: rgb(48, 96, 230);">{{ tag }}</a>
+        {% endfor %}
+      </div>
+      <p class="see-more" style="text-decoration:none;margin: 0;">{{ object.created_at }}</p>
+      <p class="border-under-post" style="padding:0;margin:0;">
         {% if request_user|judge_likes:object %}
-          <a href="{% url 'instagram:like_post' pk=object.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+          <a href="{% url 'instagram:like_post' pk=object.pk %}" style="text-decoration: none;margin:0;"><span class="like-button">&hearts;</span></a>
         {% else %}
-          <a href="{% url 'instagram:like_post' pk=object.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+          <a href="{% url 'instagram:like_post' pk=object.pk %}" style="text-decoration: none;margin:0;"><span class="like-button">&#9825;</span></a>
         {% endif %}
         <p class="good-count">{{ object.like_count }}件のいいね</p>
         {% if request_user == object.author %}
