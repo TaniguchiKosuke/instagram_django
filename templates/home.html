@@ -101,16 +101,24 @@
         </tbody>
       </table>
 
-    {% elif object_list %}
+      {% elif object_list %}
       {% for post in object_list %}
       <div class="posts-area">
         <div class="card post-card mb-4 shadow-sm">
           <h5><a href="{% url 'instagram:user_profile' pk=post.author.pk %}" class="post-username-a">{{ post.author }}</a></h5>
           <div>
             <img  src="{{ MEDIA_URL }}{{ post.image }}" class="post-image bd-placeholder-img card-img-top" >
-            {% if post.like_count > 0 %}
-            <p style="font-size: small;margin:0;">Liked by {{ post | liked_post_user }} and <a href="{% url 'instagram:liked_post_user' pk=post.pk %}" style="color: black;text-decoration:none;font-weight:bold;">others</a></p>
-            {% endif %}
+            <div class="d-flex">
+              {% if user|judge_likes:post %}
+                <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+              {% else %}
+                <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+              {% endif %}
+              {% if post.like_count > 0 %}
+              <p class="good-count" style="font-size: small;margin:0;">Liked by {{ post | liked_post_user }} and <a href="{% url 'instagram:liked_post_user' pk=post.pk %}" style="color: black;text-decoration:none;font-weight:bold;">others</a></p>
+              {% endif %}
+              <a href="{% url 'instagram:save_post' pk=post.pk %}"><img src="{{ MEDIA_URL }}app_images/save_post.svg" alt="" style="margin-top:4px;width: 28px;position:absolute;right:4px;"></a>
+            </div>
             {% if post.text %}
             <p style="margin: 0;">{{ post.text | linebreaksbr |urlize }}</p>
             {% endif %}
@@ -125,12 +133,6 @@
             <p class="card-text"></p>
             <div class="d-flex justify-content-between align-items-center">
               <div class="btn-group">
-                  {% if user|judge_likes:post %}
-                    <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
-                  {% else %}
-                    <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
-                  {% endif %}
-                  <p class="good-count">{{ post.like_count }}件のいいね</p>
                 <p class="see-more" style="text-decoration: none;">コメント{{ post | count_comment }}件</p>
                 <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">more</a>
               </div>

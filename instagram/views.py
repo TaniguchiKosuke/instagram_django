@@ -286,17 +286,14 @@ def like_post(request, *args, **kwargs):
 @login_required
 def save_post(request, *args, **kwargs):
     """
-    いいね機能のための関数
+    save機能のための関数
     """
     post = Posts.objects.get(pk=kwargs['pk'])
     is_saved = PostSave.objects.filter(user=request.user).filter(post=post).count()
     if is_saved> 0:
         save = PostSave.objects.get(user=request.user, post__id=kwargs['pk'])
         save.delete()
-        post.save()
         return redirect(reverse_lazy('instagram:home'))
-    post.like_count += 1
-    post.save()
     post_save = PostSave()
     post_save.user = request.user
     post_save.post = post

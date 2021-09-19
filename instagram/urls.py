@@ -29,4 +29,5 @@ urlpatterns = [
     path('liked_post_list/', views.LikedPostListView.as_view(), name='liked_post_list'),
     path('delete_comment/<int:pk>/', views.DeleteCommentView.as_view(), name='delete_comment'),
     path('liked_post_user/<int:pk>/', views.LikedPostUserView.as_view(), name='liked_post_user'),
+    path('save_post/<int:pk>/', views.save_post, name='save_post')
 ]
