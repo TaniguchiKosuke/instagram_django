@@ -83,3 +83,8 @@ class Message(TimeStampedModel):
 
     def __str__(self):
         return f'Message from {self.from_user} to {self.to_user}'
+
+
+class PostSave(TimeStampedModel):
+    post = models.ForeignKey('Posts', on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)

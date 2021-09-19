@@ -4,6 +4,7 @@ import random
 from django import contrib
 from django.core.checks import messages
 from django.db.models import fields, query
+from django.db.models.signals import post_save
 from django.forms.utils import pretty_name, to_current_timezone
 from django.http import request
 from django.views.generic.base import TemplateView
@@ -16,7 +17,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import CommentToPost, FriendShip, Message, PostLikes, PostTagRelation, Posts, Tag
+from .models import CommentToPost, FriendShip, Message, PostLikes, PostSave, PostTagRelation, Posts, Tag
 from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm, UpdatePostForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -279,6 +280,27 @@ def like_post(request, *args, **kwargs):
     post_like.user = request.user
     post_like.post = post
     post_like.save()
+    return redirect(reverse_lazy('instagram:home'))
+
+
+@login_required
+def save_post(request, *args, **kwargs):
+    """
+    いいね機能のための関数
+    """
+    post = Posts.objects.get(pk=kwargs['pk'])
+    is_saved = PostSave.objects.filter(user=request.user).filter(post=post).count()
+    if is_saved> 0:
+        save = PostSave.objects.get(user=request.user, post__id=kwargs['pk'])
+        save.delete()
+        post.save()
+        return redirect(reverse_lazy('instagram:home'))
+    post.like_count += 1
+    post.save()
+    post_save = PostSave()
+    post_save.user = request.user
+    post_save.post = post
+    post_save.save()
     return redirect(reverse_lazy('instagram:home'))
 
 
