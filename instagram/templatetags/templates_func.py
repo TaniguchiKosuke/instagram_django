@@ -84,3 +84,31 @@ def count_liked_user(post, user):
     post_likes = PostLikes.objects.filter(post=post).count()
     post_likes = post_likes -1
     return post_likes
+
+
+@register.filter
+def find_reccomended_user_follower(user):
+    followers = user.followers.all()
+    if followers:
+        followers = user.followers.order_by('?')[:1]
+        followers_list = []
+        for follower in followers:
+            followers_list.append(follower.username)
+        follower = random.choice(followers_list)
+        return follower
+    else:
+        return None
+
+
+@register.filter
+def count_reccomended_user_follower(user, request_user):
+    request_user_followees = request_user.followees.all()
+    reccomended_user_followers = user.followers.all()
+    request_user_followees_list = []
+    for request_user_followee in request_user_followees:
+        if request_user_followee in reccomended_user_followers:
+            request_user_followees_list.append(request_user_followee)
+        else:
+            continue
+    user_count = len(request_user_followees_list) - 1
+    return user_count
