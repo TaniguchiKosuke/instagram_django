@@ -86,5 +86,5 @@ class Message(TimeStampedModel):
 
 
 class PostSave(TimeStampedModel):
-    post = models.ForeignKey('Posts', on_delete=models.CASCADE)
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
