@@ -31,7 +31,7 @@
 </section>
 
 <div style="width: 76%;">
-  <h3 style="margin: 32px auto 32px; width:80%;">suggested</h3>
+  <h3 style="margin: 32px auto 32px; width:80%;">Likes</h3>
   {% if object_list %}
     <table class="table table-hover" style="width: 76%;">
       <tbody>
@@ -45,7 +45,7 @@
           <td><a href="{% url 'instagram:user_profile' pk=user.pk %}" class="see-more" style="color: black;">{{ user.username }}</a></td>
           <td class="candidate-list-favourite-time text-center">
             {% if user == request_user %}
-            <h5>自分</h5>
+            <h5>you</h5>
             {% elif request_user|judge_following:user.followers %}
             <a href="{% url 'instagram:unfollow' pk=user.pk %}" class="btn btn-dark">フォロー中</a>
             {% elif not request_user|judge_following:user.followers %}

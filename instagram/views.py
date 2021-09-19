@@ -696,3 +696,28 @@ class LikedPostListView(LoginRequiredMixin, ListView):
         request_user = self.request.user
         context['request_user'] = request_user
         return context
+
+
+class LikedPostUserView(LoginRequiredMixin, ListView):
+    template_name = 'liked_post_user.html'
+    queryset = User
+    paginate_by = 16
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        post = Posts.objects.get(pk=self.kwargs['pk'])
+        post_likes = PostLikes.objects.filter(post=post)
+        queryset = []
+        for post_like in post_likes:
+            queryset.append(post_like.user)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        request_user = self.request.user
+        context['request_user'] = request_user
+        followee = User.objects.filter(followers=request_user).count()
+        follower = User.objects.filter(followees=request_user).count()
+        context['followee'] = followee
+        context['follower'] = follower
+        return context

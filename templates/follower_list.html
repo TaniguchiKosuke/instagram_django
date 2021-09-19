@@ -53,97 +53,34 @@
   </div>
   </section>
 
-<div>
-  <h3 style="margin: 16px auto 0; width:80%;">follower</h3>
-  {% if object_list %}
-  <div class="container mt-3 mb-4">
-    <div class="col-lg-9 mt-4 mt-lg-0">
-        <div class="row" style="margin-top: 0;">
-          <div class="col-md-12">
-            <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
-              <table class="table manage-candidates-top mb-0">
-                <thead>
-                  <tr>
-                    <th>User</th>
-                    <th class="text-center">Status</th>
-                  </tr>
-                </thead>
-  
-                {% for user in object_list %}
-                <tbody>
-                  <tr class="candidates-list">
-                    <td class="title">
-                      <div class="thumb">
-                        {% if user.user_image %}
-                        <a href="{% url 'instagram:user_profile' pk=user.pk %}"><img class="img-fluid" src="{{ MEDIA_URL }}{{ user.user_image }}" alt=""></a>
-                        {% else %}
-                        <a href="{% url 'instagram:user_profile' pk=user.pk %}"><img class="img-fluid" src="{{ MEDIA_URL }}images/default-user-image.png" alt=""></a>
-                        {% endif %}
-                      </div>
-                      <div class="candidate-list-details">
-                        <div class="candidate-list-info">
-                          <div class="candidate-list-title">
-                            <h5 class="mb-0"><a href="{% url 'instagram:user_profile' pk=user.pk %}" style="text-decoration: none; color: black;">{{ user.username }}</a></h5>
-                          </div>
-                          <div class="candidate-list-option">
-                            <ul class="list-unstyled">
-                              <li>{{ user.name }}</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="candidate-list-favourite-time text-center">
-                      {% if user == request_user %}
-                      <h5>自分</h5>
-                      {% elif request_user|judge_following:user.followers %}
-                      <a href="{% url 'instagram:unfollow' pk=user.pk %}" class="btn btn-dark">フォロー中</a>
-                      {% elif not request_user|judge_following:user.followers %}
-                      <a href="{% url 'instagram:follow' pk=user.pk %}" class="btn btn-outline-dark">フォロー</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-                  {% endfor %}
-  
-                </tbody>
-              </table>
-              <div class="text-center mt-3 mt-sm-3">
-                <div class="col-6 offset-3 justify-content-center">
-                  {% if is_paginated %}
-                      {% include 'pagination.html' %}
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  {% else %}
-  <div class="container mt-3 mb-4">
-    <div class="col-lg-9 mt-4 mt-lg-0">
-        <div class="row" style="margin-top: 0;">
-          <div class="col-md-12">
-            <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
-              <table class="table manage-candidates-top mb-0">
-                <thead>
-                  <tr>
-                    <th>User</th>
-                    <th class="text-center">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>フォローしている友達はいません
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div style="width: 76%;">
+    <h3 style="margin: 32px auto 32px; width:80%;">follower</h3>
+    {% if object_list %}
+      <table class="table table-hover" style="width: 76%;">
+        <tbody>
+          {% for user in object_list%}
+          <tr>
+            {% if user.user_image %}
+            <th scope="row"><img src="{{ MEDIA_URL }}{{ user.user_image }}" alt="" style="width: 32px; height:32px; border-radius: 50%;"></th>
+            {% else %}
+            <th scope="row"><img src="{{ MEDIA_URL }}images/default-user-image.png" alt="" style="width: 32px; height:32px; border-radius: 50%;"></th>
+            {% endif %}
+            <td><a href="{% url 'instagram:user_profile' pk=user.pk %}" class="see-more" style="color: black;">{{ user.username }}</a></td>
+            <td class="candidate-list-favourite-time text-center">
+              {% if user == request_user %}
+              <h5>自分</h5>
+              {% elif request_user|judge_following:user.followers %}
+              <a href="{% url 'instagram:unfollow' pk=user.pk %}" class="btn btn-dark">フォロー中</a>
+              {% elif not request_user|judge_following:user.followers %}
+              <a href="{% url 'instagram:follow' pk=user.pk %}" class="btn btn-outline-dark">フォロー</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>ユーザーが見つかりません</p>
     {% endif %}
-</div>
+  </div>
 {% endblock content %}

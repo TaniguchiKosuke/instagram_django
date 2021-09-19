@@ -1,4 +1,5 @@
 from django import template
+import random
 
 # from ..models import PostLikes
 register = template.Library()
@@ -54,3 +55,14 @@ def count_comment(post):
     from ..models import CommentToPost
     comment_count = CommentToPost.objects.filter(post=post).count()
     return comment_count
+
+
+@register.filter
+def liked_post_user(post):
+    from ..models import PostLikes
+    post_likes = PostLikes.objects.filter(post=post)
+    users = []
+    for post_like in post_likes:
+        users.append(post_like.user)
+    user = random.choice(users)
+    return user
