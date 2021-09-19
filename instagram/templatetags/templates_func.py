@@ -66,3 +66,13 @@ def liked_post_user(post):
         users.append(post_like.user)
     user = random.choice(users)
     return user
+
+
+@register.filter
+def judge_saved(user, post):
+    from ..models import PostSave
+    post_save = PostSave.objects.filter(user=user, post=post)
+    if post_save:
+        return True
+    else:
+        return False
