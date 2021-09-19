@@ -740,3 +740,28 @@ class LikedPostUserView(LoginRequiredMixin, ListView):
         context['followee'] = followee
         context['follower'] = follower
         return context
+
+
+class SavedPostListView(LoginRequiredMixin, ListView):
+    template_name = 'saved_post_list.html'
+    queryset = Posts
+    paginate_by = 15
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = User.objects.get(pk=self.kwargs['pk'])
+        post_save = PostSave.objects.filter(user=user)
+        saved_post_list = []
+        for post in post_save:
+            saved_post_list.append(post.post)
+        queryset = saved_post_list
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = User.objects.get(pk=self.kwargs['pk'])
+        context['user_profile'] = User.objects.get(pk=user.pk)
+        context['request_user'] = self.request.user
+        context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
+        context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
+        return context

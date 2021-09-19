@@ -50,9 +50,9 @@
         {{ user_profile.text }}
       </p>
       {% endif %}
-      <a href="" class="see-more" style="color: black;">posts</a>
+      <a href="" class="see-more">posts</a>
       {% if request_user == user_profile %}
-      <a href="" class="see-more">saved</a>
+      <a href="" class="see-more" style="color: black;">saved</a>
       {% endif %}
     </div>
   </div>
@@ -62,8 +62,8 @@
   <div class="container blog-page">
     <div class="row clearfix">
         
-        {% if posts%}
-        {% for post in posts %}
+        {% if object_list%}
+        {% for post in object_list%}
         <div class="col-lg-4 col-md-12">
             <div class="card single_post">
                 <div class="body" style="padding: 0;">
@@ -113,6 +113,4 @@
     </div>
   </div>
 </div>
-
-
 {% endblock content %}

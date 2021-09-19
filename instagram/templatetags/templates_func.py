@@ -76,3 +76,11 @@ def judge_saved(user, post):
         return True
     else:
         return False
+
+
+@register.filter
+def count_liked_user(post, user):
+    from ..models import PostLikes
+    post_likes = PostLikes.objects.filter(post=post).count()
+    post_likes = post_likes -1
+    return post_likes
