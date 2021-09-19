@@ -50,9 +50,9 @@
         {{ user_profile.text }}
       </p>
       {% endif %}
-      <a href="" class="see-more">posts</a>
+      <a href="{% url 'instagram:user_profile' pk=user_profile.pk %}" class="see-more">posts</a>
       {% if request_user == user_profile %}
-      <a href="" class="see-more" style="color: black;">saved</a>
+      <a href="{% url 'instagram:saved_post_list' pk=user_profile.pk %}" class="see-more" style="color: black;">saved</a>
       {% endif %}
     </div>
   </div>

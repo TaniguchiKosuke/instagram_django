@@ -21,8 +21,9 @@
       {% endif %}
   
       <p class="ff-layout">
-        <a href="{% url 'instagram:followee_list' pk=user_profile.pk %}" class="following">フォロー{{ followee }}人</a>
-        <a href="{% url 'instagram:follower_list' pk=user_profile.pk %}" class="following">フォロワー{{ follower }}人</a>
+        <a class="following" style="margin: 4px;">投稿{{ post_count }}</a>
+        <a href="{% url 'instagram:followee_list' pk=user_profile.pk %}" class="following" style="margin: 4px;">フォロー{{ followee }}人</a>
+        <a href="{% url 'instagram:follower_list' pk=user_profile.pk %}" class="following" style="margin: 4px;">フォロワー{{ follower }}人</a>
       </p>
   
       {% if request_user != user_profile %}
@@ -50,9 +51,9 @@
         {{ user_profile.text }}
       </p>
       {% endif %}
-      <a href="" class="see-more" style="color: black;">posts</a>
+      <a href="{% url 'instagram:user_profile' pk=user_profile.pk %}" class="see-more" style="color: black;">posts</a>
       {% if request_user == user_profile %}
-      <a href="" class="see-more">saved</a>
+      <a href="{% url 'instagram:saved_post_list' pk=user_profile.pk %}" class="see-more">saved</a>
       {% endif %}
     </div>
   </div>

@@ -246,6 +246,7 @@ class UserProfileView(LoginRequiredMixin, ListView):
         context['request_user'] = self.request.user
         context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
         context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
+        context['post_count'] = Posts.objects.filter(author=user).count()
         if user.username is not context['request_user']:
             result = FriendShip.objects.filter(follower__username=context['request_user'].username).filter(followee__username=user.username)
             context['connected'] = True if result else False
