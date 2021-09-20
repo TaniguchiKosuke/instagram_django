@@ -10,8 +10,8 @@ from users.models import User
 
 
 class PostForm(forms.ModelForm):
-    text = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Text'}), label='', required=False)
     image = forms.ImageField(label='')
+    text = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Text'}), label='', required=False)
     tag = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Tag'}), required=False)
 
     def __init__(self, *args, **kwargs):
@@ -21,7 +21,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Posts
-        fields = ('text', 'image', 'tag')
+        fields = ('image', 'text', 'tag')
 
 
 class UpdatePostForm(forms.ModelForm):
