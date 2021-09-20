@@ -6,9 +6,15 @@
 
 <section class="jumbotron text-center" style="background-color: #f8f9fa; margin-top:0;">
     <div class="container d-flex">
+      {% if first_post %}
+      <div>
+        <img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ first_post.image }}" alt="">
+      </div>
+      {% else %}
       <div>
         <img  class="top-image-of-user" src="{{ MEDIA_URL }}app_images/hashtag.jpeg" alt="">
       </div>
+      {% endif %}
   
       <div style="margin-left: 100px;">
         <h1 class="jumbotron-heading">{{ tag }}</h1>

@@ -78,11 +78,9 @@
 
   <div class="all-posts-area">
     <table class="table manage-candidates-top mb-0">
-      <thead>
-        <tr>
-          <th>Tags</th>
-        </tr>
-      </thead>
+      <div class="d-flex" style="width: 60%;margin:16px auto;">
+        <h5>"{{ query}}"</h5><p>の検索結果</p>
+      </div>
       {% for tag in object_list %}
         <tbody style="background-color: #fff;">
           <tr class="candidates-list">
@@ -127,7 +125,7 @@
       {% endif %}
 
       <div style="margin-left: 100px;">
-        <h1 class="jumbotron-heading">{{ query }}</h1>
+        <h1 class="jumbotron-heading">"{{ query }}"</h1><p style="font-size:20px;">が含まれる投稿</p>
         <p>
           <h5>{{ object_list.count }}</h5>
           <p>posts</p>
@@ -321,7 +319,9 @@
         </div>
   </div>
 {% else %}
+<div class="all-posts-area">
   <p>投稿はありません</p>
+</div>
 {% endif %}
   
 {% endblock content %}
