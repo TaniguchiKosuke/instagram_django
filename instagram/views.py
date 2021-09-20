@@ -254,7 +254,7 @@ class UserProfileView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = User.objects.get(pk=self.kwargs['pk'])
-        context['user_profile'] = User.objects.get(pk=user.pk)
+        context['user_profile'] = user
         context['request_user'] = self.request.user
         context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
         context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
@@ -776,4 +776,24 @@ class SavedPostListView(LoginRequiredMixin, ListView):
         context['request_user'] = self.request.user
         context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
         context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
+        return context
+
+
+class UserFollowerFriendListView(LoginRequiredMixin, ListView):
+    template_name = 'user_follower_list.html'
+    queryset = User
+    paginate_by = 16
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        request_user = self.request.user
+        context['request_user'] = request_user
+        followee = User.objects.filter(followers=request_user).count()
+        follower = User.objects.filter(followees=request_user).count()
+        context['followee'] = followee
+        context['follower'] = follower
         return context

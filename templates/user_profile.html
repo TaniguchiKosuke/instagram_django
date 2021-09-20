@@ -26,30 +26,36 @@
         <a href="{% url 'instagram:follower_list' pk=user_profile.pk %}" class="following" style="margin: 4px;">フォロワー{{ follower }}人</a>
       </p>
   
-      {% if request_user != user_profile %}
-        {% if connected %}
-        <a href="{% url 'instagram:unfollow' pk=user_profile.pk %}" class="btn btn-dark">フォロー中</a>
-        {% else %}
-        <a href="{% url 'instagram:follow' pk=user_profile.pk %}" class="btn btn-outline-dark">フォロー</a>
-        {% endif %}
-      {% endif %}
+
   
       {% if request_user.pk == user_profile.pk %}
-      <p>
+      <p style="margin: 0;">
         <a href="{% url 'instagram:message_list' %}" class="btn btn-secondary my-2">メッセージ</a>
         <a href="{% url 'instagram:user_profile_update' pk=request_user.pk %}" class="btn btn-primary my-2">編集</a>
         <a href="{% url 'instagram:settings' %}"><img src="{{ MEDIA_URL }}app_images/settings_icon.svg" alt="" style="width: 24px;height:24px;"></a>
       </p>
       {% else %}
-      <p>
+      <p style="margin: 0;">
+        {% if request_user != user_profile %}
+          {% if connected %}
+            <a href="{% url 'instagram:unfollow' pk=user_profile.pk %}" class="btn btn-dark">フォロー中</a>
+          {% else %}
+            <a href="{% url 'instagram:follow' pk=user_profile.pk %}" class="btn btn-outline-dark">フォロー</a>
+          {% endif %}
+        {% endif %}
         <a href="{% url 'instagram:messages' pk=user_profile.pk %}" class="btn btn-secondary my-2">メッセージ</a>
       </p>
       {% endif %}
   
       {% if user_profile.text %}
-      <p>
+      <p style="margin: 0;">
         {{ user_profile.text }}
       </p>
+      {% endif %}
+      {% if request_user != user_profile %}
+        {% if user_profile|find_reccomended_user_follower:user %}
+          <p style="font-size: small;"><a href="{% url 'instagram:user_follower_friend_list' pk=user_profile.pk %}" style="text-decoration: none;color:black;">followed by {{ user_profile | find_reccomended_user_follower:user }} +{{ user_profile|count_reccomended_user_follower:user }}others</a></p>
+        {% endif %}
       {% endif %}
       <a href="{% url 'instagram:user_profile' pk=user_profile.pk %}" class="see-more" style="color: black;">posts</a>
       {% if request_user == user_profile %}
