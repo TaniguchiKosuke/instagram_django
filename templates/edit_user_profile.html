@@ -5,8 +5,35 @@
 <form method='POST' enctype="multipart/form-data" class="form-signin">
   <h1 class="jumbotron-heading">プロフィールの編集</h1>
     {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn-sm btn-primary" type="submit">編集を保存</button>
+    {{ form.non_field_errors }}
+    <div class="field d-flex">
+        {% if user_image %}
+          <img src="{{ MEDIA_URL }}{{ user_image }}" style="width: 52px;height:52px;border-radius:50%;margin-right:12px;" alt="">
+        {% else %}
+          <img src="{{ MEDIA_URL }}images/default-user-image.png" style="width: 52px;height:52px;border-radius:50%;" alt="">
+        {% endif %}
+          {{ form.user_image.label_tag }}
+          {{ form.user_image }}
+          {{ form.user_image.errors }}
+    </div>
+    <div class="field">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        <span class="helptext">{{ form.username.help_text }}</span>
+        {{ form.username.errors }}
+    </div>
+    <div class="field">
+        {{ form.name.label_tag }}
+        {{ form.name }}
+        <span class="helptext">{{ form.name.help_text }}</span>
+        {{ form.name.errors }}
+    </div>
+    <div class="field">
+        {{ form.text.label_tag }}
+        {{ form.text }}
+        {{ form.text.errors }}
+    </div>
     <a href="{{request.META.HTTP_REFERER}}" class="see-more">編集をやめる</a>
+    <button class="btn-sm btn-primary" type="submit">編集を保存</button>
 </form>
 {% endblock content %}r

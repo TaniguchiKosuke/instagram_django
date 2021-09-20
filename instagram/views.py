@@ -3,6 +3,7 @@ from os import name
 import random
 from django import contrib
 from django.core.checks import messages
+from django.core.files.base import ContentFile
 from django.db.models import fields, query
 from django.db.models.signals import post_save
 from django.forms.utils import pretty_name, to_current_timezone
@@ -213,6 +214,12 @@ class UpdatePostView(LoginRequiredMixin, UpdateView):
     model = Posts
     form_class = UpdatePostForm
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = Posts.objects.get(pk=self.kwargs['pk'])
+        context['image'] = post.image
+        return context
+
     def form_valid(self, form):
         post = form.save(commit=False)
         tags = post.tag
@@ -262,6 +269,12 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'edit_user_profile.html'
     model = User
     form_class = UserProfileUpdateForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        request_user = User.objects.get(pk=self.kwargs['pk'])
+        context['user_image'] = request_user.user_image
+        return context
     
     def get_success_url(self):
         return reverse('instagram:user_profile', kwargs={'pk': self.kwargs['pk']})
