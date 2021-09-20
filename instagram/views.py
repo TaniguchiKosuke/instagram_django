@@ -780,7 +780,7 @@ class SavedPostListView(LoginRequiredMixin, ListView):
 
 
 class UserFollowerFriendListView(LoginRequiredMixin, ListView):
-    template_name = 'user_follower_list.html'
+    template_name = 'user_follower_friend_list.html'
     queryset = User
     paginate_by = 16
 
