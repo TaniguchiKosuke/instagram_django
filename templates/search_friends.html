@@ -61,13 +61,13 @@
               {% endif %}
               <td style="padding: 0;">
                 <a href="{% url 'instagram:user_profile' pk=user.pk %}" class="see-more" style="color: black;line-height:0;margin:0;">{{ user.username }}</a>
-                {% if user|find_reccomended_user_follower %}
-                  <p style="font-size: small;">followed by {{ user| find_reccomended_user_follower }} and {{ user|count_reccomended_user_follower:request_user }}others</p>
+                {% if user|find_reccomended_user_follower:request_user %}
+                  <p style="font-size: small;">followed by {{ user| find_reccomended_user_follower:request_user }} and {{ user|count_reccomended_user_follower:request_user }}others</p>
                 {% endif %}
               </td>
               <td class="candidate-list-favourite-time text-center">
                 {% if user == request_user %}
-                <h5>自分</h5>
+                <h5>you</h5>
                 {% elif request_user|judge_following:user.followers %}
                 <a href="{% url 'instagram:unfollow' pk=user.pk %}" class="btn btn-dark">フォロー中</a>
                 {% elif not request_user|judge_following:user.followers %}

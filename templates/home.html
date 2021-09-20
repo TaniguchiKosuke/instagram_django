@@ -57,8 +57,8 @@
           {% endif %}
           <td style="padding: 0;">
             <a href="{% url 'instagram:user_profile' pk=reccomended_user.pk %}" class="see-more" style="color: black;line-height:0;margin:0;">{{ reccomended_user.username }}</a>
-            {% if reccomended_user|find_reccomended_user_follower %}
-            <p style="font-size: small;">followed by {{ reccomended_user | find_reccomended_user_follower }} and {{ reccomended_user|count_reccomended_user_follower:user }}others</p>
+            {% if reccomended_user|find_reccomended_user_follower:user %}
+            <p style="font-size: small;">followed by {{ reccomended_user | find_reccomended_user_follower:user }} and {{ reccomended_user|count_reccomended_user_follower:user }}others</p>
             {% endif %}
           </td>
         </tr>
@@ -239,8 +239,8 @@
             {% endif %}
             <td style="padding: 0;">
               <a href="{% url 'instagram:user_profile' pk=reccomended_user.pk %}" class="see-more" style="color: black;line-height:0;margin:0;">{{ reccomended_user.username }}</a>
-              {% if reccomended_user|find_reccomended_user_follower %}
-              <p style="font-size: small;">followed by {{ reccomended_user | find_reccomended_user_follower }} and {{ reccomended_user|count_reccomended_user_follower:user }}others</p>
+              {% if reccomended_user|find_reccomended_user_follower:user %}
+              <p style="font-size: small;">followed by {{ reccomended_user | find_reccomended_user_follower:user }} and {{ reccomended_user|count_reccomended_user_follower:user }}others</p>
               {% endif %}
             </td>
           </tr>
