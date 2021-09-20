@@ -785,7 +785,20 @@ class UserFollowerFriendListView(LoginRequiredMixin, ListView):
     paginate_by = 16
 
     def get_queryset(self):
-        queryset = User.objects.all()
+        request_user = self.request.user
+        request_user_followees = request_user.followees.all()
+        profile_user = User.objects.get(pk=self.kwargs['pk'])
+        profile_user_follwers = profile_user.followers.all()
+        user_follower_friend_list = []
+        if request_user_followees and profile_user_follwers:
+            for requset_user_followee in request_user_followees:
+                if requset_user_followee in profile_user_follwers:
+                    user_follower_friend_list.append(requset_user_followee)
+                else:
+                    continue
+            queryset = user_follower_friend_list
+        else:
+            queryset = None
         return queryset
 
     def get_context_data(self, **kwargs):
