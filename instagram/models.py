@@ -34,6 +34,9 @@ class Posts(TimeStampedModel):
 
     class Meta:
         verbose_name = 'Post'
+    
+    def __str__(self):
+        return f'posted by {self.author}'
 
 
 class PostTagRelation(TimeStampedModel):
@@ -80,3 +83,11 @@ class Message(TimeStampedModel):
 
     def __str__(self):
         return f'Message from {self.from_user} to {self.to_user}'
+
+
+class PostSave(TimeStampedModel):
+    post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username} saved {self.post.author}'s post"

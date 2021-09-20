@@ -22,5 +22,13 @@ urlpatterns = [
     path('comment_from_post_list/<int:pk>/', views.comment_from_post_list, name='comment_from_post_list'),
     path('search_friends/', views.SearchFriendsView.as_view(), name='search_friends'),
     path('settings/', views.SettingsView.as_view(), name='settings'),
-    path('reccomended_posts/', views.ReccomendedPostsView.as_view(), name='reccomended_posts')
+    path('reccomended_posts/', views.ReccomendedPostsView.as_view(), name='reccomended_posts'),
+    path('delete_post/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
+    path('update_post/<int:pk>/', views.UpdatePostView.as_view(), name='update_post'),
+    path('see_all_reccomended_users/', views.SeeAllReccomendedUsersView.as_view(), name='see_all_reccomended_users'),
+    path('liked_post_list/', views.LikedPostListView.as_view(), name='liked_post_list'),
+    path('delete_comment/<int:pk>/', views.DeleteCommentView.as_view(), name='delete_comment'),
+    path('liked_post_user/<int:pk>/', views.LikedPostUserView.as_view(), name='liked_post_user'),
+    path('save_post/<int:pk>/', views.save_post, name='save_post'),
+    path('user_profile/<int:pk>/saved_post_list/', views.SavedPostListView.as_view(), name='saved_post_list'),
 ]
