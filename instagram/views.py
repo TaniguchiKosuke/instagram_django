@@ -90,8 +90,13 @@ class HomeView(LoginRequiredMixin, ListView):
         if query:
             context['query_exist'] = True
             if query.startswith('#'):
-                # context['tags'] = Tag.objects.filter(Q(name__icontains=query))
                 context['tags'] = PostTagRelation.objects.filter(tag__name__icontains=query)
+            else:
+                context['query'] = query
+                context['is_not_tag'] = True
+                post_list = Posts.objects.filter(Q(text__icontains=query) | Q(author__username__icontains=query) | Q(tag__icontains=query))
+                if post_list:
+                    context['first_post'] = post_list.first()
 
         #「知り合いかも」にフォローしてる、もしくはフォローされてる友達のフォローしてる人をおすすめとして表示させるための処理
         reccomended_users = find_reccomended_users(user, followee_friendships, follower_friendships)
