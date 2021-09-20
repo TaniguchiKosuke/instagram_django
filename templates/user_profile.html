@@ -82,7 +82,9 @@
                         <p>{{ post.text }}</p>
                         {% endif %}
                         {% if post.tag%}
-                        <a href="" style="text-decoration: none; color: rgb(48, 96, 230);">{{ post.tag }}</a>
+                          {% for tag in post.tag|split_tags %}
+                            <a href="{% url 'instagram:tag_post_list' tag=tag %}" style="text-decoration: none; color: rgb(48, 96, 230);">{{ tag }}</a>
+                          {% endfor %}
                         {% endif %}
                     </div>
   

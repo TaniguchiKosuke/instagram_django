@@ -360,7 +360,7 @@ def comment_from_post_list(request, pk):
             author=author,
             post=post,
         )
-    return redirect(reverse_lazy('instagram:home'))
+    return redirect('instagram:post_detail', pk=pk)
 
 
 class PostDetailView(LoginRequiredMixin, DetailView):
