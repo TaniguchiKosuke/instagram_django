@@ -560,7 +560,11 @@ class TagPostListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         tag = self.kwargs['tag']
-        queryset = PostTagRelation.objects.filter(tag__name=tag)
+        post_tag_relation = PostTagRelation.objects.filter(tag__name=tag).order_by('-post__created_at')
+        post_list = []
+        for post_tag in post_tag_relation:
+            post_list.append(post_tag.post)
+        queryset = post_list
         return queryset
     
     def get_context_data(self, **kwargs):
@@ -835,7 +839,6 @@ def follow_tag_view(request, *args, **kwargs):
     # return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
     #前の画面に遷移
     return redirect(request.META['HTTP_REFERER'])
-
 
     
 @login_required
