@@ -319,6 +319,76 @@
         </div>
   </div>
 {% else %}
+<section class="jumbotron text-center home-profile">
+  <div class="container">
+
+    {% if user.user_image %}
+    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ user.user_image }}" alt=""></a>
+    {% else %}
+    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}images/default-user-image.png" alt=""></a>
+    {% endif %}
+
+    <h1 class="jumbotron-heading">{{ user.username }}</h1>
+    {% if user.name %}
+    <h4>{{ user.name }}</h4>
+    {% endif %}
+    <p class="ff-layout">
+      <a href="{% url 'instagram:followee_list' pk=user.pk %}" class="following">フォロー{{ followee }}人</a>
+      <a href="{% url 'instagram:follower_list' pk=user.pk %}" class="following">フォロワー{{ follower }}人</a>
+    </p>
+    <p>
+      <a href="{% url 'instagram:message_list' %}" class="btn btn-secondary my-2">メッセージ</a>
+      {% if user.is_authenticated %}
+      <a href="{% url 'instagram:user_profile' pk=user.pk %}" class="btn btn-secondary my-2">プロフィール</a>
+      <a href="{% url 'instagram:settings' %}"><img src="{{ MEDIA_URL }}app_images/settings_icon.svg" alt="" style="width: 24px;height:24px;"></a>
+      {% endif %}
+    </p>
+  </div>
+
+  <div>
+    <h4>通知一覧</h4>
+    {% if message_notice_today %}
+    <p>今日届いたメッセージがあります</p>
+    {% else %}
+    <p>今日のメッセージはありません</p>
+    {% endif %}
+  </div>
+
+  <div style="margin-top: 12px;">
+    <div class="d-flex" style="width: 44%;margin:0 auto;">
+      <h4>知り合いかも</h4>
+      <a href="{% url 'instagram:see_all_reccomended_users' %}" class="see-more" style="font-weight:bold;color:rgb(40, 112, 245);">see all</a>
+    </div>
+    {% if reccomended_users %}
+    <table class="table table-hover" style="width: 76%;">
+      <tbody>
+        {% for reccomended_user in reccomended_users%}
+        <tr>
+          {% if reccomended_user.user_image %}
+          <th scope="row"><img src="{{ MEDIA_URL }}{{ reccomended_user.user_image }}" alt="" style="width: 32px; height:32px; border-radius: 50%;padding:0;"></th>
+          {% else %}
+          <th scope="row"><img src="{{ MEDIA_URL }}images/default-user-image.png" alt="" style="width: 32px; height:32px; border-radius: 50%;padding:0;"></th>
+          {% endif %}
+          <td style="padding: 0;">
+            <a href="{% url 'instagram:user_profile' pk=reccomended_user.pk %}" class="see-more" style="color: black;line-height:0;margin:0;">{{ reccomended_user.username }}</a>
+            {% if reccomended_user|find_reccomended_user_follower:user %}
+            <p style="font-size: small;">followed by {{ reccomended_user | find_reccomended_user_follower:user }} and {{ reccomended_user|count_reccomended_user_follower:user }}others</p>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      
+    </table>
+    {% else %}
+    <p>知り合いのユーザーが見つかりません</p>
+    {% endif %}
+
+
+  </div>
+
+  </div>
+</section>
 <div class="all-posts-area">
   <p>投稿はありません</p>
 </div>

@@ -39,6 +39,7 @@ class HomeView(LoginRequiredMixin, ListView):
         queryset = super().get_queryset()
         request_user = self.request.user
         #投稿を検索する処理
+        following_tag = FollowTag.objects.filter(user=request_user)
         query = self.request.GET.get('query')
         if query:
             if not query.startswith('#'):
@@ -53,8 +54,8 @@ class HomeView(LoginRequiredMixin, ListView):
                     else:
                         continue
                 queryset = post_tag_list
-        #フォローしているユーザーがいる場合は、それらを考慮に入れておすすめの投稿を表示する
-        elif request_user.followees.all():
+        #フォローしているユーザーがいる場合、もしくはフォローしているハッシュタグが存在する場合は、それらを考慮に入れておすすめの投稿を表示する
+        elif request_user.followees.all() or following_tag:
             queryset = get_timeline_post(request_user)
         else:
             queryset = Posts.objects.all().order_by('-created_at')
@@ -111,7 +112,8 @@ class HomeView(LoginRequiredMixin, ListView):
 def get_timeline_post(request_user):
     """
     タイムラインに表示させる投稿を取得する関数
-    （フォローしてるユーザ―がいる場合）
+    （フォローしてるユーザ―がいる場合、
+    もしくはフォローしているハッシュタグがある場合）
     sort条件(
         フォローしているユーザーの投稿,
         フォローしているハッシュタグの投稿,
@@ -121,9 +123,11 @@ def get_timeline_post(request_user):
 
     return: list
     """
-    for followee in request_user.followees.all():
-        friend_and_my_posts = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
     following_tags = FollowTag.objects.filter(user=request_user)
+    followees = request_user.followees.all()
+    if followees:
+        for followee in followees:
+            friend_and_my_posts = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
     if following_tags:
         following_tag_list = []
         for following_tag in following_tags:
@@ -132,12 +136,14 @@ def get_timeline_post(request_user):
         for tag in following_tag_list:
             tag_post = Posts.objects.filter(tag=tag)
             tag_post_list = list(chain(tag_post_list, tag_post))
-    if following_tags:
+    if following_tags and followees:
         timeline_post_list = list(chain(friend_and_my_posts, tag_post_list))
+    elif following_tags and (not followees):
+        timeline_post_list = list(tag_post_list)
     else:
         timeline_post_list = list(friend_and_my_posts)
     # queryset.sort(key=attrgetter('created_at'), reverse=True)
-    timeline_post_list.sort(key=lambda x: x.created_at, reverse=True)
+    # timeline_post_list.sort(key=lambda x: x.created_at, reverse=True)
 
     return timeline_post_list
 
