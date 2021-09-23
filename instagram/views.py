@@ -112,22 +112,30 @@ def get_timeline_post(request_user):
     """
     タイムラインに表示させる投稿を取得する関数
     （フォローしてるユーザ―がいる場合）
+    sort条件(
+        フォローしているユーザーの投稿,
+        フォローしているハッシュタグの投稿,
+        自分の投稿,
+        その他の投稿,
+    )
+
     return: list
     """
     for followee in request_user.followees.all():
         friend_and_my_posts = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
-    all_posts_count = Posts.objects.all().count()
-    if all_posts_count > 20:
-        other_posts = Posts.objects.order_by('?')[:20]
+    following_tags = FollowTag.objects.filter(user=request_user)
+    if following_tags:
+        following_tag_list = []
+        for following_tag in following_tags:
+            following_tag_list.append(following_tag.tag.name)
+        tag_post_list = []
+        for tag in following_tag_list:
+            tag_post = Posts.objects.filter(tag=tag)
+            tag_post_list = list(chain(tag_post_list, tag_post))
+    if following_tags:
+        timeline_post_list = list(chain(friend_and_my_posts, tag_post_list))
     else:
-        other_posts = Posts.objects.order_by('?')[:all_posts_count]
-    other_posts_list = []
-    for post in other_posts:
-        if not post in friend_and_my_posts:
-            other_posts_list.append(post)
-        else:
-            continue
-    timeline_post_list = list(chain(friend_and_my_posts, other_posts_list))
+        timeline_post_list = list(friend_and_my_posts)
     # queryset.sort(key=attrgetter('created_at'), reverse=True)
     timeline_post_list.sort(key=lambda x: x.created_at, reverse=True)
 
