@@ -55,27 +55,9 @@ class HomeView(LoginRequiredMixin, ListView):
                 queryset = post_tag_list
         #フォローしているユーザーがいる場合は、それらを考慮に入れておすすめの投稿を表示する
         elif request_user.followees.all():
-            friend_posts_list = []
-            for followee in request_user.followees.all():
-                friend_posts = Posts.objects.filter(author=followee).order_by('-created_at')
-                friend_posts_list = list(chain(friend_posts_list, friend_posts))
-            my_posts = Posts.objects.filter(author=request_user).order_by('-created_at')
-            all_posts_count = Posts.objects.all().count()
-            if all_posts_count > 20:
-                other_posts = Posts.objects.order_by('?')[:20]
-            else:
-                other_posts = Posts.objects.order_by('?')[:all_posts_count]
-            other_posts_list = []
-            for post in other_posts:
-                if (not post in friend_posts_list) and (not post in my_posts):
-                    other_posts_list.append(post)
-                else:
-                    continue
-            queryset = list(chain(friend_posts_list, my_posts, other_posts_list))
-            # queryset.sort(key=attrgetter('created_at'), reverse=True)
-            queryset.sort(key=lambda x: x.created_at, reverse=True)
+            queryset = get_timeline_post(request_user)
         else:
-            queryset = Posts.objects.order_by('-created_at')
+            queryset = Posts.objects.all().order_by('-created_at')
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -126,13 +108,38 @@ class HomeView(LoginRequiredMixin, ListView):
         return context
 
 
+def get_timeline_post(request_user):
+    """
+    タイムラインに表示させる投稿を取得する関数
+    （フォローしてるユーザ―がいる場合）
+    return: list
+    """
+    for followee in request_user.followees.all():
+        friend_and_my_posts = Posts.objects.filter(Q(author=followee) | Q(author=request_user)).order_by('-created_at')
+    all_posts_count = Posts.objects.all().count()
+    if all_posts_count > 20:
+        other_posts = Posts.objects.order_by('?')[:20]
+    else:
+        other_posts = Posts.objects.order_by('?')[:all_posts_count]
+    other_posts_list = []
+    for post in other_posts:
+        if not post in friend_and_my_posts:
+            other_posts_list.append(post)
+        else:
+            continue
+    timeline_post_list = list(chain(friend_and_my_posts, other_posts_list))
+    # queryset.sort(key=attrgetter('created_at'), reverse=True)
+    timeline_post_list.sort(key=lambda x: x.created_at, reverse=True)
+
+    return timeline_post_list
+
+
 def find_reccomended_users(request_user, followee_friendships, follower_friendships):
     """
     「知り合いかも」にフォローしてる、
     もしくはフォローされてる友達のフォローしてる人を
     おすすめとして表示させるための処理
-    return: reccomended_users
-    type: list
+    return: list
     """
 
     alrealdy_followees = list(request_user.followees.all())
@@ -520,8 +527,7 @@ class MessageListView(LoginRequiredMixin, ListView):
 def find_message_address(request_user):
     """
     メッセージ画面で送信先のユーザー一覧を生成する関数
-    return: to_user_list
-    type: list or QuerySet
+    return: list or QuerySet
     """
     messages = Message.objects.filter(Q(to_user=request_user) | Q(from_user=request_user))
     if messages:
