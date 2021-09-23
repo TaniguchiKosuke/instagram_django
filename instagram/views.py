@@ -862,13 +862,18 @@ def unfollow_tag_view(request, *args, **kwargs):
     return redirect(request.META['HTTP_REFERER'])
 
 
-class FollowingHashtagList(LoginRequiredMixin, ListView):
+class FollowingHashtagListView(LoginRequiredMixin, ListView):
     template_name = 'following_hashtag_list.html'
     queryset = Tag
     paginate_by = 16
 
     def get_queryset(self):
-        queryset = Tag.objects.all()
+        user = User.objects.get(pk=self.kwargs['pk'])
+        following_tags = FollowTag.objects.filter(user=user)
+        tag_list = []
+        for following_tag in following_tags:
+            tag_list.append(following_tag.tag)
+        queryset = tag_list
         return queryset
 
     def get_context_data(self, **kwargs):

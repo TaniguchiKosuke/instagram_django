@@ -17,6 +17,16 @@ def judge_following(request_user, followers):
 
 
 @register.filter
+def judge_following_hashtag(user_profile, tag_name):
+    from ..models import FollowTag
+    following_tag = FollowTag.objects.filter(user=user_profile, tag__name=tag_name)
+    if following_tag:
+        return True
+    else:
+        return False
+
+
+@register.filter
 def judge_likes(user, post):
     #importの問題(循環importかな？)を回避するためにここでimport
     from ..models import PostLikes

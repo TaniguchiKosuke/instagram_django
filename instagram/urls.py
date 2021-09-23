@@ -34,5 +34,5 @@ urlpatterns = [
     path('user_profile/<int:pk>/user_follower_friend_list/', views.UserFollowerFriendListView.as_view(), name='user_follower_friend_list'),
     path('follow_tag/<int:pk>/', views.follow_tag_view, name='follow_tag'),
     path('unfollow_tag/<int:pk>/', views.unfollow_tag_view, name='unfollow_tag'),
-    path('user_profile/<int:pk>/following_hashtag', views.FollowingHashtagList.as_view(), name='following_hashtag'),
+    path('user_profile/<int:pk>/following_hashtag', views.FollowingHashtagListView.as_view(), name='following_hashtag'),
 ]

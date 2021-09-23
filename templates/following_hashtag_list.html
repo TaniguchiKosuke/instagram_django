@@ -64,10 +64,10 @@
           <th scope="row"><img src="{{ MEDIA_URL }}images/default-user-image.png" alt="" style="width: 32px; height:32px; border-radius: 50%;"></th>
           <td><a href="{% url 'instagram:tag_post_list' tag=tag.name %}" class="see-more" style="color: black;">{{ tag.name }}</a></td>
           <td class="candidate-list-favourite-time text-center">
-            {% if request_user|judge_following:user.followers %}
-            <a href="{% url 'instagram:unfollow' pk=user.pk %}" class="btn btn-dark">フォロー中</a>
-            {% elif not request_user|judge_following:user.followers %}
-            <a href="{% url 'instagram:follow' pk=user.pk %}" class="btn btn-outline-dark">フォロー</a>
+            {% if request_user|judge_following_hashtag:tag.name %}
+            <a href="{% url 'instagram:unfollow_tag' pk=tag.pk %}" class="btn btn-dark">フォロー中</a>
+            {% elif not request_user|judge_following_hashtag:tag.name %}
+            <a href="{% url 'instagram:follow_tag' pk=tag.pk %}" class="btn btn-outline-dark">フォロー</a>
             {% endif %}
           </td>
         </tr>
