@@ -436,7 +436,9 @@ class FolloweeListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = User.objects.get(pk=self.kwargs['pk'])
-        context['request_user'] = self.request.user
+        request_user = self.request.user
+        context['tag_following'] = FollowTag.objects.filter(user=request_user)
+        context['request_user'] = request_user
         context['user_profile'] = user
         context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
         context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
@@ -836,7 +838,6 @@ def follow_tag_view(request, *args, **kwargs):
         messages.warning(request, 'フォローしました')
     else:
         messages.warning(request, 'あなたは既にフォローしています')
-    # return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
     #前の画面に遷移
     return redirect(request.META['HTTP_REFERER'])
 
@@ -857,6 +858,25 @@ def unfollow_tag_view(request, *args, **kwargs):
         return redirect(reverse_lazy('instagram:home'))
     except FollowTag.DoesNotExist:
         messages.warning(request, 'フォローしてません')
-    # return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
     #前の画面に遷移
     return redirect(request.META['HTTP_REFERER'])
+
+
+class FollowingHashtagList(LoginRequiredMixin, ListView):
+    template_name = 'following_hashtag_list.html'
+    queryset = Tag
+    paginate_by = 16
+
+    def get_queryset(self):
+        queryset = Tag.objects.all()
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        requset_user = self.request.user
+        user = User.objects.get(pk=self.kwargs['pk'])
+        context['request_user'] = requset_user
+        context['user_profile'] = user
+        context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
+        context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
+        return context
