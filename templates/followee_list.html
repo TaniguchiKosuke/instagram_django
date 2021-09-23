@@ -61,11 +61,12 @@
         {% if tag_following %}
         <tr>
           <th scope="row"><img src="{{ MEDIA_URL }}app_images/hashtag.jpeg" alt="" style="width: 32px; height:32px; border-radius: 50%;"></th>
-          <td><a href="{% url 'instagram:following_tag' pk=user_profile.pk %}" class="see-more" style="color: black;">ハッシュタグ</a></td>
+          <td><a href="{% url 'instagram:following_hashtag' pk=user_profile.pk %}" class="see-more" style="color: black;">ハッシュタグ</a></td>
           <td>
           </td>
         </tr>
         {% endif %}
+        {% for user in object_list %}
         <tr>
           {% if user.user_image %}
           <th scope="row"><img src="{{ MEDIA_URL }}{{ user.user_image }}" alt="" style="width: 32px; height:32px; border-radius: 50%;"></th>
