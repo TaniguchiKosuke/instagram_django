@@ -18,7 +18,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import CommentToPost, FriendShip, Message, PostLikes, PostSave, PostTagRelation, Posts, Tag
+from .models import CommentToPost, FollowTag, FriendShip, Message, PostLikes, PostSave, PostTagRelation, Posts, Tag
 from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm, UpdatePostForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -566,13 +566,16 @@ class TagPostListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tag = self.kwargs['tag']
-        context['tag'] = tag
+        context['tag'] = Tag.objects.get(name=tag)
         context['num_of_posts'] = PostTagRelation.objects.filter(tag__name=tag).count()
-        context['request_user'] = self.request.user
+        request_user = self.request.user
+        context['request_user'] = request_user
         tag = self.kwargs['tag']
         post_tag_relation_first = PostTagRelation.objects.filter(tag__name=tag)
         if post_tag_relation_first:
             context['first_post'] = post_tag_relation_first.first().post
+        result = FollowTag.objects.filter(user__username=request_user.username).filter(tag__name=tag)
+        context['connected'] = True if result else False
         return context
 
 
@@ -810,3 +813,47 @@ class UserFollowerFriendListView(LoginRequiredMixin, ListView):
         context['followee'] = followee
         context['follower'] = follower
         return context
+
+
+@login_required
+def follow_tag_view(request, *args, **kwargs):
+    """
+    タグをフォローするための関数
+    """
+    try:
+        user = User.objects.get(pk=request.user.pk)
+        tag = Tag.objects.get(pk=kwargs['pk'])
+    except Tag.DoesNotExist:
+        messages.warning(request, 'タグが存在しません')
+        return redirect(reverse_lazy('instagram:home'))
+
+    _, created = FollowTag.objects.get_or_create(user=user, tag=tag)
+    if created:
+        messages.warning(request, 'フォローしました')
+    else:
+        messages.warning(request, 'あなたは既にフォローしています')
+    # return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
+    #前の画面に遷移
+    return redirect(request.META['HTTP_REFERER'])
+
+
+    
+@login_required
+def unfollow_tag_view(request, *args, **kwargs):
+    """
+    既にフォローしているタグのフォローを解除するための関数
+    """
+    try:
+        user = User.objects.get(pk=request.user.pk)
+        tag = Tag.objects.get(pk=kwargs['pk'])
+        unfollow = FollowTag.objects.get(user=user, tag=tag)
+        unfollow.delete()
+        messages.success(request, 'フォローを外しました')
+    except Tag.DoesNotExist:
+        messages.warning(request, 'ユーザーが存在しません')
+        return redirect(reverse_lazy('instagram:home'))
+    except FollowTag.DoesNotExist:
+        messages.warning(request, 'フォローしてません')
+    # return redirect(reverse_lazy('instagram:user_profile', kwargs={'pk':followee.pk}))
+    #前の画面に遷移
+    return redirect(request.META['HTTP_REFERER'])

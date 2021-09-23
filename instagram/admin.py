@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CommentToPost, Message, Posts, Tag, PostLikes, PostTagRelation, PostSave
+from .models import CommentToPost, FollowTag, Message, Posts, Tag, PostLikes, PostTagRelation, PostSave
 
 
 @admin.register(Posts)
@@ -29,3 +29,4 @@ admin.site.register(Message)
 admin.site.register(Tag)
 admin.site.register(PostLikes)
 admin.site.register(PostSave)
+admin.site.register(FollowTag)

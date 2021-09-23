@@ -1,7 +1,7 @@
 from os import name
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.db.models.base import ModelState
+from django.db.models.base import ModelState, ModelStateFieldsCacheDescriptor
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import related
 from django.urls.base import translate_url
@@ -18,7 +18,7 @@ class TimeStampedModel(models.Model):
 
 
 class Tag(TimeStampedModel):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
@@ -91,3 +91,11 @@ class PostSave(TimeStampedModel):
 
     def __str__(self):
         return f"{self.user.username} saved {self.post.author}'s post"
+
+
+class FollowTag(TimeStampedModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user} followed {self.tag}'

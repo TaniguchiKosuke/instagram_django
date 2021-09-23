@@ -17,11 +17,16 @@
       {% endif %}
   
       <div style="margin-left: 100px;">
-        <h1 class="jumbotron-heading">{{ tag }}</h1>
+        <h1 class="jumbotron-heading" style="margin: 0;">{{ tag.name }}</h1>
         <p>
-          <h5>{{ num_of_posts }}</h5>
-          <p>posts</p>
+          <h5 style="margin: 0;">{{ num_of_posts }}</h5>
+          <p style="margin: 0;">posts</p>
         </p>
+        {% if connected %}
+            <a href="{% url 'instagram:unfollow_tag' pk=tag.pk %}" class="btn btn-dark">フォロー中</a>
+          {% else %}
+            <a href="{% url 'instagram:follow_tag' pk=tag.pk %}" class="btn btn-outline-dark">フォロー</a>
+          {% endif %}
       </div>
     </div>
   </section>

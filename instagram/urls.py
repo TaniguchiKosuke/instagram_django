@@ -32,4 +32,6 @@ urlpatterns = [
     path('save_post/<int:pk>/', views.save_post, name='save_post'),
     path('user_profile/<int:pk>/saved_post_list/', views.SavedPostListView.as_view(), name='saved_post_list'),
     path('user_profile/<int:pk>/user_follower_friend_list/', views.UserFollowerFriendListView.as_view(), name='user_follower_friend_list'),
+    path('follow_tag/<int:pk>/', views.follow_tag_view, name='follow_tag'),
+    path('unfollow_tag/<int:pk>/', views.unfollow_tag_view, name='unfollow_tag'),
 ]
