@@ -4,27 +4,40 @@
 {% block content %}
 <section class="jumbotron text-center home-profile">
   <div class="container">
-    {% if request_user.image %}
-    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ user.image }}" alt=""></a>
+
+    {% if request_user.user_image %}
+    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ request_user.user_image }}" alt=""></a>
     {% else %}
     <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}images/default-user-image.png" alt=""></a>
     {% endif %}
+
     <h1 class="jumbotron-heading">{{ request_user.username }}</h1>
     {% if request_user.name %}
     <h4>{{ request_user.name }}</h4>
     {% endif %}
     <p class="ff-layout">
-      <a href="" class="following">フォロー</a>
-      <a href="" class="following">フォロワー</a>
+      <a href="{% url 'instagram:followee_list' pk=request_user.pk %}" class="following">フォロー{{ followee }}人</a>
+      <a href="{% url 'instagram:follower_list' pk=request_user.pk %}" class="following">フォロワー{{ follower }}人</a>
     </p>
+
     <p>
-      <a href="{% url 'instagram:post' %}" class="btn btn-primary my-2">投稿</a>
-      {% if request_user.is_authenticated %}
-      <a href="{% url 'instagram:user_profile' pk=user.pk %}" class="btn btn-secondary my-2">プロフィール</a>
-      {% endif %}
+      <a href="{% url 'instagram:message_list' %}" class="btn btn-secondary my-2">メッセージ</a>
+      <a href="{% url 'instagram:user_profile_update' pk=request_user.pk %}" class="btn btn-primary my-2">編集</a>
     </p>
+
+    {% if request_user.text %}
+      <p>
+        {{ request_user.text }}
+      </p>
+    {% endif %}
+    <p>
+    <a href="" class="see-more">過去の投稿</a>
+    {% if request_user == user_profile %}
+    <a href="" class="see-more">いいねした投稿</a>
+    {% endif %}
+  </p>
   </div>
-</section>
+  </section>
 
 <section class="jumbotron text-center all-posts-area" style="background-color: #f8f9fa;padding:0;">
   <div class="container posts-area"">
@@ -47,11 +60,13 @@
         {% endif %}
       </div>
       <p style="margin: 0;">{{ object.text | linebreaksbr |urlize }}</p>
-      <div>
-        {% for tag in object.tag|split_tags %}
-          <a href="{% url 'instagram:tag_post_list' tag=tag %}" style="text-decoration: none; color: rgb(48, 96, 230);">{{ tag }}</a>
-        {% endfor %}
-      </div>
+      {% if object.tag %}
+        <div>
+          {% for tag in object.tag|split_tags %}
+            <a href="{% url 'instagram:tag_post_list' tag=tag %}" style="text-decoration: none; color: rgb(48, 96, 230);">{{ tag }}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
       <p class="see-more" style="text-decoration:none;margin: 0;">{{ object.created_at }}</p>
       <p class="border-under-post" style="padding:0;margin:0;">
         {% if request_user == object.author %}

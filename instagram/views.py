@@ -391,8 +391,11 @@ class PostDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['request_user'] = user
         context['comments'] = CommentToPost.objects.filter(post=self.kwargs['pk'])
-        context['request_user'] = self.request.user
+        context['followee'] = FriendShip.objects.filter(follower=user).count()
+        context['follower'] = FriendShip.objects.filter(followee=user).count()
         return context
 
 
@@ -708,6 +711,8 @@ class ReccomendedPostsView(LoginRequiredMixin, ListView):
         followees_posts = random.sample(followees_posts, followees_posts_num)
         reccomended_posts = list(chain(reccomended_posts_by_tag, followees_posts))
         random.shuffle(reccomended_posts)
+        if not (liked_posts and request_user.followees):
+            reccomended_posts = Posts.objects.all()[:40]
         queryset = reccomended_posts
         return queryset
 
