@@ -139,7 +139,8 @@ def get_timeline_post(request_user):
     if following_tags and followees:
         timeline_post_list = list(chain(friend_and_my_posts, tag_post_list))
     elif following_tags and (not followees):
-        timeline_post_list = list(tag_post_list)
+        my_posts = Posts.objects.filter(author=request_user)
+        timeline_post_list = list(chain(my_posts, tag_post_list))
     else:
         timeline_post_list = list(friend_and_my_posts)
     # queryset.sort(key=attrgetter('created_at'), reverse=True)
