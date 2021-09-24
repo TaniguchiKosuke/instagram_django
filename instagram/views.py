@@ -67,7 +67,9 @@ class HomeView(LoginRequiredMixin, ListView):
         context['user'] = user
         followee_friendships = FriendShip.objects.filter(follower__username=user)
         follower_friendships = FriendShip.objects.filter(followee__username=user)
-        context['followee'] = followee_friendships.count()
+        followee_count = followee_friendships.count()
+        tag_follow_count = FollowTag.objects.filter(user=user).count()
+        context['followee'] = followee_count + tag_follow_count
         context['follower'] = follower_friendships.count()
         context['comment_from_post_list_form'] = CommentFromPostListForm()
         query = self.request.GET.get('query')
@@ -278,7 +280,9 @@ class UserProfileView(LoginRequiredMixin, ListView):
         user = User.objects.get(pk=self.kwargs['pk'])
         context['user_profile'] = user
         context['request_user'] = self.request.user
-        context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
+        followee_count = FriendShip.objects.filter(follower__username=user.username).count()
+        tag_follow_count = FollowTag.objects.filter(user=user).count()
+        context['followee'] = followee_count + tag_follow_count
         context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
         context['post_count'] = Posts.objects.filter(author=user).count()
         if user.username is not context['request_user']:
@@ -394,7 +398,9 @@ class PostDetailView(LoginRequiredMixin, DetailView):
         user = self.request.user
         context['request_user'] = user
         context['comments'] = CommentToPost.objects.filter(post=self.kwargs['pk'])
-        context['followee'] = FriendShip.objects.filter(follower=user).count()
+        followee_count = FriendShip.objects.filter(follower__username=user.username).count()
+        tag_follow_count = FollowTag.objects.filter(user=user).count()
+        context['followee'] = followee_count + tag_follow_count
         context['follower'] = FriendShip.objects.filter(followee=user).count()
         return context
 
@@ -465,7 +471,9 @@ class FolloweeListView(LoginRequiredMixin, ListView):
         context['tag_following'] = FollowTag.objects.filter(user=request_user)
         context['request_user'] = request_user
         context['user_profile'] = user
-        context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
+        followee_count = FriendShip.objects.filter(follower__username=user.username).count()
+        tag_follow_count = FollowTag.objects.filter(user=user).count()
+        context['followee'] = followee_count + tag_follow_count
         context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
         return context
 
@@ -485,7 +493,9 @@ class FollowerListView(LoginRequiredMixin, ListView):
         user = User.objects.get(pk=self.kwargs['pk'])
         context['request_user'] = self.request.user
         context['user_profile'] = user
-        context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
+        followee_count = FriendShip.objects.filter(follower__username=user.username).count()
+        tag_follow_count = FollowTag.objects.filter(user=user).count()
+        context['followee'] = followee_count + tag_follow_count
         context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
         return context
 
@@ -657,7 +667,9 @@ class SearchFriendsView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         context['request_user'] = user
-        context['followee'] = FriendShip.objects.filter(follower=user).count()
+        followee_count = FriendShip.objects.filter(follower__username=user.username).count()
+        tag_follow_count = FollowTag.objects.filter(user=user).count()
+        context['followee'] = followee_count + tag_follow_count
         context['follower'] = FriendShip.objects.filter(followee=user).count()
         return context
 
@@ -809,7 +821,9 @@ class SavedPostListView(LoginRequiredMixin, ListView):
         user = User.objects.get(pk=self.kwargs['pk'])
         context['user_profile'] = User.objects.get(pk=user.pk)
         context['request_user'] = self.request.user
-        context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
+        followee_count = FriendShip.objects.filter(follower__username=user.username).count()
+        tag_follow_count = FollowTag.objects.filter(user=user).count()
+        context['followee'] = followee_count + tag_follow_count
         context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
         return context
 
@@ -908,6 +922,8 @@ class FollowingHashtagListView(LoginRequiredMixin, ListView):
         user = User.objects.get(pk=self.kwargs['pk'])
         context['request_user'] = requset_user
         context['user_profile'] = user
-        context['followee'] = FriendShip.objects.filter(follower__username=user.username).count()
+        followee_count = FriendShip.objects.filter(follower__username=user.username).count()
+        tag_follow_count = FollowTag.objects.filter(user=user).count()
+        context['followee'] = followee_count + tag_follow_count
         context['follower'] = FriendShip.objects.filter(followee__username=user.username).count()
         return context
