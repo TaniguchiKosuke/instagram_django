@@ -394,19 +394,22 @@ def comment_from_post_list(request, pk):
     return redirect('instagram:post_detail', pk=pk)
 
 
-class PostDetailView(LoginRequiredMixin, DetailView):
+class PostDetailView(LoginRequiredMixin, ListView):
     template_name = 'post_detail.html'
-    model = Posts
+    queryset = Posts
+
+    def get_queryset(self):
+        post_author = Posts.objects.get(pk=self.kwargs['pk']).author
+        queryset = Posts.objects.filter(author=post_author).order_by('-created_at')[:6]
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['post'] = Posts.objects.get(pk=self.kwargs['pk'])
         user = self.request.user
         context['request_user'] = user
         context['comments'] = CommentToPost.objects.filter(post=self.kwargs['pk'])
-        followee_count = FriendShip.objects.filter(follower__username=user.username).count()
-        tag_follow_count = FollowTag.objects.filter(user=user).count()
-        context['followee'] = followee_count + tag_follow_count
-        context['follower'] = FriendShip.objects.filter(followee=user).count()
+        context['comment_from_post_list_form'] = CommentFromPostListForm()
         return context
 
 
