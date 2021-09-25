@@ -35,4 +35,5 @@ urlpatterns = [
     path('follow_tag/<int:pk>/', views.follow_tag_view, name='follow_tag'),
     path('unfollow_tag/<int:pk>/', views.unfollow_tag_view, name='unfollow_tag'),
     path('user_profile/<int:pk>/following_hashtag', views.FollowingHashtagListView.as_view(), name='following_hashtag'),
+    path('comment_to_comment/<int:pk>/', views.comment_to_comment, name='comment_to_comment'),
 ]

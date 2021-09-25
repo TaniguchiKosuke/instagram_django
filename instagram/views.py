@@ -363,9 +363,32 @@ class CommentToPostView(LoginRequiredMixin, CreateView):
         return reverse('instagram:post_detail', kwargs={'pk':self.kwargs['pk']})
 
 
-class CommentToCommentView(LoginRequiredMixin, CreateView):
-    template_name = 'comment_to_comment.html'
-    form_class = CommentToCommentForm
+@csrf_protect
+def comment_to_comment(request, pk):
+    """
+    コメントに対してコメントするための関数
+    フォームの先頭の文字が@だったら、この関数が呼ばれる
+    """
+    print('here4')
+    form = CommentToCommentForm(request.POST or None)
+    print(form)
+    text = request.POST.get('text')
+    if form.is_valid():
+        print('here5')
+        comment_text = text.lstrip('@')
+        author = request.user
+        to_comment_author = comment_text.split()[0]
+        post = Posts.objects.get(pk=pk)
+        to_comment_author = User.objects.get(username=to_comment_author)
+        to_comment = CommentToPost.objects.filter(author=to_comment_author, post=post)
+        to_comment.comment_count += 1
+        to_comment.save()
+        CommentToComment.objects.create(
+            text=text,
+            author=author,
+            to_comment=to_comment,
+        )
+    return redirect('instagram:post_detail', pk=pk)
 
 
 class DeleteCommentView(LoginRequiredMixin, DeleteView):
@@ -379,18 +402,38 @@ def comment_from_post_list(request, pk):
     """
     投稿一覧画面から直接コメントをするための関数
     """
-    form = CommentFromPostListForm(request.POST or None)
-    if form.is_valid():
-        text = request.POST['text']
-        author = request.user
-        post = Posts.objects.get(pk=pk)
-        post.comment_count += 1
-        post.save()
-        CommentToPost.objects.create(
-            text=text,
-            author=author,
-            post=post,
-        )
+    comment_text = request.POST['text']
+    if comment_text.startswith('@'):
+        # return redirect('instagram:comment_to_comment', pk=pk)
+        form = CommentToCommentForm(request.POST or None)
+        if form.is_valid():
+            author = request.user
+            text = comment_text.lstrip('@')
+            to_comment_author = text.split()[0]
+            post = Posts.objects.get(pk=pk)
+            to_comment_author = User.objects.filter(username=to_comment_author).first()
+            to_comment = CommentToPost.objects.filter(author=to_comment_author, post=post).first()
+            to_comment.comment_count += 1
+            to_comment.save()
+            CommentToComment.objects.create(
+                text=comment_text,
+                author=author,
+                to_comment=to_comment,
+            )
+    else:
+        form = CommentFromPostListForm(request.POST or None)
+        if form.is_valid():
+            text = request.POST['text']
+            author = request.user
+            post = Posts.objects.get(pk=pk)
+            post.comment_count += 1
+            post.save()
+            CommentToPost.objects.create(
+                text=text,
+                author=author,
+                post=post,
+            )
+            print('here3')
     return redirect('instagram:post_detail', pk=pk)
 
 

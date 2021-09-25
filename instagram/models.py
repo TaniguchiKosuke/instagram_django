@@ -57,6 +57,7 @@ class CommentToPost(TimeStampedModel):
     text = models.CharField(max_length=300)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    comment_count = models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.author} {self.text}'
@@ -65,10 +66,11 @@ class CommentToPost(TimeStampedModel):
 class CommentToComment(TimeStampedModel):
     text = models.CharField(max_length=300)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    to_comment = models.ForeignKey(CommentToPost, on_delete=models.CASCADE)
+
 
     def __str__(self):
-        return F'{self.author} {self.text}'
+        return f'{self.author} {self.text}'
 
 
 class FriendShip(TimeStampedModel):

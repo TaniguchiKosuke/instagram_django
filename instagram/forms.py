@@ -68,7 +68,7 @@ class CommentToPostForm(forms.ModelForm):
         fields = ('text',)
 
 
-class CommentToCommentForm(forms.ModelForm):
+class CommentToCommentForm(forms.Form):
     text = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Comment'}), label='')
 
     def __init__(self, *args, **kwargs):
@@ -76,9 +76,9 @@ class CommentToCommentForm(forms.ModelForm):
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
 
-    class Meta:
-        model = CommentToComment
-        fields = ('text',)
+    # class Meta:
+    #     model = CommentToComment
+    #     fields = ('text',)
 
 
 class MessageForm(forms.ModelForm):
