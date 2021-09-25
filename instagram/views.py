@@ -18,8 +18,8 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import CommentToPost, FollowTag, FriendShip, Message, PostLikes, PostSave, PostTagRelation, Posts, Tag
-from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm, UpdatePostForm
+from .models import CommentToComment, CommentToPost, FollowTag, FriendShip, Message, PostLikes, PostSave, PostTagRelation, Posts, Tag
+from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm, UpdatePostForm, CommentToCommentForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
@@ -361,6 +361,11 @@ class CommentToPostView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse('instagram:post_detail', kwargs={'pk':self.kwargs['pk']})
+
+
+class CommentToCommentView(LoginRequiredMixin, CreateView):
+    template_name = 'comment_to_comment.html'
+    form_class = CommentToCommentForm
 
 
 class DeleteCommentView(LoginRequiredMixin, DeleteView):

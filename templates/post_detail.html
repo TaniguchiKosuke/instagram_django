@@ -2,96 +2,112 @@
 {% load static %}
 {% load templates_func %}
 {% block content %}
-<section class="jumbotron text-center home-profile">
-  <div class="container">
 
-    {% if request_user.user_image %}
-    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ request_user.user_image }}" alt=""></a>
-    {% else %}
-    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}images/default-user-image.png" alt=""></a>
-    {% endif %}
 
-    <h1 class="jumbotron-heading">{{ request_user.username }}</h1>
-    {% if request_user.name %}
-    <h4>{{ request_user.name }}</h4>
-    {% endif %}
-    <p class="ff-layout">
-      <a href="{% url 'instagram:followee_list' pk=request_user.pk %}" class="following">フォロー{{ followee }}人</a>
-      <a href="{% url 'instagram:follower_list' pk=request_user.pk %}" class="following">フォロワー{{ follower }}人</a>
-    </p>
-
-    <p>
-      <a href="{% url 'instagram:message_list' %}" class="btn btn-secondary my-2">メッセージ</a>
-      <a href="{% url 'instagram:user_profile_update' pk=request_user.pk %}" class="btn btn-primary my-2">編集</a>
-    </p>
-
-    {% if request_user.text %}
-      <p>
-        {{ request_user.text }}
-      </p>
-    {% endif %}
-    <p>
-    <a href="" class="see-more">過去の投稿</a>
-    {% if request_user == user_profile %}
-    <a href="" class="see-more">いいねした投稿</a>
-    {% endif %}
-  </p>
-  </div>
-  </section>
-
-<section class="jumbotron text-center all-posts-area" style="background-color: #f8f9fa;padding:0;">
-  <div class="container posts-area"">
-    <div class="card post-card mb-4 shadow-sm">
-      <h5><a href="" class="see-post-author">{{ object.author }}</a></h5>
-      <img  src="{{ MEDIA_URL }}{{ object.image }}" class="bd-placeholder-img card-img-top">
-      <div class="d-flex">
-        {% if user|judge_likes:object %}
-          <a href="{% url 'instagram:like_post' pk=object.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
-        {% else %}
-          <a href="{% url 'instagram:like_post' pk=object.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
-        {% endif %}
-        {% if object.like_count > 0 %}
-        <p class="good-count" style="font-size: small;margin:0;">Liked by {{ object | liked_post_user }} and <a href="{% url 'instagram:liked_post_user' pk=object.pk %}" style="color: black;text-decoration:none;font-weight:bold;">others</a></p>
-        {% endif %}
-        {% if user|judge_saved:object %}
-          <a href="{% url 'instagram:save_post' pk=object.pk %}"><img src="{{ MEDIA_URL }}app_images/saved_post.svg" alt="" style="margin-top:4px;width: 28px;position:absolute;right:4px;"></a>
-        {% else %}
-          <a href="{% url 'instagram:save_post' pk=object.pk %}"><img src="{{ MEDIA_URL }}app_images/save_post.svg" alt="" style="margin-top:4px;width: 28px;position:absolute;right:4px;"></a>
-        {% endif %}
-      </div>
-      <p style="margin: 0;">{{ object.text | linebreaksbr |urlize }}</p>
-      {% if object.tag %}
-        <div>
-          {% for tag in object.tag|split_tags %}
-            <a href="{% url 'instagram:tag_post_list' tag=tag %}" style="text-decoration: none; color: rgb(48, 96, 230);">{{ tag }}</a>
-          {% endfor %}
+<section class="jumbotron text-center all-posts-area d-flex" style="background-color: #f8f9fa;padding:0;">
+    <div class="container posts-area">
+      <div class="card post-card mb-4 shadow-sm">
+        <h5><a href="" class="see-post-author">{{ object.author }}</a></h5>
+        <img  src="{{ MEDIA_URL }}{{ object.image }}" class="bd-placeholder-img card-img-top">
+        <div class="d-flex">
+          {% if user|judge_likes:object %}
+            <a href="{% url 'instagram:like_post' pk=object.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+          {% else %}
+            <a href="{% url 'instagram:like_post' pk=object.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+          {% endif %}
+          {% if object.like_count > 0 %}
+          <p class="good-count" style="font-size: small;margin:0;">Liked by {{ object | liked_post_user }} and <a href="{% url 'instagram:liked_post_user' pk=object.pk %}" style="color: black;text-decoration:none;font-weight:bold;">others</a></p>
+          {% endif %}
+          {% if user|judge_saved:object %}
+            <a href="{% url 'instagram:save_post' pk=object.pk %}"><img src="{{ MEDIA_URL }}app_images/saved_post.svg" alt="" style="margin-top:4px;width: 28px;position:absolute;right:4px;"></a>
+          {% else %}
+            <a href="{% url 'instagram:save_post' pk=object.pk %}"><img src="{{ MEDIA_URL }}app_images/save_post.svg" alt="" style="margin-top:4px;width: 28px;position:absolute;right:4px;"></a>
+          {% endif %}
         </div>
-      {% endif %}
-      <p class="see-more" style="text-decoration:none;margin: 0;">{{ object.created_at }}</p>
-      <p class="border-under-post" style="padding:0;margin:0;">
-        {% if request_user == object.author %}
-        <a href="{% url 'instagram:delete_post' pk=object.pk %}" class="see-more">投稿の削除</a>
-        <a href="{% url 'instagram:update_post' pk=object.pk %}" class="see-more">編集</a>
-        {% else %}
+        <p style="margin: 0;">{{ object.text | linebreaksbr |urlize }}</p>
+        {% if object.tag %}
+          <div>
+            {% for tag in object.tag|split_tags %}
+              <a href="{% url 'instagram:tag_post_list' tag=tag %}" style="text-decoration: none; color: rgb(48, 96, 230);">{{ tag }}</a>
+            {% endfor %}
+          </div>
         {% endif %}
-        <a href="{% url 'instagram:comment_to_post' pk=object.pk %}" class="see-more">コメントする</a>
-        </p>
+        <p class="see-more" style="text-decoration:none;margin: 0;">{{ object.created_at }}</p>
+        <p class="border-under-post" style="padding:0;margin:0;">
+          {% if request_user == object.author %}
+          <a href="{% url 'instagram:delete_post' pk=object.pk %}" class="see-more">投稿の削除</a>
+          <a href="{% url 'instagram:update_post' pk=object.pk %}" class="see-more">編集</a>
+          {% else %}
+          {% endif %}
+          <a href="{% url 'instagram:comment_to_post' pk=object.pk %}" class="see-more">コメントする</a>
+          </p>
+      </div>
     </div>
 
-      {% if comments %}
-      {% for comment in comments %}
-      <div class='post-comment' style="padding: 0;">
-        <h5><a href="" class="comment-author">{{ comment.author }}</a></h5>
-        <p style="margin: 0;">{{ comment.text | linebreaksbr }}</p>
-        {% if request_user == comment.author %}
-           <a href="{% url 'instagram:delete_comment' pk=comment.pk %}" class="see-more">削除</a>
-        {% endif %}
-      </div>
-      {% endfor %}
-    {% else %}
-    <p>コメントはありません</p>
-    {% endif %}
+    <div class="container mb-5" style="overflow-y: scroll;height:468px;width:48%;background-color:#fff;">
+      <div class="comment-card">
+        <div class="row">
+          <div class="col-md-12">
+                <div class="row">
+                  <div class="col-md-12">
+                        <div class="comment-media">
+                          <div class="media-body">
+                            
+                            <div class=" d-block d-flex">
+                              <a class="pr-3" href="#">
+                                <img class="rounded-circle" style="width: 40px;height:40px;" alt="Bootstrap Media Another Preview" src="https://i.imgur.com/xELPaag.jpg" /></a>
+                                  <div class="media-body">
+                                    <div class="row">
+                                          <div class="col-12 d-flex">
+                                              <h5>Simona Disa</h5> <span>- 3 hours ago</span>
+                                            </div>
+                                      </div> letters, as opposed to using 'Content here, content here', making it look like readable English.
+                                  </div>
+                            </div>
+
+                            <div class="media mt-4">
+                              <a class="pr-3" href="#">
+                                <img class="rounded-circle" style="width: 40px;height:40px;" alt="Bootstrap Media Another Preview" src="https://i.imgur.com/xELPaag.jpg" /></a>
+                                <div class="media-body">
+                                  <div class="row">
+                                        <div class="col-12 d-flex">
+                                            <h5>Simona Disa</h5> <span>- 3 hours ago</span>
+                                          </div>
+                                  </div> letters, as opposed to using 'Content here, content here', making it look like readable English.
+                                </div>
+                             </div>
+
+                            </div>
+                        </div>
+                      </div>
+                </div>
+            </div>
+          </div>
+    </div>
   </div>
 </section>
 
+
+
+
+
+
 {% endblock content %}
+
+
+
+<div>
+  {% if comments %}
+  {% for comment in comments %}
+  <div class='post-comment' style="padding: 0;background-color:#fff;">
+    <h5><a href="" class="comment-author">{{ comment.author }}</a></h5>
+    <p style="margin: 0;">{{ comment.text | linebreaksbr }}</p>
+    {% if request_user == comment.author %}
+       <a href="{% url 'instagram:delete_comment' pk=comment.pk %}" class="see-more">削除</a>
+       {% endif %}
+  </div>
+  {% endfor %}
+  {% else %}
+<p>コメントはありません</p>
+{% endif %}
+</div>

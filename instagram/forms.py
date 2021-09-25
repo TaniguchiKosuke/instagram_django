@@ -5,7 +5,7 @@ from django.core.files.base import File
 from django.db import reset_queries
 from django.db.models import fields
 from django.db.models.base import Model
-from .models import CommentToPost, Message, Posts
+from .models import CommentToComment, CommentToPost, Message, Posts
 from users.models import User
 
 
@@ -65,6 +65,19 @@ class CommentToPostForm(forms.ModelForm):
 
     class Meta:
         model = CommentToPost
+        fields = ('text',)
+
+
+class CommentToCommentForm(forms.ModelForm):
+    text = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Comment'}), label='')
+
+    def __init__(self, *args, **kwargs):
+        super(CommentToCommentForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
+    class Meta:
+        model = CommentToComment
         fields = ('text',)
 
 

@@ -3,6 +3,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.base import ModelState, ModelStateFieldsCacheDescriptor
 from django.db.models.deletion import CASCADE
+from django.db.models.expressions import F
 from django.db.models.fields import related
 from django.urls.base import translate_url
 from django.utils import timezone
@@ -59,6 +60,15 @@ class CommentToPost(TimeStampedModel):
 
     def __str__(self):
         return f'{self.author} {self.text}'
+
+
+class CommentToComment(TimeStampedModel):
+    text = models.CharField(max_length=300)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return F'{self.author} {self.text}'
 
 
 class FriendShip(TimeStampedModel):
