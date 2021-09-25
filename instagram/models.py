@@ -68,9 +68,20 @@ class CommentToComment(TimeStampedModel):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     to_comment = models.ForeignKey(CommentToPost, on_delete=models.CASCADE)
 
-
     def __str__(self):
         return f'{self.author} {self.text}'
+
+
+class PostCommentRelation(TimeStampedModel):
+    comment_to_comment = models.ForeignKey(CommentToComment, on_delete=models.CASCADE)
+    comment_to_post = models.ForeignKey(CommentToPost, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('comment_to_comment', 'comment_to_post')
+
+    def __str__(self):
+        return f'{self.comment_to_comment} and {self.comment_to_post}'
+
 
 
 class FriendShip(TimeStampedModel):

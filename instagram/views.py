@@ -18,7 +18,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import CommentToComment, CommentToPost, FollowTag, FriendShip, Message, PostLikes, PostSave, PostTagRelation, Posts, Tag
+from .models import CommentToComment, CommentToPost, FollowTag, FriendShip, Message, PostCommentRelation, PostLikes, PostSave, PostTagRelation, Posts, Tag
 from .forms import CommentFromPostListForm, MessageForm, PostForm, UserProfileUpdateForm, CommentToPostForm, UpdatePostForm, CommentToCommentForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -417,10 +417,14 @@ def comment_from_post_list(request, pk):
                 to_comment = CommentToPost.objects.filter(author=to_comment_author, post=post).first()
                 to_comment.comment_count += 1
                 to_comment.save()
-                CommentToComment.objects.create(
+                comment_to_comment = CommentToComment.objects.create(
                     text=comment_text,
                     author=author,
                     to_comment=to_comment,
+                )
+                PostCommentRelation.objects.create(
+                    comment_to_comment=comment_to_comment,
+                    comment_to_post=to_comment,
                 )
     else:
         form = CommentFromPostListForm(request.POST or None)
