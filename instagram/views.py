@@ -369,32 +369,32 @@ def comment_to_comment(request, pk):
     コメントに対してコメントするための関数
     フォームの先頭の文字が@だったら、この関数が呼ばれる
     """
-    print('here4')
-    form = CommentToCommentForm(request.POST or None)
-    print(form)
-    text = request.POST.get('text')
-    if form.is_valid():
-        print('here5')
-        comment_text = text.lstrip('@')
-        author = request.user
-        to_comment_author = comment_text.split()[0]
-        post = Posts.objects.get(pk=pk)
-        to_comment_author = User.objects.get(username=to_comment_author)
-        to_comment = CommentToPost.objects.filter(author=to_comment_author, post=post)
-        to_comment.comment_count += 1
-        to_comment.save()
-        CommentToComment.objects.create(
-            text=text,
-            author=author,
-            to_comment=to_comment,
-        )
-    return redirect('instagram:post_detail', pk=pk)
+    pass
 
 
 class DeleteCommentView(LoginRequiredMixin, DeleteView):
     template_name = 'comment_confirm_delete.html'
     model = CommentToPost
     success_url = reverse_lazy('instagram:home')
+
+
+def judge_to_comment_author_exist(to_comment_author, pk):
+    """
+    コメントの作成者が存在するかを判定する関数
+    引数: 
+        to_comment_auhot: str
+        pk: Postsモデルのpk
+    return: True or False
+    """
+    post = Posts.objects.get(pk=pk)
+    comment_to_post = CommentToPost.objects.filter(post=post)
+    comment_author_list = []
+    for comment in comment_to_post:
+        comment_author_list.append(comment.author.username)
+    if to_comment_author in comment_author_list:
+        return True
+    else:
+        return False
 
 
 @csrf_protect
@@ -410,16 +410,18 @@ def comment_from_post_list(request, pk):
             author = request.user
             text = comment_text.lstrip('@')
             to_comment_author = text.split()[0]
-            post = Posts.objects.get(pk=pk)
-            to_comment_author = User.objects.filter(username=to_comment_author).first()
-            to_comment = CommentToPost.objects.filter(author=to_comment_author, post=post).first()
-            to_comment.comment_count += 1
-            to_comment.save()
-            CommentToComment.objects.create(
-                text=comment_text,
-                author=author,
-                to_comment=to_comment,
-            )
+            to_comment_author_exist = judge_to_comment_author_exist(to_comment_author, pk)
+            if to_comment_author_exist:
+                post = Posts.objects.get(pk=pk)
+                to_comment_author = User.objects.filter(username=to_comment_author).first()
+                to_comment = CommentToPost.objects.filter(author=to_comment_author, post=post).first()
+                to_comment.comment_count += 1
+                to_comment.save()
+                CommentToComment.objects.create(
+                    text=comment_text,
+                    author=author,
+                    to_comment=to_comment,
+                )
     else:
         form = CommentFromPostListForm(request.POST or None)
         if form.is_valid():
@@ -433,7 +435,6 @@ def comment_from_post_list(request, pk):
                 author=author,
                 post=post,
             )
-            print('here3')
     return redirect('instagram:post_detail', pk=pk)
 
 
