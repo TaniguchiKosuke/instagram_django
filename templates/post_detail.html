@@ -39,7 +39,6 @@
           <a href="{% url 'instagram:update_post' pk=post.pk %}" class="see-more">編集</a>
           {% else %}
           {% endif %}
-          <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメントする</a>
           </p>
       </div>
     </div>
@@ -76,26 +75,9 @@
                                       <a href="{% url 'instagram:delete_comment' pk=comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
                                     </div>
                                     <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">6hours</p>
-                                    <a href="{% url 'instagram:comment_detail' pk=post.pk comment_pk=comment.pk %}" style="font-size:small;text-decoration: none;color:gray;">View replies(3)</a>
-                                  </div>
-                                </div>
-
-                                
-                                <div class="media mt-4 ml-5">
-                                  <a class="pr-3" href="{% url 'instagram:user_profile' pk=comment.author.pk %}">
-                                    <img class="rounded-circle" style="width: 40px;height:40px;" alt="Bootstrap Media Another Preview" src="{{ MEDIA_URL }}images/default-user-image.png" /></a>
-                                  <div class="media-body" style="position: relative;">
-                                    <div class="row" style="margin: 0;">
-                                          <div class="col-12 d-flex">
-                                              <h6>{{ comment.author }}</h6>
-                                          </div>
-                                    </div>
-                                    <div class="d-flex">
-                                      <p style="margin: 0;">{{ comment.text | linebreaksbr }}</p>
-
-                                      <a href="{% url 'instagram:delete_comment' pk=comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
-                                    </div>
-                                    <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">6hours</p>
+                                    {% if comment.pk|comment_to_comment_count > 0 %}
+                                    <a href="{% url 'instagram:comment_detail' pk=post.pk comment_pk=comment.pk %}" style="font-size:small;text-decoration: none;color:gray;">View replies({{ comment.pk|comment_to_comment_count }})</a>
+                                    {% endif %}
                                   </div>
                                 </div>
                                 {% endfor %}

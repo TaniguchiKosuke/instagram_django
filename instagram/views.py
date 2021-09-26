@@ -11,7 +11,7 @@ from django.http import request
 from django.views.generic.base import TemplateView
 from users.models import User
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
+from django.contrib.auth import REDIRECT_FIELD_NAME, login
 from django.urls.base import reverse, translate_url
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
@@ -362,7 +362,7 @@ class CommentToPostView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('instagram:post_detail', kwargs={'pk':self.kwargs['pk']})
 
-
+@login_required
 @csrf_protect
 def comment_to_comment(request, pk):
     """
@@ -375,7 +375,11 @@ def comment_to_comment(request, pk):
 class DeleteCommentView(LoginRequiredMixin, DeleteView):
     template_name = 'comment_confirm_delete.html'
     model = CommentToPost
-    success_url = reverse_lazy('instagram:home')
+
+    def get_success_url(self):
+        comment = CommentToPost.objects.get(pk=self.kwargs['pk'])
+        post_pk = Posts.objects.get(pk=comment.post.pk)
+        return reverse('instagram:post_detail', kwargs={'pk': post_pk.pk})
 
 
 def judge_to_comment_author_exist(to_comment_author, pk):
@@ -397,6 +401,7 @@ def judge_to_comment_author_exist(to_comment_author, pk):
         return False
 
 
+@login_required
 @csrf_protect
 def comment_from_post_list(request, pk):
     """
@@ -442,6 +447,42 @@ def comment_from_post_list(request, pk):
     return redirect('instagram:post_detail', pk=pk)
 
 
+@login_required
+@csrf_protect
+def comment_from_comment_detail(request, pk):
+    """
+    comment_detailからコメントした際に呼ばれるview
+    リダイレクト先はcomment_detail
+    """
+    comment_text = request.POST['text']
+    if comment_text.startswith('@'):
+        # return redirect('instagram:comment_to_comment', pk=pk)
+        form = CommentToCommentForm(request.POST or None)
+        if form.is_valid():
+            author = request.user
+            text = comment_text.lstrip('@')
+            to_comment_author = text.split()[0]
+            to_comment_author_exist = judge_to_comment_author_exist(to_comment_author, pk)
+            if to_comment_author_exist:
+                post = Posts.objects.get(pk=pk)
+                to_comment_author = User.objects.filter(username=to_comment_author).first()
+                to_comment = CommentToPost.objects.filter(author=to_comment_author, post=post).first()
+                to_comment.comment_count += 1
+                to_comment.save()
+                comment_to_comment = CommentToComment.objects.create(
+                    text=comment_text,
+                    author=author,
+                    to_comment=to_comment,
+                )
+                PostCommentRelation.objects.create(
+                    comment_to_comment=comment_to_comment,
+                    comment_to_post=to_comment,
+                )
+            return redirect('instagram:comment_detail', pk=pk, comment_pk=to_comment.pk)
+    else:
+        return redirect('instagram:post_detail', pk=pk)
+
+
 class PostDetailView(LoginRequiredMixin, ListView):
     template_name = 'post_detail.html'
     queryset = Posts
@@ -475,8 +516,11 @@ class CommentDetailView(LoginRequiredMixin, ListView):
         context['post'] = Posts.objects.get(pk=self.kwargs['pk'])
         user = self.request.user
         context['request_user'] = user
-        context['comments'] = CommentToComment.objects.filter(to_comment=self.kwargs['comment_pk'])
-        context['comment_from_post_list_form'] = CommentFromPostListForm()
+        context['to_comment'] = CommentToPost.objects.get(pk=self.kwargs['comment_pk'])
+        context['comment_to_comment'] = CommentToComment.objects.filter(to_comment=self.kwargs['comment_pk'])
+        to_comment_author_default = CommentToPost.objects.get(pk=self.kwargs['comment_pk'])
+        init_context = {'text': '@'+to_comment_author_default.author.username+' '}
+        context['comment_from_post_list_form'] = CommentFromPostListForm(initial=init_context)
         return context
 
 

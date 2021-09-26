@@ -39,7 +39,6 @@
           <a href="{% url 'instagram:update_post' pk=post.pk %}" class="see-more">編集</a>
           {% else %}
           {% endif %}
-          <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメントする</a>
           </p>
       </div>
     </div>
@@ -53,51 +52,54 @@
                     <div class="col-md-12" style="padding: 0;">
                           <div class="comment-media">
                             <div class="media-body">
-                              {% if comments %}
-                                {% for comment in comments %}
-                                <div class=" d-block d-flex" style="margin: 12px auto;">
-                                  {% if comment.author.user_image %}
-                                    <a class="pr-3" href="{% url 'instagram:user_profile' pk=comment.author.pk %}">
-                                      <img class="rounded-circle" style="width: 40px;height:40px;" alt="Bootstrap Media Another Preview" src="{{ MEDIA_URL }}{{ comment.author.user_image }}" /></a>
-                                  {% else %}
-                                    <a class="pr-3" href="{% url 'instagram:user_profile' pk=comment.author.pk %}">
-                                      <img class="rounded-circle" style="width: 40px;height:40px;" alt="Bootstrap Media Another Preview" src="{{ MEDIA_URL }}images/default-user-image.png" /></a>
-                                  {% endif %}
-                                  <div class="media-body" style="position: relative;">
-                                    <div class="row" style="margin: 0;">
-                                          <div class="col-12 d-flex">
-                                              <h6>{{ comment.author }}</h6>
-                                          </div>
-                                    </div>
-                                    <div class="d-flex">
-                                      <p style="margin: 0;">{{ comment.text | linebreaksbr }}</p>
-                                      {% if request_user == comment.author %}
-                                      {% endif %}
-                                      <a href="{% url 'instagram:delete_comment' pk=comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
-                                    </div>
-                                    <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">6hours</p>
-                                  </div>
-                                </div>
-
+                              {% if to_comment %}
+                              
                                 
-                                <div class="media mt-4 ml-5">
-                                  <a class="pr-3" href="{% url 'instagram:user_profile' pk=comment.author.pk %}">
+                                <div class="media mt-4">
+                                  <a class="pr-3" href="{% url 'instagram:user_profile' pk=to_comment.author.pk %}">
                                     <img class="rounded-circle" style="width: 40px;height:40px;" alt="Bootstrap Media Another Preview" src="{{ MEDIA_URL }}images/default-user-image.png" /></a>
-                                  <div class="media-body" style="position: relative;">
-                                    <div class="row" style="margin: 0;">
-                                          <div class="col-12 d-flex">
-                                              <h6>{{ comment.author }}</h6>
-                                          </div>
+                                    <div class="media-body" style="position: relative;">
+                                      <div class="row" style="margin: 0;">
+                                        <div class="col-12 d-flex">
+                                          <h6>{{ to_comment.author }}</h6>
+                                        </div>
+                                      </div>
+                                      <div class="d-flex">
+                                        <p style="margin: 0;">{{ to_comment.text | linebreaksbr }}</p>
+                                        
+                                        <a href="{% url 'instagram:delete_comment' pk=to_comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
+                                      </div>
+                                      <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">6hours</p>
                                     </div>
-                                    <div class="d-flex">
-                                      <p style="margin: 0;">{{ comment.text | linebreaksbr }}</p>
-
-                                      <a href="{% url 'instagram:delete_comment' pk=comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
-                                    </div>
-                                    <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">6hours</p>
                                   </div>
-                                </div>
-                                {% endfor %}
+
+                                  {% if comment_to_comment %}
+                                    {% for comment in comment_to_comment %}
+                                    <div class=" d-block d-flex ml-5" style="margin: 12px auto;">
+                                      {% if comment.author.user_image %}
+                                        <a class="pr-3" href="{% url 'instagram:user_profile' pk=comment.author.pk %}">
+                                          <img class="rounded-circle" style="width: 40px;height:40px;" alt="Bootstrap Media Another Preview" src="{{ MEDIA_URL }}{{ comment.author.user_image }}" /></a>
+                                      {% else %}
+                                        <a class="pr-3" href="{% url 'instagram:user_profile' pk=comment.author.pk %}">
+                                          <img class="rounded-circle" style="width: 40px;height:40px;" alt="Bootstrap Media Another Preview" src="{{ MEDIA_URL }}images/default-user-image.png" /></a>
+                                      {% endif %}
+                                      <div class="media-body" style="position: relative;">
+                                        <div class="row" style="margin: 0;">
+                                              <div class="col-12 d-flex">
+                                                  <h6>{{ comment.author }}</h6>
+                                              </div>
+                                        </div>
+                                        <div class="d-flex">
+                                          <p style="margin: 0;">{{ comment.text | linebreaksbr }}</p>
+                                          {% if request_user == comment.author %}
+                                          {% endif %}
+                                          <a href="{% url 'instagram:delete_comment' pk=comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
+                                        </div>
+                                        <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">6hours</p>
+                                      </div>
+                                    </div>
+                                    {% endfor %}
+                                  {% endif %}
                               {% else %}
                                 <p>コメントはありません</p>
                               {% endif %}
@@ -113,7 +115,7 @@
 
         </div>
 
-        <form method="POST" class="form-inline" style="position: absolute;bottom:0;" action="{% url 'instagram:comment_from_post_list' pk=post.pk %}">
+        <form method="POST" class="form-inline" style="position: absolute;bottom:0;" action="{% url 'instagram:comment_from_comment_detail' pk=post.pk %}">
           {% csrf_token %}
           <div class="mb-3">
             {{ comment_from_post_list_form }}

@@ -127,3 +127,11 @@ def count_reccomended_user_follower(user, request_user):
             continue
     user_count = len(request_user_followees_list) - 1
     return user_count
+
+
+@register.filter
+def comment_to_comment_count(comment_pk):
+    from ..models import CommentToComment, CommentToPost
+    to_comment = CommentToPost.objects.get(pk=comment_pk)
+    comment_count = CommentToComment.objects.filter(to_comment=to_comment).count()
+    return comment_count
