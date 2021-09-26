@@ -378,8 +378,19 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         comment = CommentToPost.objects.get(pk=self.kwargs['pk'])
-        post_pk = Posts.objects.get(pk=comment.post.pk)
-        return reverse('instagram:post_detail', kwargs={'pk': post_pk.pk})
+        post = Posts.objects.get(pk=comment.post.pk)
+        return reverse('instagram:post_detail', kwargs={'pk': post.pk})
+
+
+class DeleteCommentToCommentView(LoginRequiredMixin, DeleteView):
+    template_name = 'comment_to_comment_confirm_delete.html'
+    model = CommentToComment
+
+    def get_success_url(self):
+        comment = CommentToComment.objects.get(pk=self.kwargs['pk'])
+        to_comment = CommentToPost.objects.get(pk=comment.to_comment.pk)
+        post = Posts.objects.get(pk=to_comment.post.pk)
+        return reverse('instagram:comment_detail', kwargs={'pk':post.pk, 'comment_pk': to_comment.pk})
 
 
 def judge_to_comment_author_exist(to_comment_author, pk):

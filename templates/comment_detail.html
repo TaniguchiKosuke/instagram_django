@@ -93,7 +93,7 @@
                                           <p style="margin: 0;">{{ comment.text | linebreaksbr }}</p>
                                           {% if request_user == comment.author %}
                                           {% endif %}
-                                          <a href="{% url 'instagram:delete_comment' pk=comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
+                                          <a href="{% url 'instagram:delete_comment_to_comment' pk=comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
                                         </div>
                                         <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">6hours</p>
                                       </div>
