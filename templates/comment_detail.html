@@ -4,7 +4,7 @@
 {% block content %}
 
 
-<section class="jumbotron text-center all-posts-area d-flex" style="background-color: #f8f9fa;padding:0;">
+<section class="jumbotron text-center all-posts-area d-flex" style="background-color: #fff;padding:0;">
     <div class="container posts-area">
       <div class="card post-card mb-4 shadow-sm">
         <h5><a href="" class="see-post-author">{{ post.author }}</a></h5>
@@ -44,7 +44,8 @@
     </div>
 
     <div style="position: relative;height:460px;width:44%;">
-      <div class="container mb-5" style="position:relative;overflow-y: scroll;height:88%;background-color:#fff;margin:0;padding:0;">
+      <a href="{% url 'instagram:post_detail' pk=post.pk %}" style="position: absolute;top:0;left:0;z-index:1;"><img src="{{ MEDIA_URL }}app_images/back_icon.png" alt=""></a>
+      <div class="container mb-5" style="position:relative;top:20px;overflow-y: scroll;height:88%;margin:0;padding:0;">
         <div class="comment-card" style="padding: 0;">
           <div class="row" style="margin: 0;">
             <div class="col-md-12">
@@ -56,8 +57,13 @@
                               
                                 
                                 <div class="media mt-4">
+                                  {% if to_comment.author.user_image %}
+                                  <a class="pr-3" href="{% url 'instagram:user_profile' pk=to_comment.author.pk %}">
+                                    <img class="rounded-circle" style="width: 40px;height:40px;" alt="Bootstrap Media Another Preview" src="{{ MEDIA_URL }}{{ to_comment.author.user_image }}" /></a>
+                                {% else %}
                                   <a class="pr-3" href="{% url 'instagram:user_profile' pk=to_comment.author.pk %}">
                                     <img class="rounded-circle" style="width: 40px;height:40px;" alt="Bootstrap Media Another Preview" src="{{ MEDIA_URL }}images/default-user-image.png" /></a>
+                                {% endif %}
                                     <div class="media-body" style="position: relative;">
                                       <div class="row" style="margin: 0;">
                                         <div class="col-12 d-flex">
@@ -69,7 +75,7 @@
                                         
                                         <a href="{% url 'instagram:delete_comment' pk=to_comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
                                       </div>
-                                      <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">6hours</p>
+                                      <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">{{ to_comment.pk|comment_date }}</p>
                                     </div>
                                   </div>
 
@@ -95,7 +101,7 @@
                                           {% endif %}
                                           <a href="{% url 'instagram:delete_comment_to_comment' pk=comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
                                         </div>
-                                        <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">6hours</p>
+                                        <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">{{ comment.pk|comment_to_comment_date }}</p>
                                       </div>
                                     </div>
                                     {% endfor %}

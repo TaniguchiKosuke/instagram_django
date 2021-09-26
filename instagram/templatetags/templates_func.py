@@ -1,5 +1,8 @@
 from django import template
 import random
+import datetime
+from django.utils.timezone import localtime
+
 
 # from ..models import PostLikes
 register = template.Library()
@@ -135,3 +138,36 @@ def comment_to_comment_count(comment_pk):
     to_comment = CommentToPost.objects.get(pk=comment_pk)
     comment_count = CommentToComment.objects.filter(to_comment=to_comment).count()
     return comment_count
+
+
+@register.filter
+def comment_date(comment_pk):
+    from ..models import CommentToPost
+    now_datetime = datetime.datetime.now()
+    today = datetime.datetime.strftime(now_datetime, '%Y-%m-%d')
+    comment_created_at = CommentToPost.objects.get(pk=comment_pk).created_at
+    comment_created_at = localtime(comment_created_at)
+    comment_date = datetime.datetime.strftime(comment_created_at, '%Y-%m-%d')
+    if comment_date == today:
+        now_datetime = datetime.datetime.strftime(now_datetime, '%Y%m%d%H')
+        comment_created_at = datetime.datetime.strftime(comment_created_at, '%Y%m%d%H')
+        comment_date = str(int(now_datetime)-int(comment_created_at)) + 'hours ago'
+    return comment_date
+
+
+@register.filter
+def comment_to_comment_date(comment_pk):
+    from ..models import CommentToComment
+    now_datetime = datetime.datetime.now()
+    today = datetime.datetime.strftime(now_datetime, '%Y-%m-%d')
+    comment_created_at = CommentToComment.objects.get(pk=comment_pk).created_at
+    comment_created_at = localtime(comment_created_at)
+    print(comment_created_at)
+    comment_date = datetime.datetime.strftime(comment_created_at, '%Y-%m-%d')
+    if comment_date == today:
+        now_datetime = datetime.datetime.strftime(now_datetime, '%Y%m%d%H')
+        comment_created_at = datetime.datetime.strftime(comment_created_at, '%Y%m%d%H')
+        print(now_datetime)
+        print(comment_created_at)
+        comment_date = str(int(now_datetime)-int(comment_created_at)) + 'hours ago'
+    return comment_date
