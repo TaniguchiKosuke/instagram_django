@@ -38,5 +38,6 @@ urlpatterns = [
     path('comment_to_comment/<int:pk>/', views.comment_to_comment, name='comment_to_comment'),
     path('post_detail/<int:pk>/comment_detail/<int:comment_pk>/', views.CommentDetailView.as_view(), name='comment_detail'),
     path('comment_from_comment_detail/<int:pk>/', views.comment_from_comment_detail, name='comment_from_comment_detail'),
-    path('delete_comment_to_comment/<int:pk>/', views.DeleteCommentToCommentView.as_view(), name='delete_comment_to_comment')
+    path('delete_comment_to_comment/<int:pk>/', views.DeleteCommentToCommentView.as_view(), name='delete_comment_to_comment'),
+    path('like_post_from_post_detail/<int:pk>/', views.like_post_from_post_detail, name='like_post_from_post_detail'),
 ]

@@ -328,6 +328,36 @@ def like_post(request, *args, **kwargs):
     return redirect(reverse_lazy('instagram:home'))
 
 
+def like_post_func(request, *args, **kwargs):
+    """
+    いいね機能のための関数
+    ページに応じていいねのための関数があり、
+    それらの関数はこの関数を呼ぶ。
+    いるページによってredirect先を変えるためにこのような
+    機能にした
+    """
+    post = Posts.objects.get(pk=kwargs['pk'])
+    is_like = PostLikes.objects.filter(user=request.user).filter(post=post).count()
+    if is_like > 0:
+        like = PostLikes.objects.get(user=request.user, post__id=kwargs['pk'])
+        like.delete()
+        post.like_count -= 1
+        post.save()
+    else:
+        post.like_count += 1
+        post.save()
+        post_like = PostLikes()
+        post_like.user = request.user
+        post_like.post = post
+        post_like.save()
+
+
+@login_required
+def like_post_from_post_detail(request, *args, **kwargs):
+    like_post_func(request, *args, **kwargs)
+    return redirect('instagram:post_detail', pk=kwargs['pk'])
+
+
 @login_required
 def save_post(request, *args, **kwargs):
     """

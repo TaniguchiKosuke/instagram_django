@@ -11,9 +11,9 @@
         <img  src="{{ MEDIA_URL }}{{ post.image }}" class="bd-placeholder-img card-img-top">
         <div class="d-flex">
           {% if user|judge_likes:post %}
-            <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+            <a href="{% url 'instagram:like_post_from_post_detail' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
           {% else %}
-            <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+            <a href="{% url 'instagram:like_post_from_post_detail' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
           {% endif %}
           {% if post.like_count > 0 %}
           <p class="good-count" style="font-size: small;margin:0;">Liked by {{ post | liked_post_user }} and <a href="{% url 'instagram:liked_post_user' pk=post.pk %}" style="color: black;text-decoration:none;font-weight:bold;">others</a></p>
@@ -72,7 +72,7 @@
                                       <p style="margin: 0;">{{ comment.text | linebreaksbr }}</p>
                                       <a href="{% url 'instagram:like_post' pk=post.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;"><span class="comment-like-button">&hearts;</span></a>
                                       {% if request_user == comment.author %}
-                                        <a href="{% url 'instagram:delete_comment' pk=comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
+                                        <a href="{% url 'instagram:delete_comment' pk=comment.pk %}" style="position:absolute;right:0;top:20px;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
                                       {% endif %}
                                     </div>
                                     <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">{{ comment.pk|comment_date }}</p>

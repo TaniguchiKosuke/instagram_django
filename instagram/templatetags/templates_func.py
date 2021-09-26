@@ -77,7 +77,10 @@ def liked_post_user(post):
     users = []
     for post_like in post_likes:
         users.append(post_like.user)
-    user = random.choice(users)
+    if users:
+        user = random.choice(users)
+    else:
+        return False
     return user
 
 
