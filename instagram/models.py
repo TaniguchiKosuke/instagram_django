@@ -63,6 +63,14 @@ class CommentToPost(TimeStampedModel):
         return f'{self.author} {self.text}'
 
 
+class PostCommentLikes(TimeStampedModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post_comment = models.ForeignKey(CommentToPost, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user} likes {self.post_comment}'s comment"
+
+
 class CommentToComment(TimeStampedModel):
     text = models.CharField(max_length=300)
     author = models.ForeignKey(User, on_delete=models.CASCADE)

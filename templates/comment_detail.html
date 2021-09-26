@@ -45,7 +45,7 @@
 
     <div style="position: relative;height:460px;width:44%;">
       <a href="{% url 'instagram:post_detail' pk=post.pk %}" style="position: absolute;top:0;left:0;z-index:1;"><img src="{{ MEDIA_URL }}app_images/back_icon.png" alt=""></a>
-      <div class="container mb-5" style="position:relative;top:20px;overflow-y: scroll;height:88%;margin:0;padding:0;">
+      <div class="container mb-5" style="position:relative;top:32px;overflow-y: scroll;height:88%;margin:0;padding:0;">
         <div class="comment-card" style="padding: 0;">
           <div class="row" style="margin: 0;">
             <div class="col-md-12">
@@ -73,7 +73,9 @@
                                       <div class="d-flex">
                                         <p style="margin: 0;">{{ to_comment.text | linebreaksbr }}</p>
                                         
-                                        <a href="{% url 'instagram:delete_comment' pk=to_comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
+                                        {% if request_user == comment.author %}
+                                          <a href="{% url 'instagram:delete_comment' pk=to_comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
+                                        {% endif %}
                                       </div>
                                       <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">{{ to_comment.pk|comment_date }}</p>
                                     </div>
@@ -98,8 +100,8 @@
                                         <div class="d-flex">
                                           <p style="margin: 0;">{{ comment.text | linebreaksbr }}</p>
                                           {% if request_user == comment.author %}
+                                            <a href="{% url 'instagram:delete_comment_to_comment' pk=comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
                                           {% endif %}
-                                          <a href="{% url 'instagram:delete_comment_to_comment' pk=comment.pk %}" style="position:absolute;right:0;top:0;font-size: 12px;text-decoration:none;color:gray;line-height:20px;">削除</a>
                                         </div>
                                         <p style="position:absolute;right:0;bottom:4px;font-size: 12px;color:gray;">{{ comment.pk|comment_to_comment_date }}</p>
                                       </div>

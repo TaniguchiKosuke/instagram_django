@@ -258,6 +258,11 @@ text-decoration: underline;
   font-size: 28px;
 }
 
+.comment-like-button {
+  color: rgb(255, 0, 106);
+  font-size: 16px;
+}
+
 .good-count {
   font-size: 16px;
   line-height: 32px;

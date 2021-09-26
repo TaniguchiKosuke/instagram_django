@@ -459,6 +459,11 @@ def comment_from_post_list(request, pk):
 
 
 @login_required
+def like_comment(request):
+    pass
+
+
+@login_required
 @csrf_protect
 def comment_from_comment_detail(request, pk):
     """
