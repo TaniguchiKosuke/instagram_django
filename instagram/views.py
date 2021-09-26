@@ -461,6 +461,25 @@ class PostDetailView(LoginRequiredMixin, ListView):
         return context
 
 
+class CommentDetailView(LoginRequiredMixin, ListView):
+    template_name = 'comment_detail.html'
+    queryset = Posts
+
+    def get_queryset(self):
+        post_author = Posts.objects.get(pk=self.kwargs['pk']).author
+        queryset = Posts.objects.filter(author=post_author).order_by('-created_at')[:6]
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['post'] = Posts.objects.get(pk=self.kwargs['pk'])
+        user = self.request.user
+        context['request_user'] = user
+        context['comments'] = CommentToComment.objects.filter(to_comment=self.kwargs['comment_pk'])
+        context['comment_from_post_list_form'] = CommentFromPostListForm()
+        return context
+
+
 @login_required
 def follow_view(request, *args, **kwargs):
     """
