@@ -98,7 +98,6 @@ def judge_saved(user, post):
 def count_liked_user(post):
     from ..models import PostLikes
     post_likes = PostLikes.objects.filter(post=post).count()
-    print(post_likes)
     post_likes = post_likes -1
     return post_likes
 
@@ -166,12 +165,9 @@ def comment_to_comment_date(comment_pk):
     today = datetime.datetime.strftime(now_datetime, '%Y-%m-%d')
     comment_created_at = CommentToComment.objects.get(pk=comment_pk).created_at
     comment_created_at = localtime(comment_created_at)
-    print(comment_created_at)
     comment_date = datetime.datetime.strftime(comment_created_at, '%Y-%m-%d')
     if comment_date == today:
         now_datetime = datetime.datetime.strftime(now_datetime, '%Y%m%d%H')
         comment_created_at = datetime.datetime.strftime(comment_created_at, '%Y%m%d%H')
-        print(now_datetime)
-        print(comment_created_at)
         comment_date = str(int(now_datetime)-int(comment_created_at)) + 'hours ago'
     return comment_date
