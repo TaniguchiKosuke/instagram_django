@@ -40,4 +40,6 @@ urlpatterns = [
     path('comment_from_comment_detail/<int:pk>/', views.comment_from_comment_detail, name='comment_from_comment_detail'),
     path('delete_comment_to_comment/<int:pk>/', views.DeleteCommentToCommentView.as_view(), name='delete_comment_to_comment'),
     path('like_post_from_post_detail/<int:pk>/', views.like_post_from_post_detail, name='like_post_from_post_detail'),
+    path('like_post_from_comment_detail/<int:pk>/<int:comment_pk>/', views.like_post_from_comment_detail, name='like_post_from_comment_detail'),
+    path('like_post_from_user_profile/<int:pk>/<int:user_profile_pk>/', views.like_post_from_user_profile, name='like_post_from_user_profile'),
 ]

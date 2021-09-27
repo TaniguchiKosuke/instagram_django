@@ -1,5 +1,5 @@
 import math
-from os import name
+from os import name, path
 import random
 from django import contrib
 from django.core.checks import messages
@@ -356,6 +356,34 @@ def like_post_func(request, *args, **kwargs):
 def like_post_from_post_detail(request, *args, **kwargs):
     like_post_func(request, *args, **kwargs)
     return redirect('instagram:post_detail', pk=kwargs['pk'])
+
+
+@login_required
+# def like_post_from_comment_detail(request, *args, **kwargs):
+def like_post_from_comment_detail(request, pk, comment_pk):
+    '''
+    comment_detailから投稿にいいねを押した際にcomment_detailに
+    戻すための関数。現状では、post_detailに戻しているので改良の
+    余地あり
+    '''
+    args = ()
+    kwargs = {
+        'pk': pk,
+        'comment_pk': comment_pk,
+    }
+    like_post_func(request, *args, **kwargs)
+    return redirect('instagram:comment_detail', pk=kwargs['pk'], comment_pk=kwargs['comment_pk'])
+
+
+@login_required
+def like_post_from_user_profile(request, pk, user_profile_pk):
+    args = ()
+    kwargs = {
+        'pk': pk,
+        'user_profile_pk': user_profile_pk,
+    }
+    like_post_func(request, *args, **kwargs)
+    return redirect('instagram:user_profile', pk=kwargs['user_profile_pk'])
 
 
 @login_required

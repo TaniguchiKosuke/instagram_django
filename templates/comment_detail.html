@@ -11,12 +11,12 @@
         <img  src="{{ MEDIA_URL }}{{ post.image }}" class="bd-placeholder-img card-img-top">
         <div class="d-flex">
           {% if user|judge_likes:post %}
-            <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+            <a href="{% url 'instagram:like_post_from_comment_detail' pk=post.pk comment_pk=to_comment.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
           {% else %}
-            <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+            <a href="{% url 'instagram:like_post_from_comment_detail' pk=post.pk comment_pk=to_comment.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
           {% endif %}
           {% if post.like_count > 0 %}
-          <p class="good-count" style="font-size: small;margin:0;">Liked by {{ post | liked_post_user }} and <a href="{% url 'instagram:liked_post_user' pk=post.pk %}" style="color: black;text-decoration:none;font-weight:bold;">others</a></p>
+          <p class="good-count" style="font-size: small;margin:0;">Liked by {{ post | liked_post_user }} and <a href="{% url 'instagram:liked_post_user' pk=post.pk %}" style="color: black;text-decoration:none;font-weight:bold;">{{ post | count_liked_user }}others</a></p>
           {% endif %}
           {% if user|judge_saved:post %}
             <a href="{% url 'instagram:save_post' pk=post.pk %}"><img src="{{ MEDIA_URL }}app_images/saved_post.svg" alt="" style="margin-top:4px;width: 28px;position:absolute;right:4px;"></a>
