@@ -387,6 +387,23 @@ def like_post_from_user_profile(request, pk, user_profile_pk):
 
 
 @login_required
+def like_post_from_reccomended_posts(request, *args, **kwargs):
+    like_post_func(request, *args, **kwargs)
+    return redirect('instagram:reccomended_posts')
+
+
+@login_required
+def like_post_from_tag_post_list(request, pk, tag):
+    args = ()
+    kwargs = {
+        'pk': pk,
+        'tag': tag,
+    }
+    like_post_func(request, *args, **kwargs)
+    return redirect('instagram:tag_post_list', tag=kwargs['tag'])
+
+
+@login_required
 def save_post(request, *args, **kwargs):
     """
     save機能のための関数
