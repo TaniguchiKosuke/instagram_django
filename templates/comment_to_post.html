@@ -5,7 +5,7 @@
     <h2 class="page-header">コメント</h2>
       {% csrf_token %}
       {{ form.as_p }}
-      <button class="btn-sm btn-primary" type="submit">コメントする</button>
       <a href="{{request.META.HTTP_REFERER}}" class="see-more">戻る</a>
+      <button class="btn-sm btn-primary" type="submit">コメントする</button>
 </form>
 {% endblock content %}

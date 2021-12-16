@@ -1,8 +1,9 @@
 from os import name
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.db.models.base import ModelState
+from django.db.models.base import ModelState, ModelStateFieldsCacheDescriptor
 from django.db.models.deletion import CASCADE
+from django.db.models.expressions import F
 from django.db.models.fields import related
 from django.urls.base import translate_url
 from django.utils import timezone
@@ -18,7 +19,7 @@ class TimeStampedModel(models.Model):
 
 
 class Tag(TimeStampedModel):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
@@ -34,6 +35,9 @@ class Posts(TimeStampedModel):
 
     class Meta:
         verbose_name = 'Post'
+    
+    def __str__(self):
+        return f'posted by {self.author}'
 
 
 class PostTagRelation(TimeStampedModel):
@@ -53,9 +57,39 @@ class CommentToPost(TimeStampedModel):
     text = models.CharField(max_length=300)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    comment_count = models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.author} {self.text}'
+
+
+class PostCommentLikes(TimeStampedModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post_comment = models.ForeignKey(CommentToPost, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user} likes {self.post_comment}'s comment"
+
+
+class CommentToComment(TimeStampedModel):
+    text = models.CharField(max_length=300)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    to_comment = models.ForeignKey(CommentToPost, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.author} {self.text}'
+
+
+class PostCommentRelation(TimeStampedModel):
+    comment_to_comment = models.ForeignKey(CommentToComment, on_delete=models.CASCADE)
+    comment_to_post = models.ForeignKey(CommentToPost, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('comment_to_comment', 'comment_to_post')
+
+    def __str__(self):
+        return f'{self.comment_to_comment} and {self.comment_to_post}'
+
 
 
 class FriendShip(TimeStampedModel):
@@ -80,3 +114,19 @@ class Message(TimeStampedModel):
 
     def __str__(self):
         return f'Message from {self.from_user} to {self.to_user}'
+
+
+class PostSave(TimeStampedModel):
+    post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username} saved {self.post.author}'s post"
+
+
+class FollowTag(TimeStampedModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user} followed {self.tag}'

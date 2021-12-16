@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load templates_func %}
 
 {% block content %}
 <section class="jumbotron text-center" style="background-color: #f8f9fa; padding-bottom:0px; padding-top: 32px;">
@@ -20,38 +21,45 @@
       {% endif %}
   
       <p class="ff-layout">
-        <a href="{% url 'instagram:followee_list' pk=user_profile.pk %}" class="following">フォロー{{ followee }}人</a>
-        <a href="{% url 'instagram:follower_list' pk=user_profile.pk %}" class="following">フォロワー{{ follower }}人</a>
+        <a class="following" style="margin: 4px;">投稿{{ post_count }}</a>
+        <a href="{% url 'instagram:followee_list' pk=user_profile.pk %}" class="following" style="margin: 4px;">フォロー{{ followee }}人</a>
+        <a href="{% url 'instagram:follower_list' pk=user_profile.pk %}" class="following" style="margin: 4px;">フォロワー{{ follower }}人</a>
       </p>
   
-      {% if request_user != user_profile %}
-        {% if connected %}
-        <a href="{% url 'instagram:unfollow' pk=user_profile.pk %}" class="btn btn-dark">フォロー中</a>
-        {% else %}
-        <a href="{% url 'instagram:follow' pk=user_profile.pk %}" class="btn btn-outline-dark">フォロー</a>
-        {% endif %}
-      {% endif %}
+
   
       {% if request_user.pk == user_profile.pk %}
-      <p>
+      <p style="margin: 0;">
         <a href="{% url 'instagram:message_list' %}" class="btn btn-secondary my-2">メッセージ</a>
         <a href="{% url 'instagram:user_profile_update' pk=request_user.pk %}" class="btn btn-primary my-2">編集</a>
         <a href="{% url 'instagram:settings' %}"><img src="{{ MEDIA_URL }}app_images/settings_icon.svg" alt="" style="width: 24px;height:24px;"></a>
       </p>
       {% else %}
-      <p>
+      <p style="margin: 0;">
+        {% if request_user != user_profile %}
+          {% if connected %}
+            <a href="{% url 'instagram:unfollow' pk=user_profile.pk %}" class="btn btn-dark">フォロー中</a>
+          {% else %}
+            <a href="{% url 'instagram:follow' pk=user_profile.pk %}" class="btn btn-outline-dark">フォロー</a>
+          {% endif %}
+        {% endif %}
         <a href="{% url 'instagram:messages' pk=user_profile.pk %}" class="btn btn-secondary my-2">メッセージ</a>
       </p>
       {% endif %}
   
       {% if user_profile.text %}
-      <p>
+      <p style="margin: 0;">
         {{ user_profile.text }}
       </p>
       {% endif %}
-      <a href="" class="see-more">過去の投稿</a>
+      {% if request_user != user_profile %}
+        {% if user_profile|find_reccomended_user_follower:user %}
+          <p style="font-size: small;"><a href="{% url 'instagram:user_follower_friend_list' pk=user_profile.pk %}" style="text-decoration: none;color:black;">followed by {{ user_profile | find_reccomended_user_follower:user }} +{{ user_profile|count_reccomended_user_follower:user }}others</a></p>
+        {% endif %}
+      {% endif %}
+      <a href="{% url 'instagram:user_profile' pk=user_profile.pk %}" class="see-more" style="color: black;">posts</a>
       {% if request_user == user_profile %}
-      <a href="" class="see-more">いいねした投稿</a>
+      <a href="{% url 'instagram:saved_post_list' pk=user_profile.pk %}" class="see-more">saved</a>
       {% endif %}
     </div>
   </div>
@@ -66,7 +74,6 @@
         <div class="col-lg-4 col-md-12">
             <div class="card single_post">
                 <div class="body" style="padding: 0;">
-                  <h5><a href="{% url 'instagram:user_profile' pk=post.author.pk %}" class="post-username-a">{{ post.author }}</a></h5>
                 </div>
                 <div class="body" style="padding: 0; margin:0 auto;">
                     <div class="img-post m-b-15" style="margin: 0 auto;">
@@ -75,7 +82,9 @@
                         <p>{{ post.text }}</p>
                         {% endif %}
                         {% if post.tag%}
-                        <a href="" style="text-decoration: none; color: rgb(48, 96, 230);">{{ post.tag }}</a>
+                          {% for tag in post.tag|split_tags %}
+                            <a href="{% url 'instagram:tag_post_list' tag=tag %}" style="text-decoration: none; color: rgb(48, 96, 230);">{{ tag }}</a>
+                          {% endfor %}
                         {% endif %}
                     </div>
   
@@ -83,9 +92,11 @@
                       <p class="card-text"></p>
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
-                            <a href="" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
-                            <a href="" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
-                            <p class="good-count">{{ post.like_count }}件</p>
+                            {% if request_user|judge_likes:post %}
+                              <a href="{% url 'instagram:like_post_from_user_profile' pk=post.pk user_profile_pk=user_profile.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+                            {% else %}
+                              <a href="{% url 'instagram:like_post_from_user_profile' pk=post.pk user_profile_pk=user_profile.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+                            {% endif %}
                             <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメント
                             </a>
                             <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">more</a>

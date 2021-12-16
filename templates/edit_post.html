@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<form method='POST' enctype="multipart/form-data" class="form-signin">
+  <h1 class="jumbotron-heading">投稿の編集</h1>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="field d-flex">
+          <img src="{{ MEDIA_URL }}{{ image }}" style="width: 140px;height:140px;margin-right:12px;" alt="">
+          {{ form.image.label_tag }}
+          {{ form.image }}
+          {{ form.image.errors }}
+    </div>
+    <div class="field">
+        {{ form.text.label_tag }}
+        {{ form.text }}
+        <span class="helptext">{{ form.text.help_text }}</span>
+        {{ form.text.errors }}
+    </div>
+    <div class="field">
+        {{ form.tag.label_tag }}
+        {{ form.tag }}
+        <span class="helptext">{{ form.tag.help_text }}</span>
+        {{ form.tag.errors }}
+    </div>
+    <a href="{{request.META.HTTP_REFERER}}" class="see-more">編集をやめる</a>
+    <button class="btn-sm btn-primary" type="submit">編集を保存</button>
+</form>
+{% endblock content %}r

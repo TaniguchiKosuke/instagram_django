@@ -1,20 +1,32 @@
 {% extends 'base.html' %}
-
+{% load static %}
+{% load templates_func %}
 {% block content %}
 
 
 <section class="jumbotron text-center" style="background-color: #f8f9fa; margin-top:0;">
     <div class="container d-flex">
+      {% if first_post %}
+      <div>
+        <img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ first_post.image }}" alt="">
+      </div>
+      {% else %}
       <div>
         <img  class="top-image-of-user" src="{{ MEDIA_URL }}app_images/hashtag.jpeg" alt="">
       </div>
+      {% endif %}
   
       <div style="margin-left: 100px;">
-        <h1 class="jumbotron-heading">{{ tag }}</h1>
+        <h1 class="jumbotron-heading" style="margin: 0;">{{ tag.name }}</h1>
         <p>
-          <h5>{{ num_of_posts }}</h5>
-          <p>posts</p>
+          <h5 style="margin: 0;">{{ num_of_posts }}</h5>
+          <p style="margin: 0;">posts</p>
         </p>
+        {% if connected %}
+            <a href="{% url 'instagram:unfollow_tag' pk=tag.pk %}" class="btn btn-dark">フォロー中</a>
+          {% else %}
+            <a href="{% url 'instagram:follow_tag' pk=tag.pk %}" class="btn btn-outline-dark">フォロー</a>
+          {% endif %}
       </div>
     </div>
   </section>
@@ -39,8 +51,11 @@
                   <p class="card-text"></p>
                   <div class="d-flex justify-content-between align-items-center">
                     <div class="btn-group">
-                        <a href="" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
-                        <a href="" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+                        {% if request_user|judge_likes:post %}
+                          <a href="{% url 'instagram:like_post_from_tag_post_list' pk=post.pk tag=tag.name %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+                        {% else %}
+                          <a href="{% url 'instagram:like_post_from_tag_post_list' pk=post.pk tag=tag.name %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+                        {% endif %}
                         <p class="good-count">{{ post.like_count }}件</p>
                         <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメント
                         </a>

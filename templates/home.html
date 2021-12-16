@@ -1,17 +1,201 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load templates_func%}
 
 {% block content %}
+
+{% if tags %}
+<section class="jumbotron text-center home-profile">
+  <div class="container">
+
+    {% if user.user_image %}
+    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ user.user_image }}" alt=""></a>
+    {% else %}
+    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}images/default-user-image.png" alt=""></a>
+    {% endif %}
+
+    <h1 class="jumbotron-heading">{{ user.username }}</h1>
+    {% if user.name %}
+    <h4>{{ user.name }}</h4>
+    {% endif %}
+    <p class="ff-layout">
+      <a href="{% url 'instagram:followee_list' pk=user.pk %}" class="following">フォロー{{ followee }}人</a>
+      <a href="{% url 'instagram:follower_list' pk=user.pk %}" class="following">フォロワー{{ follower }}人</a>
+    </p>
+    <p>
+      <a href="{% url 'instagram:message_list' %}" class="btn btn-secondary my-2">メッセージ</a>
+      {% if user.is_authenticated %}
+      <a href="{% url 'instagram:user_profile' pk=user.pk %}" class="btn btn-secondary my-2">プロフィール</a>
+      <a href="{% url 'instagram:settings' %}"><img src="{{ MEDIA_URL }}app_images/settings_icon.svg" alt="" style="width: 24px;height:24px;"></a>
+      {% endif %}
+    </p>
+  </div>
+
+  <div>
+    <h4>通知一覧</h4>
+    {% if message_notice_today %}
+    <p>今日届いたメッセージがあります</p>
+    {% else %}
+    <p>今日のメッセージはありません</p>
+    {% endif %}
+  </div>
+
+  <div style="margin-top: 12px;">
+    <div class="d-flex" style="width: 44%;margin:0 auto;">
+      <h4>知り合いかも</h4>
+      <a href="{% url 'instagram:see_all_reccomended_users' %}" class="see-more" style="font-weight:bold;color:rgb(40, 112, 245);">see all</a>
+    </div>
+    {% if reccomended_users %}
+    <table class="table table-hover" style="width: 76%;">
+      <tbody>
+        {% for reccomended_user in reccomended_users%}
+        <tr>
+          {% if reccomended_user.user_image %}
+          <th scope="row"><img src="{{ MEDIA_URL }}{{ reccomended_user.user_image }}" alt="" style="width: 32px; height:32px; border-radius: 50%;padding:0;"></th>
+          {% else %}
+          <th scope="row"><img src="{{ MEDIA_URL }}images/default-user-image.png" alt="" style="width: 32px; height:32px; border-radius: 50%;padding:0;"></th>
+          {% endif %}
+          <td style="padding: 0;">
+            <a href="{% url 'instagram:user_profile' pk=reccomended_user.pk %}" class="see-more" style="color: black;line-height:0;margin:0;">{{ reccomended_user.username }}</a>
+            {% if reccomended_user|find_reccomended_user_follower:user %}
+            <p style="font-size: small;">followed by {{ reccomended_user | find_reccomended_user_follower:user }} and {{ reccomended_user|count_reccomended_user_follower:user }}others</p>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      
+    </table>
+    {% else %}
+    <p>知り合いのユーザーが見つかりません</p>
+    {% endif %}
+
+
+  </div>
+
+  </div>
+</section>
+
+  <div class="all-posts-area" style="width: 50%;">
+    <table class="table manage-candidates-top mb-0">
+      <div class="d-flex" style="width: 60%;margin:16px auto;">
+        <h5>"{{ query}}"</h5><p>の検索結果</p>
+      </div>
+      {% for tag in object_list %}
+        <tbody style="background-color: #fff;">
+          <tr class="candidates-list">
+            <td class="title">
+              <div class="thumb">
+                <a href="{% url 'instagram:home' %}"><img class="img-fluid" src="{{ MEDIA_URL }}/app_images/hashtag.jpeg" style="width: 40px; height: 40px;" alt=""></a>
+              </div>
+            </td>
+            <td>
+              <div class="candidate-list-details">
+                <div class="candidate-list-info">
+                  <div class="candidate-list-title">
+                    <p class="mb-0"><a href="{% url 'instagram:tag_post_list' tag=tag.name %}" style="text-decoration: none; color: black;">{{ tag.name }}</a></p>   
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td><p class="see-more" style="text-decoration: none;">{{ tag.name|count_tag }}posts</p></td>
+          </tr>
+        </tbody>
+        {% endfor %}
+      </table>
+      <div class="col-6 offset-3 justify-content-center">
+        {% if is_paginated %}
+            {% include 'pagination.html' %}
+        {% endif %}
+      </div>
+  </div>
+
+{% elif query_exist and is_not_tag %}
+
+  <section class="jumbotron text-center" style="background-color: #f8f9fa; margin-top:0;">
+    <div class="container d-flex">
+      {% if first_post %}
+      <div>
+        <img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ first_post.image }}" alt="">
+      </div>
+      {% else %}
+      <div>
+        <img  class="top-image-of-user" src="{{ MEDIA_URL }}app_images/search_icon.svg" alt="" style="width: 170px;height:124px;">
+      </div>
+      {% endif %}
+
+      <div style="margin-left: 100px;">
+        <h1 class="jumbotron-heading">"{{ query }}"</h1><p style="font-size:20px;">が含まれる投稿</p>
+        <p>
+          <h5>{{ object_list.count }}</h5>
+          <p>posts</p>
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <div class="container blog-page">
+    <div class="row clearfix">
+        
+        {% if object_list %}
+        {% for post in object_list %}
+        <div class="col-lg-4 col-md-12">
+          <div class="card single_post">
+            <div class="body" style="padding: 0;">
+              <h6><a href="{% url 'instagram:user_profile' pk=post.author.pk %}" class="see-more">{{ post.author }}</a></h6>
+            </div>
+            <div class="body" style="padding: 0; margin:0 auto;">
+                <div class="img-post m-b-15" style="margin: 0 auto;">
+                    <img src="{{ MEDIA_URL }}{{ post.image }}" alt="Awesome Image">
+                </div>
+
+                <div class="card-body">
+                  <p class="card-text"></p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        {% if request_user|judge_likes:post %}
+                          <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
+                        {% else %}
+                          <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+                        {% endif %}
+                        <p class="good-count">{{ post.like_count }}件</p>
+                        <a href="{% url 'instagram:comment_to_post' pk=post.pk %}" class="see-more">コメント
+                        </a>
+                        <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">more</a>
+                    </div>
+                    <small class="text-muted"></small>
+                  </div>
+                </div>
+
+            </div>
+        </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div>投稿がありません</div>
+        {% endif %}
+            
+        <div class="col-6 offset-3 justify-content-center">
+          {% if is_paginated %}
+              {% include 'pagination.html' %}
+          {% endif %}
+        </div>
+    </div>
+
+  </div>
+
+{% elif object_list %}
+
   <section class="jumbotron text-center home-profile">
     <div class="container">
-  
+
       {% if user.user_image %}
       <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ user.user_image }}" alt=""></a>
       {% else %}
       <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}images/default-user-image.png" alt=""></a>
       {% endif %}
-  
+
       <h1 class="jumbotron-heading">{{ user.username }}</h1>
       {% if user.name %}
       <h4>{{ user.name }}</h4>
@@ -31,27 +215,34 @@
 
     <div>
       <h4>通知一覧</h4>
-      {% if message_notice %}
-      <p>メッセージがきています</p>
+      {% if message_notice_today %}
+      <p>今日届いたメッセージがあります</p>
       {% else %}
-      <p>通知はありません</p>
+      <p>今日のメッセージはありません</p>
       {% endif %}
     </div>
 
     <div style="margin-top: 12px;">
-      <h4>知り合いかも</h4>
+      <div class="d-flex" style="width: 44%;margin:0 auto;">
+        <h4>知り合いかも</h4>
+        <a href="{% url 'instagram:see_all_reccomended_users' %}" class="see-more" style="font-weight:bold;color:rgb(40, 112, 245);">see all</a>
+      </div>
       {% if reccomended_users %}
       <table class="table table-hover" style="width: 76%;">
-
         <tbody>
-          {% for user in reccomended_users%}
+          {% for reccomended_user in reccomended_users%}
           <tr>
-            {% if user.user_image %}
-            <th scope="row"><img src="{{ MEDIA_URL }}{{ user.user_image }}" alt="" style="width: 32px; border-radius: 50%;"></th>
+            {% if reccomended_user.user_image %}
+            <th scope="row"><img src="{{ MEDIA_URL }}{{ reccomended_user.user_image }}" alt="" style="width: 32px; height:32px; border-radius: 50%;padding:0;"></th>
             {% else %}
-            <th scope="row"><img src="{{ MEDIA_URL }}images/default-user-image.png" alt="" style="width: 32px; border-radius: 50%;"></th>
+            <th scope="row"><img src="{{ MEDIA_URL }}images/default-user-image.png" alt="" style="width: 32px; height:32px; border-radius: 50%;padding:0;"></th>
             {% endif %}
-            <td><a href="{% url 'instagram:user_profile' pk=user.pk %}" class="see-more" style="color: black;">{{ user.username }}</a></td>
+            <td style="padding: 0;">
+              <a href="{% url 'instagram:user_profile' pk=reccomended_user.pk %}" class="see-more" style="color: black;line-height:0;margin:0;">{{ reccomended_user.username }}</a>
+              {% if reccomended_user|find_reccomended_user_follower:user %}
+              <p style="font-size: small;">followed by {{ reccomended_user | find_reccomended_user_follower:user }} and {{ reccomended_user|count_reccomended_user_follower:user }}others</p>
+              {% endif %}
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -65,88 +256,142 @@
     </div>
 
     </div>
-    </section>
+  </section>
 
-  
   <div class="all-posts-area">
-    {% if tags %}
-    <table class="table manage-candidates-top mb-0">
-      <thead>
-        <tr>
-          <th>Tags</th>
-        </tr>
-      </thead>
-      {% for tag in object_list %}
-        <tbody style="background-color: #fff;">
-          <tr class="candidates-list">
-            <td class="title">
-              <div class="thumb">
-                <a href="{% url 'instagram:home' %}"><img class="img-fluid" src="{{ MEDIA_URL }}/app_images/hashtag.jpeg" style="width: 40px; height: 40px;" alt=""></a>
-              </div>
-            </td>
-            <td>
-              <div class="candidate-list-details">
-                <div class="candidate-list-info">
-                  <div class="candidate-list-title">
-                    <p class="mb-0"><a href="{% url 'instagram:tag_post_list' tag=tag.name %}" style="text-decoration: none; color: black;">{{ tag.name }}</a></p>
-                  </div>
-                </div>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-    {% elif object_list %}
       {% for post in object_list %}
-      <div class="posts-area">
-        <div class="card post-card mb-4 shadow-sm">
-          <h5><a href="{% url 'instagram:user_profile' pk=post.author.pk %}" class="post-username-a">{{ post.author }}</a></h5>
-          <div>
-            <img  src="{{ MEDIA_URL }}{{ post.image }}" class="post-image bd-placeholder-img card-img-top" >
-            {% if post.text %}
-            <p>{{ post.text }}</p>
-            {% endif %}
-            {% if post.tag%}
-            <a href="{% url 'instagram:tag_post_list' tag=post.tag %}" style="text-decoration: none; color: rgb(48, 96, 230);">{{ post.tag }}</a>
-            {% endif %}
-          </div>
-          <div class="card-body">
-            <p class="card-text"></p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="btn-group">
-                  <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+        <div class="posts-area">
+          <div class="card post-card mb-4 shadow-sm">
+            <h5><a href="{% url 'instagram:user_profile' pk=post.author.pk %}" class="post-username-a">{{ post.author }}</a></h5>
+            <div>
+              <img  src="{{ MEDIA_URL }}{{ post.image }}" class="post-image bd-placeholder-img card-img-top" >
+              <div class="d-flex">
+                {% if user|judge_likes:post %}
                   <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&hearts;</span></a>
-                  <p class="good-count">{{ post.like_count }}件のいいね</p>
-                <p class="see-more" style="text-decoration: none;">コメント{{ post.comment_count }}件</p>
-                <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">more</a>
+                {% else %}
+                  <a href="{% url 'instagram:like_post' pk=post.pk %}" style="text-decoration: none;"><span class="like-button">&#9825;</span></a>
+                {% endif %}
+                {% if post.like_count > 0 %}
+                <p class="good-count" style="font-size: small;margin:0;">Liked by {{ post | liked_post_user }} and <a href="{% url 'instagram:liked_post_user' pk=post.pk %}" style="color: black;text-decoration:none;font-weight:bold;">{{ post | count_liked_user }}others</a></p>
+                {% endif %}
+                {% if user|judge_saved:post %}
+                  <a href="{% url 'instagram:save_post' pk=post.pk %}"><img src="{{ MEDIA_URL }}app_images/saved_post.svg" alt="" style="margin-top:4px;width: 28px;position:absolute;right:4px;"></a>
+                {% else %}
+                  <a href="{% url 'instagram:save_post' pk=post.pk %}"><img src="{{ MEDIA_URL }}app_images/save_post.svg" alt="" style="margin-top:4px;width: 28px;position:absolute;right:4px;"></a>
+                {% endif %}
               </div>
-              <small class="text-muted"></small>
-
+              {% if post.text %}
+              <p style="margin: 0;">{{ post.text | linebreaksbr |urlize }}</p>
+              {% endif %}
+              {% if post.tag%}
+    
+              {% for tag in post.tag|split_tags %}
+                <a href="{% url 'instagram:tag_post_list' tag=tag %}" style="text-decoration: none; color: rgb(48, 96, 230);">{{ tag }}</a>
+              {% endfor %}
+              {% endif %}
             </div>
-            <form method="POST" class="form-inline" action="{% url 'instagram:comment_from_post_list' pk=post.pk %}">
-                {% csrf_token %}
-                <div class="mb-3">
-                  {{ comment_from_post_list_form }}
-                  <button type="submit" class="btn btn-outline-primary">Post</button>
+            <div class="card-body" style="padding: 0 8px;">
+              <p class="card-text"></p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <p class="see-more" style="text-decoration: none;">コメント{{ post | count_comment }}件</p>
+                  <a href="{% url 'instagram:post_detail' pk=post.pk %}" class="see-more">more</a>
                 </div>
-            </form>
+                <small class="text-muted"></small>
+
+              </div>
+              <p class="see-more" style="text-decoration: none;margin:0;">{{ post.created_at }}</p>
+              <form method="POST" class="form-inline" action="{% url 'instagram:comment_from_post_list' pk=post.pk %}">
+                  {% csrf_token %}
+                  <div class="mb-3">
+                    {{ comment_from_post_list_form }}
+                    <button type="submit" class="btn btn-primary">Post</button>
+                  </div>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-      {% endfor %}
+        {% endfor %}
+        <div class="col-6 offset-3 justify-content-center">
+          {% if is_paginated %}
+              {% include 'pagination.html' %}
+          {% endif %}
+        </div>
+  </div>
+{% else %}
+<section class="jumbotron text-center home-profile">
+  <div class="container">
+
+    {% if user.user_image %}
+    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ user.user_image }}" alt=""></a>
     {% else %}
-    <p>投稿はありません</p>
+    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}images/default-user-image.png" alt=""></a>
     {% endif %}
 
-    <div class="col-6 offset-3 justify-content-center">
-      {% if is_paginated %}
-          {% include 'pagination.html' %}
+    <h1 class="jumbotron-heading">{{ user.username }}</h1>
+    {% if user.name %}
+    <h4>{{ user.name }}</h4>
+    {% endif %}
+    <p class="ff-layout">
+      <a href="{% url 'instagram:followee_list' pk=user.pk %}" class="following">フォロー{{ followee }}人</a>
+      <a href="{% url 'instagram:follower_list' pk=user.pk %}" class="following">フォロワー{{ follower }}人</a>
+    </p>
+    <p>
+      <a href="{% url 'instagram:message_list' %}" class="btn btn-secondary my-2">メッセージ</a>
+      {% if user.is_authenticated %}
+      <a href="{% url 'instagram:user_profile' pk=user.pk %}" class="btn btn-secondary my-2">プロフィール</a>
+      <a href="{% url 'instagram:settings' %}"><img src="{{ MEDIA_URL }}app_images/settings_icon.svg" alt="" style="width: 24px;height:24px;"></a>
       {% endif %}
+    </p>
+  </div>
+
+  <div>
+    <h4>通知一覧</h4>
+    {% if message_notice_today %}
+    <p>今日届いたメッセージがあります</p>
+    {% else %}
+    <p>今日のメッセージはありません</p>
+    {% endif %}
+  </div>
+
+  <div style="margin-top: 12px;">
+    <div class="d-flex" style="width: 44%;margin:0 auto;">
+      <h4>知り合いかも</h4>
+      <a href="{% url 'instagram:see_all_reccomended_users' %}" class="see-more" style="font-weight:bold;color:rgb(40, 112, 245);">see all</a>
     </div>
+    {% if reccomended_users %}
+    <table class="table table-hover" style="width: 76%;">
+      <tbody>
+        {% for reccomended_user in reccomended_users%}
+        <tr>
+          {% if reccomended_user.user_image %}
+          <th scope="row"><img src="{{ MEDIA_URL }}{{ reccomended_user.user_image }}" alt="" style="width: 32px; height:32px; border-radius: 50%;padding:0;"></th>
+          {% else %}
+          <th scope="row"><img src="{{ MEDIA_URL }}images/default-user-image.png" alt="" style="width: 32px; height:32px; border-radius: 50%;padding:0;"></th>
+          {% endif %}
+          <td style="padding: 0;">
+            <a href="{% url 'instagram:user_profile' pk=reccomended_user.pk %}" class="see-more" style="color: black;line-height:0;margin:0;">{{ reccomended_user.username }}</a>
+            {% if reccomended_user|find_reccomended_user_follower:user %}
+            <p style="font-size: small;">followed by {{ reccomended_user | find_reccomended_user_follower:user }} and {{ reccomended_user|count_reccomended_user_follower:user }}others</p>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      
+    </table>
+    {% else %}
+    <p>知り合いのユーザーが見つかりません</p>
+    {% endif %}
+
 
   </div>
 
+  </div>
+</section>
+<div class="all-posts-area">
+  <p>投稿はありません</p>
+</div>
+{% endif %}
   
-  {% endblock content %}
+{% endblock content %}

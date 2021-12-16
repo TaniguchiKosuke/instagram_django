@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load templates_func%}
+{% block content %}
+<section class="jumbotron text-center home-profile">
+  <div class="container">
+
+    {% if user_profile.user_image %}
+    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}{{ user_profile.user_image }}" alt=""></a>
+    {% else %}
+    <a href=""><img  class="top-image-of-user" src="{{ MEDIA_URL }}images/default-user-image.png" alt=""></a>
+    {% endif %}
+    
+    <h1 class="jumbotron-heading">{{ user_profile.username }}</h1>
+    {% if user_profile.name %}
+    <h4>{{ user_profile.name }}</h4>
+    {% endif %}
+    <p class="ff-layout">
+      <a href="{% url 'instagram:followee_list' pk=user_profile.pk %}" class="following">フォロー{{ followee }}人</a>
+      <a href="{% url 'instagram:follower_list' pk=user_profile.pk %}" class="following">フォロワー{{ follower }}人</a>
+    </p>
+    
+    {% if request_user != user_profile %}
+      {% if connected %}
+      <a href="{% url 'instagram:unfollow' pk=user_profile.pk %}" class="btn btn-dark">フォロー解除</a>
+      {% else %}
+      <a href="{% url 'instagram:follow' pk=user_profile.pk %}" class="btn btn-outline-dark">フォロー</a>
+      {% endif %}
+      {% endif %}
+
+    {% if request_user.pk == user_profile.pk %}
+    <p>
+      <a href="{% url 'instagram:message_list' %}" class="btn btn-secondary my-2">メッセージ</a>
+      <a href="{% url 'instagram:user_profile_update' pk=request_user.pk %}" class="btn btn-primary my-2">編集</a>
+    </p>
+    {% else %}
+    <p>
+      <a href="{% url 'instagram:messages' pk=user_profile.pk %}" class="btn btn-secondary my-2">メッセージ</a>
+    </p>
+    {% endif %}
+    {% if user_profile.text %}
+    <p>
+      {{ user_profile.text | linebreaksbr |urlize }}
+    </p>
+    {% else %}
+    {% endif %}
+    <p>
+      <a href="" class="see-more">過去の投稿</a>
+      {% if request_user == user_profile %}
+      <a href="" class="see-more">いいねした投稿</a>
+      {% endif %}
+    </p>
+  </div>
+</section>
+
+<div style="width: 76%;">
+  <h3 style="margin: 32px auto 32px; width:80%;">ハッシュタグ</h3>
+  {% if object_list %}
+    <table class="table table-hover" style="width: 76%;">
+      <tbody>
+
+        {% for tag in object_list%}
+        <tr>
+          <th scope="row"><img src="{{ MEDIA_URL }}images/default-user-image.png" alt="" style="width: 32px; height:32px; border-radius: 50%;"></th>
+          <td><a href="{% url 'instagram:tag_post_list' tag=tag.name %}" class="see-more" style="color: black;">{{ tag.name }}</a></td>
+          <td class="candidate-list-favourite-time text-center">
+            {% if request_user|judge_following_hashtag:tag.name %}
+            <a href="{% url 'instagram:unfollow_tag' pk=tag.pk %}" class="btn btn-dark">フォロー中</a>
+            {% elif not request_user|judge_following_hashtag:tag.name %}
+            <a href="{% url 'instagram:follow_tag' pk=tag.pk %}" class="btn btn-outline-dark">フォロー</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>ユーザーが見つかりません</p>
+  {% endif %}
+</div>
+{% endblock content %}
